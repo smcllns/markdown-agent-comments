@@ -11,7 +11,19 @@ Goal: restart Markdown Agent Comments in the fresh `smcllns/markdown-agent-comme
 - [x] Run parallel research on source inventory, CLI/spec, roadmap/docs, and naming/web.
 - [x] Synthesize research into a concise PRD with embedded roadmap.
 - [x] Archive best historic work without making it the forward source of truth.
-- [ ] Review PRD shape with Sam before implementation.
+- [ ] Finish Sam PRD review before implementation.
+
+## Implementation Notes
+
+Move tactical implementation detail here instead of bloating `docs/PRD.md`.
+
+Initial fixture/test porting candidates:
+
+- archived scanner fixture catalog from prior `atag` work
+- poller behavior tests for quiet no-op, debug output, custom triggers, parked threads, human-label collision handling, timeouts, and agent failure propagation
+- selected Obsidian benchmark cases that prove callout containment and `[!DONE]-` closure
+
+Current implementation recommendation: write portable TypeScript/JavaScript for the CLI, use Bun for local dev/test/package scripts, and avoid Bun-only runtime APIs. The source can be the same either way; the distinction is whether the published CLI requires users to have Bun installed or runs under standard Node after install.
 
 ## Scope
 
@@ -22,7 +34,5 @@ Goal: restart Markdown Agent Comments in the fresh `smcllns/markdown-agent-comme
 
 ## Unresolved Questions
 
-- Should V1 include a read-only `--legacy-hash` inventory mode for old `#agent` directives?
-- Should we publish unscoped `markdown-agent-comments`, scoped `@smcllns/mdac`, or reserve both and publish one?
-- Is `<!--mdac:eot-->` the final seal, or should it be longer?
-- Which runtime should the CLI use for V1?
+- No PRD/product questions remain from the 2026-06-01 review.
+- Implementation confirmation: public CLI should probably be Node-compatible at runtime while using Bun for local dev/tests.

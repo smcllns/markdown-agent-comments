@@ -23,8 +23,11 @@ The important product constraint is that forward-looking docs should be concise,
 
 - V1 focuses on `@agent` comments only.
 - Legacy `#agent` directives are archived, not part of the default V1 scanner/resolver.
-- Package should be long and binary short: package `markdown-agent-comments`, CLI `mdac`.
-- Use `<!--mdac:eot-->` as the new protocol seal unless Sam chooses a longer seal.
+- Package should be long and binary short: publish package `markdown-agent-comments`, CLI `mdac`.
+- Reserve scoped package names if convenient during publish.
+- Use `<!--mdac:eot-->` as the protocol seal.
+- Active threads use `[!NOTE]`, not `[!NOTE]+`, so they render as callouts in GitHub.
+- `[!DONE]-` resolved threads intentionally do not render as GitHub callouts; manual cleanup or future sweep moves them out of the reading flow.
 - Start with a cheap read-only `mdac scan` before any agent invocation.
 
 ## Known prior-art locations
@@ -41,7 +44,5 @@ The important product constraint is that forward-looking docs should be concise,
 
 ## Open decisions
 
-- Add a read-only `--legacy-hash` inventory mode for old `#agent` directives, or ignore them entirely until migration work.
-- Pick the initial CLI runtime and packaging path.
-- Publish unscoped `markdown-agent-comments`, scoped `@smcllns/mdac`, or reserve both and publish one.
-- Confirm `<!--mdac:eot-->` vs longer `<!--markdown-agent-comments:eot-->`.
+- No PRD/product decisions remain from the 2026-06-01 review.
+- Implementation confirmation: public CLI should probably be Node-compatible at runtime while using Bun for local dev/tests.
