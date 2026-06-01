@@ -11,6 +11,22 @@ Sam is restarting the project in this fresh repo. Current naming preference:
 
 The important product constraint is that forward-looking docs should be concise, curated, and something Sam feels ownership of. Historic work can be archived broadly, but it should not become the source of truth by accident.
 
+## Current artifacts
+
+- Forward source of truth: `docs/PRD.md`
+- Archive index: `docs/archive/README.md`
+- Copied prior art: `docs/archive/prior-art/`
+- Research notes: `research/2026-06-01-mdac-v1/`
+- Plan: `.agents/plans/2026-06-01-mdac-v1-restart.md`
+
+## Decisions encoded in the draft PRD
+
+- V1 focuses on `@agent` comments only.
+- Legacy `#agent` directives are archived, not part of the default V1 scanner/resolver.
+- Package should be long and binary short: package `markdown-agent-comments`, CLI `mdac`.
+- Use `<!--mdac:eot-->` as the new protocol seal unless Sam chooses a longer seal.
+- Start with a cheap read-only `mdac scan` before any agent invocation.
+
 ## Known prior-art locations
 
 - `/Users/smcllns/Projects/skills/skills/atag`
@@ -25,7 +41,7 @@ The important product constraint is that forward-looking docs should be concise,
 
 ## Open decisions
 
-- Keep or drop old `#agent` directive syntax in V1.
+- Add a read-only `--legacy-hash` inventory mode for old `#agent` directives, or ignore them entirely until migration work.
 - Pick the initial CLI runtime and packaging path.
-- Decide how much of the old skill/plugin material to copy into `docs/archive`.
-- Decide whether the PRD should name the formal spec `Markdown Agent Comments` or treat the formal spec as the lower-case package name plus the plain-language phrase.
+- Publish unscoped `markdown-agent-comments`, scoped `@smcllns/mdac`, or reserve both and publish one.
+- Confirm `<!--mdac:eot-->` vs longer `<!--markdown-agent-comments:eot-->`.
