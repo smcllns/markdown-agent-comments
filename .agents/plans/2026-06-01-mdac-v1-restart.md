@@ -32,7 +32,7 @@ Current implementation recommendation: write portable TypeScript/JavaScript for 
 - Do not start CLI implementation until the PRD/roadmap is reviewed.
 - Keep forward docs curated and human-owned; historic docs can be broad but clearly separated.
 
-## Unresolved Questions
+## Review Decisions
 
 - No PRD/product questions remain from the 2026-06-01 review.
 - Implementation confirmation: public CLI should probably be Node-compatible at runtime while using Bun for local dev/tests.

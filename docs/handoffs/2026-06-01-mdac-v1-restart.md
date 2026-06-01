@@ -42,7 +42,7 @@ The important product constraint is that forward-looking docs should be concise,
 - `/Users/smcllns/Projects/atag-hero-options`
 - `/Users/smcllns/Projects/memos/md-asks/md-asks.memo.md`
 
-## Open decisions
+## Review Decisions
 
 - No PRD/product decisions remain from the 2026-06-01 review.
 - Implementation confirmation: public CLI should probably be Node-compatible at runtime while using Bun for local dev/tests.
