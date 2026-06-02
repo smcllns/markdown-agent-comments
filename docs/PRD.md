@@ -76,20 +76,16 @@ Prior names from historic work are retired: `atag`, `Markdown Agent Tags`, `@age
 4. The agent reads surrounding context, edits the document body if the ask is concrete, and records a short reply in the callout.
 5. If the ask is ambiguous, or it is appropriate to ask for further user input before concluding, the agent leaves an open `[!NOTE]` thread and pre-fills the human reply label.
 
-## Protocol Contract
+## Protocol Principles
 
-V1 recognizes `@agent`, `@claude`, `@codex`, and explicitly provided `@<custom-trigger>`.
+Markdown Agent Comments should feel like lightweight threaded comments that live inside the markdown file:
 
-Thread states:
-
-- `[!NOTE]` means active and visually open
-- `[!DONE]-` means resolved and visually collapsed.
-
-Agent replies end with `<!--mdac:eot-->`. This means humans can add follow-up questions or comments to active or closed threads and it can be easily detected for agents to process.
-
-The original request must be preserved verbatim as the first body line inside the callout. The actual work belongs in the document body, not pasted into the discussion thread.
-
-If the agent asks the human a question, the thread is parked awaiting human response and the agent will not self-reply on subsequent runs.
+- Humans ask for work with `@agent`, `@claude`, `@codex`, or an explicitly configured custom trigger.
+- Concrete asks should change the document body; the callout is the record of the request and agent response.
+- The original request should be preserved so the markdown file keeps the conversation context.
+- `[!NOTE]` threads are open; `[!DONE]-` threads are resolved.
+- Agent replies end with `<!--mdac:eot-->` so later human follow-ups can be detected.
+- If the agent needs human input, it should leave the thread open and parked rather than guessing or self-replying.
 
 ## V1 CLI Scope
 
@@ -109,28 +105,16 @@ Outside V1:
 - Cowork, Codex, OpenClaw (etc) plugins and extensions
 - Cleanup feature to move resolved comments to footnotes
 
-## Scanner Rules
+## Executable Spec
 
-Use a cheap two-pass scan before invoking an agent:
+The PRD describes product intent. Detailed scanner, prompt, and fixture behavior belongs in tests so code changes cannot silently drift from the spec:
 
-1. Single-line scan for unwrapped `@agent` comments.
-2. Multiline scan for actionable `[!NOTE]` and unsealed `[!DONE]-` threads.
+- Scanner rules: [`test/scanner.test.js`](../test/scanner.test.js)
+- CLI behavior: [`test/cli-scan.test.js`](../test/cli-scan.test.js), [`test/cli-run.test.js`](../test/cli-run.test.js), [`test/cli-watch.test.js`](../test/cli-watch.test.js)
+- Agent prompt contract: [`test/agent-prompt.test.js`](../test/agent-prompt.test.js)
+- Human-readable review fixture: [`test/human-review/README.md`](../test/human-review/README.md)
 
-Important rules:
-
-- Default triggers are `agent`, `claude`, and `codex`.
-- Custom triggers replace defaults.
-- Inline code is the escape hatch: `` `@claude` `` should not match.
-- Wrapped blockquote lines should not retrigger as fresh inline comments.
-- Sort matched files by mtime before capping output.
-
-## Quality Bar
-
-The spec doubles as the test fixture catalog.
-
-The product should be tested against real markdown shapes from the archive, especially scanner edge cases, parked threads, callout containment, and resolved-thread follow-ups.
-
-Do not treat model-quality failures as CLI failures until the scan/protocol fixture suite is stable. Detailed fixture-porting work belongs in the implementation plan, not this PRD.
+When protocol behavior changes, update the relevant test or fixture in the same change as the implementation. Do not duplicate detailed scanner branches here.
 
 ## Roadmap
 
