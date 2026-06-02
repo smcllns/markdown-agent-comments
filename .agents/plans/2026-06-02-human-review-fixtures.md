@@ -21,6 +21,7 @@ Goal: add markdown fixtures Sam can read before publish to align on detection an
 - [x] Commit changes.
 - [x] Rename review files around human-readable purpose.
 - [x] Keep generated review output ignored.
+- [x] Move naming-register guidance into the PRD.
 
 ## Notes
 

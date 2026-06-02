@@ -66,6 +66,14 @@ These are the recurring shapes that make `mdac` useful:
 | Env vars | `MDAC_*` |
 | Protocol seal | `<!--mdac:eot-->` |
 
+Use one name register per context:
+
+- Use **Markdown Agent Comments** for human-facing titles, first mentions, product prose, and the formal spec.
+- Use `mdac` for the CLI binary, shell commands, package-facing examples, config keys, CSS prefixes, and protocol tokens.
+- Use `MDAC_*` only for environment variables.
+- Use `@agent comment`, `@claude comment`, `@codex comment`, or simply "comment" for the user-facing construct.
+- Avoid prose titles like "`mdac` V1 Human Review"; prefer "Markdown Agent Comments V1 Human Review".
+
 Avoid forward-looking use of `atag`, `Markdown Agent Tags`, `@agent tags`, `md-asks`, and `markdown-agent-directives` except inside archived history.
 
 Registry note, checked 2026-06-01: npm package names [`mdac`](https://registry.npmjs.org/mdac) and [`atag`](https://registry.npmjs.org/atag) are taken. [`markdown-agent-comments`](https://registry.npmjs.org/markdown-agent-comments), [`@smcllns/mdac`](https://registry.npmjs.org/@smcllns%2fmdac), and [`@smcllns/markdown-agent-comments`](https://registry.npmjs.org/@smcllns%2fmarkdown-agent-comments) were available at check time.
