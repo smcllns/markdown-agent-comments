@@ -137,6 +137,6 @@ For human review before publishing:
 bun run test:review
 ```
 
-This runs the test suite and regenerates `test/.generated/review-cases.processed.md` from `test/review-cases.md` so scanner coverage and expected processed shapes can be reviewed together.
+This runs the test suite and regenerates `test/human-review/.generated/processed-output.md` from `test/human-review/agent-input.md` so scanner coverage and expected processed shapes can be reviewed together.
 
 Forward-looking product decisions live in [docs/PRD.md](docs/PRD.md). Historic explorations live under [docs/archive](docs/archive).

@@ -5,15 +5,16 @@ import { fileURLToPath } from "node:url";
 import { scanPath } from "../src/scanner.js";
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
-const FIXTURE_PATH = `${TEST_DIR}/review-cases.md`;
+const REVIEW_DIR = join(TEST_DIR, "human-review");
+const INPUT_PATH = join(REVIEW_DIR, "agent-input.md");
 
 describe("human review markdown fixture", () => {
   it("detects only the intended PROCESS cases", async () => {
-    const contents = await readFile(FIXTURE_PATH, "utf8");
-    const matches = await scanPath(FIXTURE_PATH);
+    const contents = await readFile(INPUT_PATH, "utf8");
+    const matches = await scanPath(INPUT_PATH);
 
     expect(matches).toHaveLength(1);
-    expect(matches[0].relativePath).toBe("review-cases.md");
+    expect(matches[0].relativePath).toBe("agent-input.md");
     expect(matches[0].reasons).toEqual([
       { kind: "inline", line: lineOf(contents, "The opening sentence is a little bloated."), trigger: "claude" },
       { kind: "inline", line: lineOf(contents, "- [ ] @agent turn this rough task"), trigger: "agent" },
@@ -25,21 +26,22 @@ describe("human review markdown fixture", () => {
     ]);
   });
 
-  it("can be scanned from the test directory without matching generated output", async () => {
-    await mkdir(join(TEST_DIR, ".generated"), { recursive: true });
-    await writeFile(join(TEST_DIR, ".generated", "review-cases.processed.md"), [
+  it("can be scanned from the review directory without matching guide or generated output", async () => {
+    await mkdir(join(REVIEW_DIR, ".generated"), { recursive: true });
+    await writeFile(join(REVIEW_DIR, ".generated", "processed-output.md"), [
       "> [!NOTE] generated output should not be scanned",
       ">",
       "> [@sam] @agent ignore generated files",
       "",
     ].join("\n"));
 
-    const matches = await scanPath(TEST_DIR);
-    expect(matches.map((match) => relative(TEST_DIR, match.file))).not.toContain(".generated/review-cases.processed.md");
+    const matches = await scanPath(REVIEW_DIR);
+    expect(matches.map((match) => relative(REVIEW_DIR, match.file))).not.toContain(".generated/processed-output.md");
+    expect(matches.map((match) => relative(REVIEW_DIR, match.file))).not.toContain("README.md");
 
-    const reviewMatches = matches.filter((match) => relative(TEST_DIR, match.file).startsWith("review-cases"));
+    const reviewMatches = matches.filter((match) => relative(REVIEW_DIR, match.file) === "agent-input.md");
 
-    expect(reviewMatches.map((match) => match.relativePath)).toEqual(["review-cases.md"]);
+    expect(reviewMatches.map((match) => match.relativePath)).toEqual(["agent-input.md"]);
   });
 });
 
