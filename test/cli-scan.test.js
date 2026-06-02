@@ -54,6 +54,18 @@ describe("mdac scan", () => {
     expect(result.stdout).toContain("inline line 2 @pi");
     expect(result.stdout).not.toContain("@codex");
   });
+
+  it("prints debug diagnostics to stderr", async () => {
+    await write("note.md", "@agent fix this\n");
+
+    const result = runCli(["scan", tempDir, "--debug"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Found 1 actionable file:");
+    expect(result.stderr).toContain(`Scanning ${tempDir}`);
+    expect(result.stderr).toContain("Triggers: @agent, @claude, @codex");
+    expect(result.stderr).toContain("Matched 1 actionable file.");
+  });
 });
 
 function runCli(args) {

@@ -99,7 +99,7 @@ async function scanCommand(options, io) {
   if (!options.targetPath) throw new UsageError("scan requires a path");
   await access(options.targetPath, constants.R_OK);
 
-  const matches = await scanForOptions(options);
+  const matches = await scanForOptions(options, io);
   io.stdout.write(formatScan(matches));
   return 0;
 }
@@ -129,7 +129,7 @@ async function watchCommand(options, io) {
 }
 
 async function runAgentCycle(options, io) {
-  const matches = await scanForOptions(options);
+  const matches = await scanForOptions(options, io);
   io.stdout.write(formatScan(matches));
   if (matches.length === 0) return 0;
 
@@ -138,11 +138,22 @@ async function runAgentCycle(options, io) {
   return await invokeAgent(options.agentCommand, prompt, options.targetPath, io);
 }
 
-async function scanForOptions(options) {
+async function scanForOptions(options, io) {
+  if (options.debug) {
+    io.stderr.write(`Scanning ${options.targetPath}\n`);
+    io.stderr.write(`Triggers: ${formatTriggerSet(options)}\n`);
+  }
+
   const matches = await scanPath(options.targetPath, {
     triggers: options.triggers ?? undefined,
     humanLabel: options.humanLabel,
   });
+
+  if (options.debug) {
+    const noun = matches.length === 1 ? "file" : "files";
+    io.stderr.write(`Matched ${matches.length} actionable ${noun}.\n`);
+  }
+
   return matches;
 }
 
@@ -190,6 +201,12 @@ export function formatScan(matches) {
 
 function parseTriggerList(value) {
   return value.split(",").map((trigger) => trigger.trim()).filter(Boolean);
+}
+
+function formatTriggerSet(options) {
+  return normalizeTriggers(options.triggers ?? ["agent", "claude", "codex"])
+    .map((trigger) => `@${trigger}`)
+    .join(", ");
 }
 
 function parsePositiveInteger(value, optionName) {
