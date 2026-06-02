@@ -1,7 +1,7 @@
 # PRD: markdown-agent-comments / mdac
 
 Status: approved for V1 implementation
-Last updated: 2026-06-01
+Last updated: 2026-06-02
 Owner: Sam
 
 ## Product Thesis
@@ -18,7 +18,7 @@ When you're writing a markdown doc, prompting an agent is a disruptive workflow:
 - you have to re-explain which file and passage need work
 - that discussion ends up outside the markdown file and is often hard to find later
 
-`mdac` solves this problem by enabling agent-addressable markdown comments:
+Markdown Agent Comments solves this problem by enabling agent-addressable markdown comments:
 
 ```markdown
 @claude can you update that paragraph to numbered list pls
@@ -34,7 +34,7 @@ The agent edits the document as requested, then wraps the original request and t
 
 ## Common Uses
 
-These are the recurring shapes that make `mdac` useful:
+These are the recurring shapes that make Markdown Agent Comments useful:
 
 ```markdown
 @codex can you make a photorealistic image of a pelican riding a bike and add it here
