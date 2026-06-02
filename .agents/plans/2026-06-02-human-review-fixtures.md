@@ -29,3 +29,4 @@ Goal: add markdown fixtures Sam can read before publish to align on detection an
 - `test/human-review/README.md` is the human guide.
 - `test/human-review/agent-input.md` is the clean markdown an agent may read.
 - `test/human-review/.generated/processed-output.md` is generated and ignored.
+- Use `Markdown Agent Comments` in human-facing titles; reserve `mdac` for CLI commands, package/binary references, protocol tokens, and URLs.
