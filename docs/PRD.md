@@ -1,29 +1,56 @@
 # PRD: markdown-agent-comments / mdac
 
-Status: draft source of truth  
-Last updated: 2026-06-01  
+Status: approved for V1 implementation
+Last updated: 2026-06-01
 Owner: Sam
 
 ## Product Thesis
 
-`mdac` lets you leave `@agent` comments in markdown and have agents resolve them in place.
+Markdown Agent Comments (`mdac`) lets you ask async agents for help directly inside markdown.
 
-The point is not a new chat app. The point is to keep the ask, the work, and the record together in the markdown file where the context already lives.
+Write an `@agent` comment inline in a markdown file. An async agent picks it up and handles the ask and saves your request and their response in a comment thread in the markdown file.
 
 ## User Problem
 
-Sam does a lot of thinking in markdown. When a note needs agent help, switching to a separate chat creates two problems:
+When you're writing a markdown doc, prompting an agent is a disruptive workflow:
 
-- the request loses local document context
-- the answer disappears into an agent session instead of staying near the text it changed
+- you leave the document and switch to an agent chat and lose focus
+- you have to re-explain which file and passage need work
+- that discussion ends up outside the markdown file and is often hard to find later
 
-`mdac` solves that by making markdown comments agent-addressable:
+`mdac` solves this problem by enabling agent-addressable markdown comments:
 
 ```markdown
-@codex tighten this paragraph
+@claude can you update that paragraph to numbered list pls
 ```
 
-The agent edits the document body, then wraps the original request and reply in a resolved callout.
+The agent edits the document as requested, then wraps the original request and their reply in a markdown callout which works like threaded comments.
+
+> [!DONE]- paragraph converted to list
+>
+> [@sam] @claude can you switch that paragraph to numbered list pls
+>
+> [@claude] done - updated to a 3-point list <!--mdac:eot-->
+
+## Common Uses
+
+These are the recurring shapes that make `mdac` useful:
+
+```markdown
+@codex can you make a photorealistic image of a pelican riding a bike and add it here
+```
+
+```markdown
+@agent I pasted this from terminal, can you fix formatting pls
+```
+
+```markdown
+@claude add a link to the actual PR here. Also drop in the homepage screenshot from the PR here too pls.
+```
+
+```markdown
+@agent can you give me three sharper options for this heading?
+```
 
 ## Naming
 
@@ -43,29 +70,30 @@ Avoid forward-looking use of `atag`, `Markdown Agent Tags`, `@agent tags`, `md-a
 
 Registry note, checked 2026-06-01: npm package names [`mdac`](https://registry.npmjs.org/mdac) and [`atag`](https://registry.npmjs.org/atag) are taken. [`markdown-agent-comments`](https://registry.npmjs.org/markdown-agent-comments), [`@smcllns/mdac`](https://registry.npmjs.org/@smcllns%2fmdac), and [`@smcllns/markdown-agent-comments`](https://registry.npmjs.org/@smcllns%2fmarkdown-agent-comments) were available at check time.
 
+Publish the unscoped `markdown-agent-comments` package and expose `mdac` as its CLI binary. Reserve `@smcllns/mdac` and `@smcllns/markdown-agent-comments` if convenient during publish.
+
 ## V1 User Workflow
 
 1. Sam writes an `@agent` comment in a markdown file.
 2. `mdac scan <path>` shows actionable files without invoking an agent.
 3. `mdac run <path> --once` invokes an agent only when the cheap scan finds work.
 4. The agent reads surrounding context, edits the document body if the ask is concrete, and records a short reply in the callout.
-5. If the ask is ambiguous, the agent leaves an open `[!NOTE]+` thread and pre-fills a human reply label.
+5. If the ask is ambiguous, or it is appropriate to ask for further user input before concluding, the agent leaves an open `[!NOTE]` thread and pre-fills the human reply label.
 
 ## Protocol Contract
 
-V1 recognizes `@agent`, `@claude`, `@codex`, and explicit custom `@trigger` comments.
+V1 recognizes `@agent`, `@claude`, `@codex`, and explicitly provided `@<custom-trigger>`.
 
 Thread states:
 
-- `[!NOTE]+` means active and visually open.
+- `[!NOTE]` means active and visually open
 - `[!DONE]-` means resolved and visually collapsed.
-- Bare `[!NOTE]`, `[!NOTE]-`, `[!DONE]`, and `[!DONE]+` are plain markdown, not `mdac` threads.
 
-Agent replies end with `<!--mdac:eot-->`.
+Agent replies end with `<!--mdac:eot-->`. This means humans can add follow-up questions or comments to active or closed threads and it can be easily detected for agents to process.
 
 The original request must be preserved verbatim as the first body line inside the callout. The actual work belongs in the document body, not pasted into the discussion thread.
 
-If the agent asks the human a question, the thread is parked. The agent must not self-reply on the next run just because its own message ended with a question.
+If the agent asks the human a question, the thread is parked awaiting human response and the agent will not self-reply on subsequent runs.
 
 ## V1 CLI Scope
 
@@ -74,26 +102,23 @@ Required:
 - `mdac scan <path>`: read-only candidate scan.
 - `mdac run <path> --once`: scan, then invoke an agent if actionable work exists.
 - `mdac watch <path>`: foreground loop around `run --once`.
-- `--trigger @name`: replace the default trigger set.
+- `--trigger @<name>`: replace the default trigger set.
 - `--name <human>`: human speaker label for prefilled replies.
-- `--debug`: explain matches and no-match decisions.
+- `--debug`: verbose terminal output for debugging
 - fixture-driven tests for scan and parked-thread behavior.
 
-Deferred:
+Outside V1:
 
-- `#agent` directive compatibility.
-- `#silent`.
-- general `@sam:` review comments.
-- launchd, cron, Cowork scheduled runs, and heartbeat automation.
-- full markdown parsing.
-- destructive cleanup modes.
+- Scheduled runs with launchd/cron
+- Cowork, Codex, OpenClaw (etc) plugins and extensions
+- Cleanup feature to move resolved comments to footnotes
 
 ## Scanner Rules
 
 Use a cheap two-pass scan before invoking an agent:
 
 1. Single-line scan for unwrapped `@agent` comments.
-2. Multiline scan for actionable `[!NOTE]+` and unsealed `[!DONE]-` threads.
+2. Multiline scan for actionable `[!NOTE]` and unsealed `[!DONE]-` threads.
 
 Important rules:
 
@@ -101,20 +126,15 @@ Important rules:
 - Custom triggers replace defaults.
 - Inline code is the escape hatch: `` `@claude` `` should not match.
 - Wrapped blockquote lines should not retrigger as fresh inline comments.
-- Accepted V1 false positives: fenced code blocks and hyphenated names like `@claude-team`.
 - Sort matched files by mtime before capping output.
 
-## Test Strategy
+## Quality Bar
 
-The spec should double as the test fixture catalog.
+The spec doubles as the test fixture catalog.
 
-Port first:
+The product should be tested against real markdown shapes from the archive, especially scanner edge cases, parked threads, callout containment, and resolved-thread follow-ups.
 
-- archived scanner fixture catalog from the prior `atag` work
-- poller behavior tests for quiet no-op, debug output, custom triggers, parked threads, human-label collision handling, timeouts, and agent failure propagation
-- selected Obsidian benchmark cases that prove callout containment and `[!DONE]-` closure
-
-Do not treat model-quality failures as CLI failures until the scan/protocol fixture suite is stable.
+Do not treat model-quality failures as CLI failures until the scan/protocol fixture suite is stable. Detailed fixture-porting work belongs in the implementation plan, not this PRD.
 
 ## Roadmap
 
@@ -124,23 +144,12 @@ Ship the `mdac` CLI with `scan`, `run --once`, `watch`, core protocol tests, and
 
 Exit criteria:
 
-- Sam can point `mdac` at a notes folder.
+- Sam can point `mdac` at a notes folder, including inside Obsidian vault
 - No-op runs are cheap and transparent.
 - Concrete asks resolve into `[!DONE]-`.
-- Ambiguous asks become `[!NOTE]+`.
+- Asks that require further user input become `[!NOTE]`.
 - Tests cover the scanner edge cases already seen in the vault.
-
-### V1.5: Cleanup And Archive
-
-Add safe cleanup for resolved threads if still needed.
-
-Likely command: `mdac sweep <path>`.
-
-Rules:
-
-- preserve the record
-- no destructive delete by default
-- make `--all` and destructive modes explicit, if they ever exist
+- Packaged published on https://registry.npmjs.org/markdown-agent-comments
 
 ### V2: `mdac.dev`
 
@@ -175,6 +184,18 @@ Possible value:
 - click to open files
 - simple install/update flow
 
+### V5: Cleanup And Archive
+
+Add safe cleanup for resolved threads if still needed.
+
+Likely command: `mdac sweep <path>`.
+
+Rules:
+
+- preserve the record
+- no destructive delete by default
+- make `--all` and destructive modes explicit, if they ever exist
+
 ## Non-Goals
 
 - not a general markdown comment system
@@ -182,10 +203,3 @@ Possible value:
 - not an Obsidian-only plugin
 - not a replacement for git history or review tools
 - not a broad agent scheduler in V1
-
-## Open Questions
-
-- Publish unscoped `markdown-agent-comments`, scoped `@smcllns/mdac`, or reserve both and publish one?
-- Is `<!--mdac:eot-->` the final seal, or should it be the longer `<!--markdown-agent-comments:eot-->`?
-- Should V1 include a read-only `--legacy-hash` inventory mode for old `#agent` directives?
-- Should the public package be Node-compatible, or is Bun-first acceptable for V1?

@@ -1,6 +1,6 @@
 # mdac V1 restart plan
 
-Status: ready for Sam review
+Status: complete
 
 Goal: restart Markdown Agent Comments in the fresh `smcllns/markdown-agent-comments` repo with curated forward docs and archived historic context.
 
@@ -11,7 +11,7 @@ Goal: restart Markdown Agent Comments in the fresh `smcllns/markdown-agent-comme
 - [x] Run parallel research on source inventory, CLI/spec, roadmap/docs, and naming/web.
 - [x] Synthesize research into a concise PRD with embedded roadmap.
 - [x] Archive best historic work without making it the forward source of truth.
-- [ ] Finish Sam PRD review before implementation.
+- [x] Finish Sam PRD review before implementation.
 
 ## Implementation Notes
 

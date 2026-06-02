@@ -19,7 +19,7 @@ The important product constraint is that forward-looking docs should be concise,
 - Research notes: `research/2026-06-01-mdac-v1/`
 - Plan: `.agents/plans/2026-06-01-mdac-v1-restart.md`
 
-## Decisions encoded in the draft PRD
+## Decisions encoded in the approved PRD
 
 - V1 focuses on `@agent` comments only.
 - Legacy `#agent` directives are archived, not part of the default V1 scanner/resolver.
