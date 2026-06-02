@@ -34,14 +34,15 @@ The environment branch rule is important because npm trusted publishing is confi
 
 ## Required npm setup
 
-Trusted publisher setup requires the package to already exist on npm.
+The package name is now secured on npm.
 
-Bootstrap options:
+Bootstrap completed:
 
-- Preferred: publish `markdown-agent-comments@0.1.0` manually once from an authenticated npm account.
-- Alternative: briefly use token-based CI for the first publish, then remove the token path.
+- Published placeholder: `markdown-agent-comments@0.0.1`
+- Registry URL: `https://www.npmjs.com/package/markdown-agent-comments`
+- Tarball contained only `package.json`, `README.md`, and `LICENSE`.
 
-After the package exists, configure trusted publishing on npm:
+Next, configure trusted publishing on npm:
 
 - Package: `markdown-agent-comments`
 - Provider: GitHub Actions
