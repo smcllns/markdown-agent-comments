@@ -6,9 +6,9 @@ Owner: Sam
 
 ## Product Thesis
 
-Markdown Agent Comments (`mdac`) lets you ask async agents for help directly inside markdown.
+Markdown files should be the place where lightweight agent collaboration happens, not just artifacts agents edit from a separate chat.
 
-Write an `@agent` comment inline in a markdown file. An async agent picks it up and handles the ask and saves your request and their response in a comment thread in the markdown file.
+Markdown Agent Comments makes an `@agent` request part of the document itself, so the ask, the work, and the follow-up record stay local, readable, and easy to resume.
 
 ## User Problem
 
@@ -32,6 +32,22 @@ The agent edits the document as requested, then wraps the original request and t
 >
 > [@claude] done - updated to a 3-point list <!--mdac:eot-->
 
+## Product Goals
+
+- Let humans prompt agents inline without leaving the markdown file.
+- Preserve the request and response in the file as a lightweight comment thread.
+- Keep concrete work in the document body instead of burying it in chat.
+- Make no-op scans cheap and transparent so the CLI can run often.
+- Preserve normal markdown readability and GitHub/Obsidian-friendly rendering.
+
+## Non-Goals
+
+- not a general markdown comment system
+- not a cloud service
+- not an Obsidian-only plugin
+- not a replacement for git history or review tools
+- not a broad agent scheduler in V1
+
 ## Common Uses
 
 These are the recurring shapes that make Markdown Agent Comments useful:
@@ -52,7 +68,11 @@ These are the recurring shapes that make Markdown Agent Comments useful:
 @agent can you give me three sharper options for this heading?
 ```
 
-## V1 User Workflow
+## V1 Scope
+
+V1 is the local CLI milestone. The workflow, protocol principles, and CLI commands below are the detailed V1 scope; the roadmap at the bottom shows how later milestones build on this.
+
+### User Workflow
 
 1. Sam writes an `@agent` comment in a markdown file.
 2. `mdac scan <path>` shows actionable files without invoking an agent.
@@ -60,7 +80,7 @@ These are the recurring shapes that make Markdown Agent Comments useful:
 4. The agent reads surrounding context, edits the document body if the ask is concrete, and records a short reply in the callout.
 5. If the ask is ambiguous, or it is appropriate to ask for further user input before concluding, the agent leaves an open `[!NOTE]` thread and pre-fills the human reply label.
 
-## Protocol Principles
+### Protocol Principles
 
 Markdown Agent Comments should feel like lightweight threaded comments that live inside the markdown file:
 
@@ -71,7 +91,7 @@ Markdown Agent Comments should feel like lightweight threaded comments that live
 - Agent replies end with `<!--mdac:eot-->` so later human follow-ups can be detected.
 - If the agent needs human input, it should leave the thread open and parked rather than guessing or self-replying.
 
-## V1 CLI Scope
+### CLI Scope
 
 Required:
 
@@ -89,19 +109,38 @@ Outside V1:
 - Cowork, Codex, OpenClaw (etc) plugins and extensions
 - Cleanup feature to move resolved comments to footnotes
 
-## Non-Goals
+## Naming
 
-- not a general markdown comment system
-- not a cloud service
-- not an Obsidian-only plugin
-- not a replacement for git history or review tools
-- not a broad agent scheduler in V1
+| Context | Use |
+|---|---|
+| Product name, formal spec, and human-facing titles | Markdown Agent Comments |
+| Repo and npm package | `markdown-agent-comments` |
+| CLI binary and shell commands | `mdac` |
+| Website | `mdac.dev` |
+| Natural description | `@agent comments in markdown` |
+| User-facing construct | `@agent comment`, `@claude comment`, `@codex comment`, or "comment" |
+| Config keys and CSS prefixes | `mdac.*`, `--mdac-*` |
+| Environment variables | `MDAC_*` |
+| Protocol seal | `<!--mdac:eot-->` |
+
+Prior names from historic work are retired: `atag`, `Markdown Agent Tags`, `@agent tags`, `md-asks`, and `markdown-agent-directives`. If they appear in forward-looking docs, code, or UI, update them to the current naming system; leave them only in archived history or explicit historical notes.
+
+## Executable Spec
+
+The PRD describes product intent. Detailed scanner, prompt, and fixture behavior belongs in tests so code changes cannot silently drift from the spec:
+
+- Scanner rules: [`test/scanner.test.js`](../test/scanner.test.js)
+- CLI behavior: [`test/cli-scan.test.js`](../test/cli-scan.test.js), [`test/cli-run.test.js`](../test/cli-run.test.js), [`test/cli-watch.test.js`](../test/cli-watch.test.js)
+- Agent prompt contract: [`test/agent-prompt.test.js`](../test/agent-prompt.test.js)
+- Human-readable review fixture: [`test/human-review/README.md`](../test/human-review/README.md)
+
+When protocol behavior changes, update the relevant test or fixture in the same change as the implementation. Do not duplicate detailed scanner branches here.
 
 ## Roadmap
 
 ### V1: Local CLI That Works For Sam
 
-Ship the `mdac` CLI with `scan`, `run --once`, `watch`, core protocol tests, and a minimal README.
+Ship the `mdac` CLI with `scan`, `run --once`, `watch`, core protocol tests, and a minimal README. The detailed V1 workflow, protocol, and CLI scope are defined above.
 
 Exit criteria:
 
@@ -110,7 +149,7 @@ Exit criteria:
 - Concrete asks resolve into `[!DONE]-`.
 - Asks that require further user input become `[!NOTE]`.
 - Tests cover the scanner edge cases already seen in the vault.
-- Packaged published on https://registry.npmjs.org/markdown-agent-comments
+- Package published on https://registry.npmjs.org/markdown-agent-comments
 
 ### V2: `mdac.dev`
 
@@ -156,30 +195,3 @@ Rules:
 - preserve the record
 - no destructive delete by default
 - make `--all` and destructive modes explicit, if they ever exist
-
-## Naming
-
-| Context | Use |
-|---|---|
-| Product name, formal spec, and human-facing titles | Markdown Agent Comments |
-| Repo and npm package | `markdown-agent-comments` |
-| CLI binary and shell commands | `mdac` |
-| Website | `mdac.dev` |
-| Natural description | `@agent comments in markdown` |
-| User-facing construct | `@agent comment`, `@claude comment`, `@codex comment`, or "comment" |
-| Config keys and CSS prefixes | `mdac.*`, `--mdac-*` |
-| Environment variables | `MDAC_*` |
-| Protocol seal | `<!--mdac:eot-->` |
-
-Prior names from historic work are retired: `atag`, `Markdown Agent Tags`, `@agent tags`, `md-asks`, and `markdown-agent-directives`. If they appear in forward-looking docs, code, or UI, update them to the current naming system; leave them only in archived history or explicit historical notes.
-
-## Executable Spec
-
-The PRD describes product intent. Detailed scanner, prompt, and fixture behavior belongs in tests so code changes cannot silently drift from the spec:
-
-- Scanner rules: [`test/scanner.test.js`](../test/scanner.test.js)
-- CLI behavior: [`test/cli-scan.test.js`](../test/cli-scan.test.js), [`test/cli-run.test.js`](../test/cli-run.test.js), [`test/cli-watch.test.js`](../test/cli-watch.test.js)
-- Agent prompt contract: [`test/agent-prompt.test.js`](../test/agent-prompt.test.js)
-- Human-readable review fixture: [`test/human-review/README.md`](../test/human-review/README.md)
-
-When protocol behavior changes, update the relevant test or fixture in the same change as the implementation. Do not duplicate detailed scanner branches here.
