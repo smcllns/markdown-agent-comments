@@ -23,6 +23,8 @@ The publish step uses npm CLI because npm trusted publishing currently requires 
 
 ## Required GitHub setup
 
+The local workflow has not been pushed to GitHub yet. As of 2026-06-02, `git ls-remote --heads origin` returned no branches, and `gh repo view` reported no default branch name.
+
 Create or update the GitHub environment:
 
 - Environment name: `npm`
@@ -31,6 +33,8 @@ Create or update the GitHub environment:
 - Required reviewers: leave unset if the intended behavior is automatic publish on merge/push to `main`
 
 The environment branch rule is important because npm trusted publishing is configured against a repository, workflow filename, and optional environment. The environment gives GitHub a place to reject publish jobs from non-main refs.
+
+Current blocker: `gh api --method PUT repos/smcllns/markdown-agent-comments/environments/npm` failed with `403 Must have admin rights to Repository` using the current `yolo-sam` GitHub token. Create this environment in the GitHub UI or use a GitHub token with repository admin rights.
 
 ## Required npm setup
 
@@ -51,6 +55,8 @@ Next, configure trusted publishing on npm:
 - Workflow filename: `publish.yml`
 - Environment name: `npm`
 - Allowed action: `npm publish`
+
+Live check on 2026-06-02: `https://registry.npmjs.org/markdown-agent-comments/0.1.0` returned `404`, so `0.1.0` is still available.
 
 After the trusted publisher succeeds, npm recommends setting publishing access to require 2FA and disallow tokens.
 
