@@ -59,6 +59,20 @@ describe("mdac run --once", () => {
     expect(log.argv[0]).toContain("Human speaker label: [@sam]");
   });
 
+  it("invokes the agent from the containing directory when target is a file", async () => {
+    const file = await write("single.md", "@claude tighten this\n");
+
+    const result = runCli(["run", file, "--once", "--agent-command", `node ${stubPath}`]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toContain("Found 1 actionable file:\n- single.md\n");
+
+    const log = JSON.parse((await readFile(logPath, "utf8")).trim());
+    expect(log.cwd).toBe(await realpath(tempDir));
+    expect(log.argv[0]).toContain("- single.md");
+  });
+
   it("requires --once for run", async () => {
     const result = runCli(["run", tempDir, "--agent-command", `node ${stubPath}`]);
 
@@ -88,4 +102,5 @@ async function write(relativePath, contents) {
   const file = join(tempDir, relativePath);
   await mkdir(join(file, ".."), { recursive: true });
   await writeFile(file, contents);
+  return file;
 }

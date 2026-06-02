@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-import { access } from "node:fs/promises";
+import { access, stat } from "node:fs/promises";
 import { constants } from "node:fs";
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
+import path from "node:path";
 import { scanPath, normalizeTriggers } from "./scanner.js";
 
 const DEFAULT_AGENT_COMMAND = "claude -p --permission-mode acceptEdits";
@@ -135,7 +136,8 @@ async function runAgentCycle(options, io) {
 
   io.stdout.write("Invoking agent...\n");
   const prompt = buildAgentPrompt(options, matches);
-  return await invokeAgent(options.agentCommand, prompt, options.targetPath, io);
+  const cwd = await agentCwd(options.targetPath);
+  return await invokeAgent(options.agentCommand, prompt, cwd, io);
 }
 
 async function scanForOptions(options, io) {
@@ -214,6 +216,12 @@ function parsePositiveInteger(value, optionName) {
     throw new UsageError(`${optionName} must be a positive integer`);
   }
   return Number(value);
+}
+
+async function agentCwd(targetPath) {
+  const absolutePath = path.resolve(targetPath);
+  const targetStat = await stat(absolutePath);
+  return targetStat.isFile() ? path.dirname(absolutePath) : absolutePath;
 }
 
 async function invokeAgent(commandText, prompt, cwd, io) {

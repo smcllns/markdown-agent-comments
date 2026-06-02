@@ -122,6 +122,15 @@ describe("scanPath", () => {
 
     expect(matches.map((match) => match.relativePath)).toEqual(["newer.md", "older.md"]);
   });
+
+  it("uses the basename when scanning a single markdown file", async () => {
+    const file = await write("single.md", "@codex fix this\n");
+
+    const matches = await scanPath(file);
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].relativePath).toBe("single.md");
+  });
 });
 
 async function write(relativePath, contents) {

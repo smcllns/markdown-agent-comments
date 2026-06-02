@@ -6,9 +6,13 @@ const SEAL = "<!--mdac:eot-->";
 
 export async function scanPath(root, options = {}) {
   const absoluteRoot = path.resolve(root);
+  const rootStat = await stat(absoluteRoot);
   const triggers = normalizeTriggers(options.triggers ?? DEFAULT_TRIGGERS);
   const humanLabel = normalizeLabel(options.humanLabel ?? "sam");
-  const files = await markdownFiles(absoluteRoot);
+  const rootIsFile = rootStat.isFile();
+  const files = rootIsFile
+    ? (absoluteRoot.endsWith(".md") ? [absoluteRoot] : [])
+    : await markdownFiles(absoluteRoot);
   const matches = [];
 
   for (const file of files) {
@@ -18,7 +22,7 @@ export async function scanPath(root, options = {}) {
     const fileStat = await stat(file);
     matches.push({
       file,
-      relativePath: path.relative(absoluteRoot, file),
+      relativePath: rootIsFile ? path.basename(file) : path.relative(absoluteRoot, file),
       mtimeMs: fileStat.mtimeMs,
       reasons,
     });
