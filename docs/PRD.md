@@ -4,45 +4,49 @@ Status: approved for V1 implementation
 Last updated: 2026-06-02
 Owner: Sam
 
-## Product Thesis
+## Product Vision
 
-Markdown Agent Comments (`mdac`) lets you ask async agents for help directly inside markdown.
+Markdown Agent Comments (`mdac`) lets users write `@agent` comments in markdown files to prompt an async agent for input or document changes inline.
 
-Write an `@agent` comment inline in a markdown file. An async agent picks it up and handles the ask and saves your request and their response in a comment thread in the markdown file.
+It follows a file-over-app philosophy (the markdown file is the source of truth) so it works across any markdown editor and agents that work with `.md` files. It aims to require minimal additional syntax that supports a good reading and writing experience in plaintext markdown with progressive enhancement in Obsidian and GitHub.
+
+## Product Goals
+
+- works with any markdown editor that uses local `.md` files
+- works with coding agents that can read and edit local files
+- one human-readable SKILL.md + a minimal CLI, and wrappers for coding agent plugins or desktop apps.
+- aspire to be fast, convenient, and minimal, with high upside and negligible downside
+
+## Non-Goals
+
+- not a cloud service (you bring your own coding agent)
+- not a replacement for git history or review tools (those are complementary tools)
+- not a general markdown comment system
+- not an Obsidian-only plugin
 
 ## User Problem
 
-When you're writing a markdown doc, prompting an agent is a disruptive workflow:
+When you're writing in a markdown doc it can be disruptive to prompt an agent for input:
 
 - you leave the document and switch to an agent chat and lose focus
 - you have to re-explain which file and passage need work
 - that discussion ends up outside the markdown file and is often hard to find later
 
-Markdown Agent Comments solves this problem by enabling agent-addressable markdown comments:
+### How this solves it
+
+Humans ask for work with `@agent`, `@claude`, `@codex`, or an explicitly configured custom trigger:
 
 ```markdown
 @claude can you update that paragraph to numbered list pls
 ```
 
-The agent edits the document as requested, then wraps the original request and their reply in a markdown callout which works like threaded comments.
+The agent edits the document as requested, then wraps the discussion in a callout which acts like threaded comments inside the markdown file and can be committed to git or deleted. Comment threads can be multi-turn if the agent needs more input or the human has a follow-up ask.
 
 > [!DONE]- paragraph converted to list
 >
 > [@sam] @claude can you switch that paragraph to numbered list pls
 >
 > [@claude] done - updated to a 3-point list <!--mdac:eot-->
-
-## Product Goals
-
-[example] Ship a local CLI that lets Sam process `@agent` comments in markdown without leaving the file or losing the request/response history.
-
-## Non-Goals
-
-- not a general markdown comment system
-- not a cloud service
-- not an Obsidian-only plugin
-- not a replacement for git history or review tools
-- not a broad agent scheduler in V1
 
 ## Common Uses
 
@@ -68,7 +72,7 @@ These are the recurring shapes that make Markdown Agent Comments useful:
 
 ### User Workflow
 
-1. Sam writes an `@agent` comment in a markdown file.
+1. Human writes an `@agent` comment in a markdown file.
 2. `mdac scan <path>` shows actionable files without invoking an agent.
 3. `mdac run <path> --once` invokes an agent only when the cheap scan finds work.
 4. The agent reads surrounding context, edits the document body if the ask is concrete, and records a short reply in the callout.
@@ -92,10 +96,10 @@ Required:
 - `mdac scan <path>`: read-only candidate scan.
 - `mdac run <path> --once`: scan, then invoke an agent if actionable work exists.
 - `mdac watch <path>`: foreground loop around `run --once`.
-- `--trigger @<name>`: replace the default trigger set.
-- `--name <human>`: human speaker label for prefilled replies.
-- `--debug`: verbose terminal output for debugging
-- fixture-driven tests for scan and parked-thread behavior.
+- `--trigger @<name>`: replace the default agent trigger name.
+- `--name <human>`: human speaker label the agent uses for prefilled replies.
+- `--debug`: verbose terminal output for debugging.
+- `test/`: fixture-driven tests for scan and parked-thread behavior.
 
 Outside V1:
 
@@ -105,30 +109,28 @@ Outside V1:
 
 ## Naming
 
-| Context | Use |
-|---|---|
-| Product name, formal spec, and human-facing titles | Markdown Agent Comments |
-| Repo and npm package | `markdown-agent-comments` |
-| CLI binary and shell commands | `mdac` |
-| Website | `mdac.dev` |
-| Natural description | `@agent comments in markdown` |
-| User-facing construct | `@agent comment`, `@claude comment`, `@codex comment`, or "comment" |
-| Config keys and CSS prefixes | `mdac.*`, `--mdac-*` |
-| Environment variables | `MDAC_*` |
-| Protocol seal | `<!--mdac:eot-->` |
+| Context                                            | Use                                                                 |
+| -------------------------------------------------- | ------------------------------------------------------------------- |
+| Product name, formal spec, and human-facing titles | Markdown Agent Comments                                             |
+| Repo and npm package                               | `markdown-agent-comments`                                           |
+| CLI binary and shell commands                      | `mdac`                                                              |
+| Website                                            | `mdac.dev`                                                          |
+| Natural description                                | `@agent comments in markdown`                                       |
+| User-facing construct                              | `@agent comment`, `@claude comment` or just "comment" |
+| Config keys and CSS prefixes                       | `mdac.*`, `--mdac-*`                                                |
+| Environment variables                              | `MDAC_*`                                                            |
+| End of agent comments seal                         | `<!--mdac:eot-->`                                                   |
 
 Prior names from historic work are retired: `atag`, `Markdown Agent Tags`, `@agent tags`, `md-asks`, and `markdown-agent-directives`. If they appear in forward-looking docs, code, or UI, update them to the current naming system; leave them only in archived history or explicit historical notes.
 
 ## Executable Spec
 
-The PRD describes product intent. Detailed scanner, prompt, and fixture behavior belongs in tests so code changes cannot silently drift from the spec:
+The PRD describes product intent. Detailed scanner, prompt, and fixture behavior belongs in tests to avoid drift:
 
 - Scanner rules: [`test/scanner.test.js`](../test/scanner.test.js)
 - CLI behavior: [`test/cli-scan.test.js`](../test/cli-scan.test.js), [`test/cli-run.test.js`](../test/cli-run.test.js), [`test/cli-watch.test.js`](../test/cli-watch.test.js)
 - Agent prompt contract: [`test/agent-prompt.test.js`](../test/agent-prompt.test.js)
 - Human-readable review fixture: [`test/human-review/README.md`](../test/human-review/README.md)
-
-When protocol behavior changes, update the relevant test or fixture in the same change as the implementation. Do not duplicate detailed scanner branches here.
 
 ## Roadmap
 
@@ -143,7 +145,7 @@ Exit criteria:
 - Concrete asks resolve into `[!DONE]-`.
 - Asks that require further user input become `[!NOTE]`.
 - Tests cover the scanner edge cases already seen in the vault.
-- Package published on https://registry.npmjs.org/markdown-agent-comments
+- Package published on [https://registry.npmjs.org/markdown-agent-comments](https://registry.npmjs.org/markdown-agent-comments)
 
 ### V2: `mdac.dev`
 
@@ -167,7 +169,21 @@ Exit criteria:
 - plugin tests prove the wrapper invokes `mdac`
 - no duplicate protocol logic lives in plugin docs
 
-### V4: Desktop Wrapper
+### V4: Cleanup And Archive
+
+Add safe cleanup for resolved threads if still needed. Moves them to doc footnotes by default, or deleted if explicitly requested.
+
+Likely command: `mdac sweep <path>`.
+Potential editing-time shorthands: `#sweep` to sweep when resolved, `#delete` to fully remove when resolved.
+Default is manual sweep; users may later configure auto-sweep or auto-delete when comments resolve.
+
+Rules:
+
+- preserve the record
+- no destructive delete by default
+- make `--all` and destructive modes explicit, if they ever exist
+
+### V5: Desktop Wrapper
 
 Consider a tray/app wrapper only after the CLI has proven stable.
 
@@ -177,15 +193,3 @@ Possible value:
 - unresolved-thread list
 - click to open files
 - simple install/update flow
-
-### V5: Cleanup And Archive
-
-Add safe cleanup for resolved threads if still needed.
-
-Likely command: `mdac sweep <path>`.
-
-Rules:
-
-- preserve the record
-- no destructive delete by default
-- make `--all` and destructive modes explicit, if they ever exist
