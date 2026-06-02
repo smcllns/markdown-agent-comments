@@ -59,6 +59,32 @@ describe("mdac run --once", () => {
     expect(log.argv[0]).toContain("Human speaker label: [@sam]");
   });
 
+  it("uses MDAC_AGENT_COMMAND when --agent-command is omitted", async () => {
+    await write("note.md", "@claude tighten this\n");
+
+    const result = runCli(["run", tempDir, "--once"], {
+      MDAC_AGENT_COMMAND: `node ${stubPath}`,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toContain("Invoking agent...\n");
+    expect(existsSync(logPath)).toBe(true);
+  });
+
+  it("lets --agent-command override MDAC_AGENT_COMMAND", async () => {
+    await write("note.md", "@claude tighten this\n");
+
+    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`], {
+      MDAC_AGENT_COMMAND: "definitely-not-a-real-command",
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toContain("agent output\n");
+    expect(existsSync(logPath)).toBe(true);
+  });
+
   it("invokes the agent from the containing directory when target is a file", async () => {
     const file = await write("single.md", "@claude tighten this\n");
 
@@ -90,12 +116,13 @@ describe("mdac run --once", () => {
   });
 });
 
-function runCli(args) {
+function runCli(args, env = {}) {
   const proc = Bun.spawnSync({
     cmd: ["node", CLI, ...args],
     env: {
       ...process.env,
       MDAC_TEST_LOG: logPath,
+      ...env,
     },
     stdout: "pipe",
     stderr: "pipe",

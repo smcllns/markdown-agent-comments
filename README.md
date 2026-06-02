@@ -62,7 +62,7 @@ Scans once, then invokes an agent only if actionable comments exist.
 mdac watch <path> --interval 60
 ```
 
-Runs in the foreground and repeats the `run --once` behavior on an interval.
+Runs in the foreground and repeats the `run --once` behavior on an interval. Clean watch cycles stay quiet by default; use `--debug` to print scan diagnostics.
 
 ## Options
 
@@ -70,7 +70,7 @@ Runs in the foreground and repeats the `run --once` behavior on an interval.
 |---|---|
 | `--trigger @name` | Replace the default trigger set. |
 | `--name NAME` | Human speaker label used in threads. Defaults to `sam`. |
-| `--agent-command CMD` | Command used by `run` and `watch`. |
+| `--agent-command CMD` | Command used by `run` and `watch`. The prompt is appended as the final argument. |
 | `--interval SEC` | Watch interval in seconds. Defaults to `60`. |
 | `--debug` | Print scanner diagnostics to stderr. |
 

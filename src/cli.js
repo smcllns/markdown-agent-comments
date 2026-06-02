@@ -130,17 +130,21 @@ async function watchCommand(options, io) {
   let cycles = 0;
   while (true) {
     cycles += 1;
-    const code = await runAgentCycle(options, io);
+    const code = await runAgentCycle(options, io, { quietWhenClean: true });
     if (code !== 0) return code;
     if (options.maxCycles !== null && cycles >= options.maxCycles) return 0;
     await sleep(options.intervalSeconds * 1000);
   }
 }
 
-async function runAgentCycle(options, io) {
+async function runAgentCycle(options, io, { quietWhenClean = false } = {}) {
   const matches = await scanForOptions(options, io);
+  if (matches.length === 0) {
+    if (!quietWhenClean) io.stdout.write(formatScan(matches));
+    return 0;
+  }
+
   io.stdout.write(formatScan(matches));
-  if (matches.length === 0) return 0;
 
   io.stdout.write("Invoking agent...\n");
   const prompt = buildAgentPrompt(options, matches);
@@ -312,7 +316,7 @@ function usage() {
     "Options:",
     "  --trigger @name    Replace the default trigger set.",
     "  --name NAME        Human speaker label for thread placeholders.",
-    "  --agent-command C  Agent command for run. Default: claude -p --permission-mode acceptEdits.",
+    "  --agent-command C  Agent command for run/watch. Prompt is appended as final argument.",
     "  --interval SEC     Watch interval in seconds. Default: 60.",
     "  --once             Required for run in V1.",
     "  --debug            Print verbose diagnostics when supported.",

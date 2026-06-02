@@ -34,8 +34,18 @@ describe("mdac watch", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe("");
-    expect(result.stdout).toContain(`Watching ${tempDir} every 60s`);
-    expect(result.stdout).toContain("No actionable mdac comments found.\n");
+    expect(result.stdout).toBe(`Watching ${tempDir} every 60s...\n`);
+    expect(existsSync(logPath)).toBe(false);
+  });
+
+  it("prints clean watch cycles in debug mode", async () => {
+    await write("note.md", "plain markdown\n");
+
+    const result = runCli(["watch", tempDir, "--interval", "60", "--max-cycles", "1", "--agent-command", `node ${stubPath}`, "--debug"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe(`Watching ${tempDir} every 60s...\n`);
+    expect(result.stderr).toContain("Matched 0 actionable files.\n");
     expect(existsSync(logPath)).toBe(false);
   });
 
