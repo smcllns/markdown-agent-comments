@@ -13,11 +13,11 @@ Goal: preserve the important agent-behavior contract from the old `atag` skill i
 
 ## Tasks
 
-- [ ] Add failing prompt contract tests.
-- [ ] Expand V1 agent prompt.
-- [ ] Confirm tests reject historical markers and scanner instructions.
-- [ ] Update handoff notes.
-- [ ] Run verification and commit.
+- [x] Add failing prompt contract tests.
+- [x] Expand V1 agent prompt.
+- [x] Confirm tests reject historical markers and scanner instructions.
+- [x] Update handoff notes.
+- [x] Run verification and commit.
 
 ## V1.5 Follow-Up
 
