@@ -1,0 +1,21 @@
+{
+  "name": "markdown-agent-comments",
+  "version": "0.1.0",
+  "description": "@agent comments in markdown",
+  "type": "module",
+  "bin": {
+    "mdac": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "bun test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "homepage": "https://mdac.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smcllns/markdown-agent-comments.git"
+  },
+  "license": "MIT"
+}
