@@ -14,10 +14,12 @@ The important product constraint is that forward-looking docs should be concise,
 ## Current artifacts
 
 - Forward source of truth: `docs/PRD.md`
+- Local CLI user guide: `README.md`
 - Archive index: `docs/archive/README.md`
 - Copied prior art: `docs/archive/prior-art/`
 - Research notes: `research/2026-06-01-mdac-v1/`
-- Plan: `.agents/plans/2026-06-01-mdac-v1-restart.md`
+- Research plan: `.agents/plans/2026-06-01-mdac-v1-restart.md`
+- Implementation plan: `.agents/plans/2026-06-02-mdac-v1-cli.md`
 
 ## Decisions encoded in the approved PRD
 
@@ -46,3 +48,25 @@ The important product constraint is that forward-looking docs should be concise,
 
 - No PRD/product decisions remain from the 2026-06-01 review.
 - Implementation confirmation: public CLI should probably be Node-compatible at runtime while using Bun for local dev/tests.
+
+## V1 CLI implementation status
+
+Implemented:
+
+- `mdac scan <path>`
+- `mdac run <path> --once`
+- `mdac watch <path> --interval <seconds>`
+- `--trigger`, `--name`, `--agent-command`, and `--debug`
+- cheap markdown scanner for inline comments, active `[!NOTE]` threads, `[!DONE]-` follow-ups, parked agent replies, custom triggers, and mtime sorting
+- package allowlist for a small npm artifact: `package.json`, `LICENSE`, `README.md`, `docs/PRD.md`, and `src/`
+
+Verification:
+
+- `bun run test` passes.
+- Scratch smoke passed for `scan`, `run --once`, and bounded `watch` with a fake agent command.
+- Read-only Obsidian scan completed against `/Users/smcllns/Projects/obsidian` and found real actionable files.
+- `bun publish --dry-run` packs the intended six files.
+
+Remaining blocker:
+
+- Real npm publish is blocked until an npm credential is available. The configured 1Password service account found no npm/npmjs/package-publish token, and local npm/Bun config points at `http://127.0.0.1:8765/` with no auth token.
