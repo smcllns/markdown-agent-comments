@@ -31,7 +31,7 @@ Start on `main` in `/Users/smcllns/Projects/markdown-agent-comments`.
 Recommended next sequence:
 
 1. Configure GitHub environment `npm` and npm trusted publishing for `smcllns/markdown-agent-comments` / `publish.yml` / environment `npm`.
-2. Review `test/review-cases.md` and `test/review-cases.processed.md` via `bun run test:review` so scanner coverage and subjective processed behavior feel right before publish.
+2. Review `test/review-cases.md` and `test/.generated/review-cases.processed.md` via `bun run test:review` so scanner coverage and subjective processed behavior feel right before publish.
 3. Do one last CLI polish pass before `0.1.0`: focus on `--agent-command` semantics, README install wording, and whether `watch` should print quieter status by default.
 4. Bump `package.json` from `0.1.0` only if needed, or publish current `0.1.0` once the final CLI changes are in.
 5. Push to GitHub and verify CI/publish behavior.

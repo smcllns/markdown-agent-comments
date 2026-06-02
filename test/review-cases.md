@@ -4,7 +4,7 @@ This file is intentionally scanned by the test suite. It is meant to be easy for
 
 - `PROCESS` cases should be detected by `mdac scan` and handed to an agent.
 - `IGNORE` cases should not be detected.
-- Run `bun run test:review` to regenerate `test/review-cases.processed.md`.
+- Run `bun run test:review` to regenerate `test/.generated/review-cases.processed.md`.
 
 ## PROCESS Cases
 

@@ -1,14 +1,16 @@
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { scanPath } from "../src/scanner.js";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const INPUT = join(ROOT, "test", "review-cases.md");
-const OUTPUT = join(ROOT, "test", "review-cases.processed.md");
+const OUTPUT_DIR = join(ROOT, "test", ".generated");
+const OUTPUT = join(OUTPUT_DIR, "review-cases.processed.md");
 
 const matches = await scanPath(INPUT);
 
+await mkdir(OUTPUT_DIR, { recursive: true });
 await writeFile(OUTPUT, [
   "# mdac V1 Review Cases - Processed Output",
   "",

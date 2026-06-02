@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { readFile } from "node:fs/promises";
-import { dirname, relative } from "node:path";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { scanPath } from "../src/scanner.js";
 
@@ -26,7 +26,17 @@ describe("human review markdown fixture", () => {
   });
 
   it("can be scanned from the test directory without matching generated output", async () => {
+    await mkdir(join(TEST_DIR, ".generated"), { recursive: true });
+    await writeFile(join(TEST_DIR, ".generated", "review-cases.processed.md"), [
+      "> [!NOTE] generated output should not be scanned",
+      ">",
+      "> [@sam] @agent ignore generated files",
+      "",
+    ].join("\n"));
+
     const matches = await scanPath(TEST_DIR);
+    expect(matches.map((match) => relative(TEST_DIR, match.file))).not.toContain(".generated/review-cases.processed.md");
+
     const reviewMatches = matches.filter((match) => relative(TEST_DIR, match.file).startsWith("review-cases"));
 
     expect(reviewMatches.map((match) => match.relativePath)).toEqual(["review-cases.md"]);

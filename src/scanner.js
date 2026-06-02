@@ -11,6 +11,7 @@ import {
 
 const ACTIVE_CALLOUT_RE = new RegExp(`^\\s*>\\s*${escapeRegExp(ACTIVE_CALLOUT)}(?:\\s|$)`);
 const DONE_CALLOUT_RE = new RegExp(`^\\s*>\\s*${escapeRegExp(DONE_CALLOUT)}(?:\\s|$)`);
+const IGNORED_DIRS = new Set([".git", ".generated", "node_modules"]);
 
 export async function scanPath(root, options = {}) {
   const absoluteRoot = path.resolve(root);
@@ -172,7 +173,7 @@ async function walk(current, files) {
 
   const entries = await readdir(current, { withFileTypes: true });
   for (const entry of entries) {
-    if (entry.name === ".git" || entry.name === "node_modules") continue;
+    if (IGNORED_DIRS.has(entry.name)) continue;
     await walk(path.join(current, entry.name), files);
   }
 }
