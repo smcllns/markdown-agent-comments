@@ -6,9 +6,9 @@ Owner: Sam
 
 ## Product Thesis
 
-Markdown files should be the place where lightweight agent collaboration happens, not just artifacts agents edit from a separate chat.
+Markdown Agent Comments (`mdac`) lets you ask async agents for help directly inside markdown.
 
-Markdown Agent Comments makes an `@agent` request part of the document itself, so the ask, the work, and the follow-up record stay local, readable, and easy to resume.
+Write an `@agent` comment inline in a markdown file. An async agent picks it up and handles the ask and saves your request and their response in a comment thread in the markdown file.
 
 ## User Problem
 
@@ -34,11 +34,7 @@ The agent edits the document as requested, then wraps the original request and t
 
 ## Product Goals
 
-- Let humans prompt agents inline without leaving the markdown file.
-- Preserve the request and response in the file as a lightweight comment thread.
-- Keep concrete work in the document body instead of burying it in chat.
-- Make no-op scans cheap and transparent so the CLI can run often.
-- Preserve normal markdown readability and GitHub/Obsidian-friendly rendering.
+[example] Ship a local CLI that lets Sam process `@agent` comments in markdown without leaving the file or losing the request/response history.
 
 ## Non-Goals
 
@@ -69,8 +65,6 @@ These are the recurring shapes that make Markdown Agent Comments useful:
 ```
 
 ## V1 Scope
-
-V1 is the local CLI milestone. The workflow, protocol principles, and CLI commands below are the detailed V1 scope; the roadmap at the bottom shows how later milestones build on this.
 
 ### User Workflow
 
@@ -140,7 +134,7 @@ When protocol behavior changes, update the relevant test or fixture in the same 
 
 ### V1: Local CLI That Works For Sam
 
-Ship the `mdac` CLI with `scan`, `run --once`, `watch`, core protocol tests, and a minimal README. The detailed V1 workflow, protocol, and CLI scope are defined above.
+Ship the `mdac` CLI with `scan`, `run --once`, `watch`, core protocol tests, and a minimal README.
 
 Exit criteria:
 
