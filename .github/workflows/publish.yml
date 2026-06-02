@@ -1,0 +1,133 @@
+name: Publish to npm
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Test package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Configure Bun install gate
+        run: |
+          mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}"
+          cat > "${XDG_CONFIG_HOME:-$HOME/.config}/.bunfig.toml" <<'EOF'
+          [install]
+          minimumReleaseAge = 604800
+          EOF
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run tests
+        run: bun run test
+
+  inspect:
+    name: Check package version
+    runs-on: ubuntu-latest
+    outputs:
+      package_name: ${{ steps.package.outputs.package_name }}
+      package_version: ${{ steps.package.outputs.package_version }}
+      should_publish: ${{ steps.package.outputs.should_publish }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - id: package
+        name: Check registry for current version
+        run: |
+          node <<'JS'
+          const fs = require("node:fs");
+          const { execFileSync } = require("node:child_process");
+
+          async function main() {
+            const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            const versionChanged = process.env.GITHUB_EVENT_NAME === "workflow_dispatch"
+              ? true
+              : currentCommitChangedVersion(pkg.version);
+
+            if (!versionChanged) {
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `package_name=${pkg.name}\n`);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `package_version=${pkg.version}\n`);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, "should_publish=false\n");
+              console.log(`${pkg.name}@${pkg.version} unchanged; skipping publish.`);
+              return;
+            }
+
+            const versionUrl = `https://registry.npmjs.org/${encodeURIComponent(pkg.name)}/${encodeURIComponent(pkg.version)}`;
+            const response = await fetch(versionUrl);
+
+            if (response.status !== 200 && response.status !== 404) {
+              throw new Error(`Registry check failed: ${response.status} ${response.statusText}`);
+            }
+
+            const shouldPublish = response.status === 404;
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `package_name=${pkg.name}\n`);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `package_version=${pkg.version}\n`);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `should_publish=${shouldPublish}\n`);
+
+            console.log(`${pkg.name}@${pkg.version} ${shouldPublish ? "is not published yet" : "already exists"}.`);
+          }
+
+          main().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+
+          function currentCommitChangedVersion(currentVersion) {
+            try {
+              const previousPackageJson = execFileSync("git", ["show", "HEAD^:package.json"], { encoding: "utf8" });
+              const previous = JSON.parse(previousPackageJson);
+              return previous.version !== currentVersion;
+            } catch (error) {
+              console.log("Could not read previous package.json; treating version as changed.");
+              return true;
+            }
+          }
+          JS
+
+  publish:
+    name: Publish package
+    needs: [test, inspect]
+    if: needs.inspect.outputs.should_publish == 'true'
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: Show npm CLI version
+        run: npm --version
+
+      - name: Verify package contents
+        run: npm publish --dry-run --access public
+
+      - name: Publish
+        run: npm publish --access public

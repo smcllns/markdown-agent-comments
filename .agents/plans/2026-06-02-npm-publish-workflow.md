@@ -14,10 +14,10 @@ Goal: publish `markdown-agent-comments` from GitHub Actions when `main` contains
 
 ## Tasks
 
-- [ ] Add publish workflow.
-- [ ] Add setup notes for npm trusted publishing.
-- [ ] Validate YAML and local tests.
-- [ ] Commit workflow setup.
+- [x] Add publish workflow.
+- [x] Add setup notes for npm trusted publishing.
+- [x] Validate YAML and local tests.
+- [x] Commit workflow setup.
 
 ## Notes
 
