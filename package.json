@@ -6,6 +6,12 @@
   "bin": {
     "mdac": "./src/cli.js"
   },
+  "files": [
+    "src",
+    "docs/PRD.md",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "bun test test/*.test.js"
   },
