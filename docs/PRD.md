@@ -54,31 +54,19 @@ These are the recurring shapes that make Markdown Agent Comments useful:
 
 ## Naming
 
-| Surface | Use |
+| Context | Use |
 |---|---|
-| Repo | `markdown-agent-comments` |
-| Package | `markdown-agent-comments` |
-| CLI binary | `mdac` |
-| Natural description | `@agent comments in markdown` |
-| Formal spec title | Markdown Agent Comments |
+| Product name, formal spec, and human-facing titles | Markdown Agent Comments |
+| Repo and npm package | `markdown-agent-comments` |
+| CLI binary and shell commands | `mdac` |
 | Website | `mdac.dev` |
-| Config namespace | `mdac.*` |
-| Env vars | `MDAC_*` |
+| Natural description | `@agent comments in markdown` |
+| User-facing construct | `@agent comment`, `@claude comment`, `@codex comment`, or "comment" |
+| Config keys and CSS prefixes | `mdac.*`, `--mdac-*` |
+| Environment variables | `MDAC_*` |
 | Protocol seal | `<!--mdac:eot-->` |
 
-Use one name register per context:
-
-- Use **Markdown Agent Comments** for human-facing titles, first mentions, product prose, and the formal spec.
-- Use `mdac` for the CLI binary, shell commands, package-facing examples, config keys, CSS prefixes, and protocol tokens.
-- Use `MDAC_*` only for environment variables.
-- Use `@agent comment`, `@claude comment`, `@codex comment`, or simply "comment" for the user-facing construct.
-- Avoid prose titles like "`mdac` V1 Human Review"; prefer "Markdown Agent Comments V1 Human Review".
-
-Avoid forward-looking use of `atag`, `Markdown Agent Tags`, `@agent tags`, `md-asks`, and `markdown-agent-directives` except inside archived history.
-
-Registry note, checked 2026-06-01: npm package names [`mdac`](https://registry.npmjs.org/mdac) and [`atag`](https://registry.npmjs.org/atag) are taken. [`markdown-agent-comments`](https://registry.npmjs.org/markdown-agent-comments), [`@smcllns/mdac`](https://registry.npmjs.org/@smcllns%2fmdac), and [`@smcllns/markdown-agent-comments`](https://registry.npmjs.org/@smcllns%2fmarkdown-agent-comments) were available at check time.
-
-Publish the unscoped `markdown-agent-comments` package and expose `mdac` as its CLI binary. Reserve `@smcllns/mdac` and `@smcllns/markdown-agent-comments` if convenient during publish.
+Prior names from historic work are retired: `atag`, `Markdown Agent Tags`, `@agent tags`, `md-asks`, and `markdown-agent-directives`. If they appear in forward-looking docs, code, or UI, update them to the current naming system; leave them only in archived history or explicit historical notes.
 
 ## V1 User Workflow
 
