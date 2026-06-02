@@ -1,6 +1,6 @@
 # V1 Agent Prompt Plan
 
-Status: in progress
+Status: complete
 
 Goal: preserve the important agent-behavior contract from the old `atag` skill in the V1 `mdac` agent prompt.
 

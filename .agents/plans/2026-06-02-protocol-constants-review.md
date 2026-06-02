@@ -1,6 +1,6 @@
 # Protocol Constants Review Plan
 
-Status: in progress
+Status: complete
 
 Goal: address the engineering review findings without adding a heavy abstraction layer.
 

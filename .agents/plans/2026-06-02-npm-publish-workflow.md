@@ -1,6 +1,6 @@
 # npm Publish Workflow Plan
 
-Status: in progress
+Status: workflow committed; trusted publishing setup pending
 
 Goal: publish `markdown-agent-comments` from GitHub Actions when `main` contains an unpublished package version.
 
@@ -21,8 +21,8 @@ Goal: publish `markdown-agent-comments` from GitHub Actions when `main` contains
 
 ## Notes
 
-- Trusted publisher setup requires the package to already exist on npm.
-- Configure npm trusted publisher after first manual publish:
+- Placeholder `markdown-agent-comments@0.0.1` is published on npm.
+- Configure npm trusted publisher before the real `0.1.0` publish:
   - package: `markdown-agent-comments`
   - repository: `smcllns/markdown-agent-comments`
   - workflow filename: `publish.yml`
