@@ -13,12 +13,12 @@ Goal: add markdown fixtures Sam can read before publish to align on detection an
 
 ## Tasks
 
-- [ ] Add review input fixture.
-- [ ] Add scanner fixture test.
-- [ ] Add processed-output generator.
-- [ ] Add `test:review` script.
-- [ ] Run verification and open review files.
-- [ ] Commit changes.
+- [x] Add review input fixture.
+- [x] Add scanner fixture test.
+- [x] Add processed-output generator.
+- [x] Add `test:review` script.
+- [x] Run verification and open review files.
+- [x] Commit changes.
 
 ## Notes
 

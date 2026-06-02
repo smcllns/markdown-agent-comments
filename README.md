@@ -131,4 +131,12 @@ bun run test
 node ./src/cli.js --help
 ```
 
+For human review before publishing:
+
+```bash
+bun run test:review
+```
+
+This runs the test suite and regenerates `test/review-cases.processed.md` from `test/review-cases.md` so scanner coverage and expected processed shapes can be reviewed together.
+
 Forward-looking product decisions live in [docs/PRD.md](docs/PRD.md). Historic explorations live under [docs/archive](docs/archive).
