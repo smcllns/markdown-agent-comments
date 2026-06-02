@@ -5,6 +5,14 @@ import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import path from "node:path";
 import { scanPath, normalizeTriggers } from "./scanner.js";
+import {
+  ACTIVE_CALLOUT,
+  DEFAULT_HUMAN_LABEL,
+  DEFAULT_TRIGGERS,
+  DONE_CALLOUT,
+  EOT_SEAL,
+  normalizeHumanLabel,
+} from "./protocol.js";
 
 const DEFAULT_AGENT_COMMAND = "claude -p --permission-mode acceptEdits";
 
@@ -45,7 +53,7 @@ function parseArgs(argv) {
     command,
     targetPath: null,
     triggers: null,
-    humanLabel: "sam",
+    humanLabel: DEFAULT_HUMAN_LABEL,
     debug: false,
     once: false,
     intervalSeconds: 60,
@@ -160,7 +168,7 @@ async function scanForOptions(options, io) {
 }
 
 export function buildAgentPrompt(options, matches) {
-  const triggers = normalizeTriggers(options.triggers ?? ["agent", "claude", "codex"]);
+  const triggers = normalizeTriggers(options.triggers ?? DEFAULT_TRIGGERS);
   const triggerDisplay = triggers.map((trigger) => `@${trigger}`).join(", ");
   const humanLabel = normalizeHumanLabel(options.humanLabel);
   const files = matches.map((match) => `- ${match.relativePath}`).join("\n");
@@ -174,11 +182,11 @@ export function buildAgentPrompt(options, matches) {
     files,
     "",
     "Thread format:",
-    "- Active threads use [!NOTE].",
-    "- Resolved threads use [!DONE]-. The title is a one-line outcome summary.",
+    `- Active threads use ${ACTIVE_CALLOUT}.`,
+    `- Resolved threads use ${DONE_CALLOUT}. The title is a one-line outcome summary.`,
     "- Separate turns inside a callout with a single blank quoted line.",
     `- Human turns use [@${humanLabel}]. Agent turns use the active trigger label, for example [@${triggers[0]}].`,
-    "- End every agent reply with <!--mdac:eot-->.",
+    `- End every agent reply with ${EOT_SEAL}.`,
     "",
     "Resolution contract:",
     "- Read the full file and enough surrounding context to understand the request.",
@@ -188,18 +196,18 @@ export function buildAgentPrompt(options, matches) {
     "- If the ask sits on a task item, update the checkbox too.",
     "- Preserve the original request verbatim as the first body line inside the callout.",
     "- For an inline trigger, create a new callout immediately after the affected block, copy the original line verbatim into the callout, and remove the live trigger from the body.",
-    "- Conclude completed work with [!DONE]- and a title using past-tense action + scope, about 60 characters or less.",
+    `- Conclude completed work with ${DONE_CALLOUT} and a title using past-tense action + scope, about 60 characters or less.`,
     "",
     "When more human input is required:",
     "- If the request is ambiguous, missing context, or non-actionable, do not guess.",
     "- Do not invent facts, benefits, metrics, names, dates, or other specifics that are not present in the document.",
-    "- Leave the thread as [!NOTE], ask the smallest useful clarification question, end with <!--mdac:eot-->, then prefill the human reply label.",
+    `- Leave the thread as ${ACTIVE_CALLOUT}, ask the smallest useful clarification question, end with ${EOT_SEAL}, then prefill the human reply label.`,
     `- Prefill format: a blank quoted separator line, then > [@${humanLabel}]`,
     "",
     "Parked threads:",
     "- If the latest real thread line is agent-authored, the thread is parked waiting on the human.",
     "- Do not self-reply to parked threads, even if the agent's last reply asked a question.",
-    "- If a human follows up after <!--mdac:eot-->, inspect the request and reseal the thread after your turn.",
+    `- If a human follows up after ${EOT_SEAL}, inspect the request and reseal the thread after your turn.`,
     "",
   ].join("\n");
 }
@@ -226,7 +234,7 @@ function parseTriggerList(value) {
 }
 
 function formatTriggerSet(options) {
-  return normalizeTriggers(options.triggers ?? ["agent", "claude", "codex"])
+  return normalizeTriggers(options.triggers ?? DEFAULT_TRIGGERS)
     .map((trigger) => `@${trigger}`)
     .join(", ");
 }
@@ -286,13 +294,10 @@ function splitCommand(commandText) {
     }
   }
 
+  if (quote) throw new UsageError("--agent-command has unterminated quote");
+
   if (current) parts.push(current);
   return parts;
-}
-
-function normalizeHumanLabel(label) {
-  const first = String(label).trim().split(/\s+/)[0] || "user";
-  return first.toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "") || "user";
 }
 
 function usage() {

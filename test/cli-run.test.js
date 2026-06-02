@@ -79,6 +79,15 @@ describe("mdac run --once", () => {
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain("run currently requires --once");
   });
+
+  it("rejects unterminated quoted agent commands", async () => {
+    await write("note.md", "@claude tighten this\n");
+
+    const result = runCli(["run", tempDir, "--once", "--agent-command", "\"node"]);
+
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain("--agent-command has unterminated quote");
+  });
 });
 
 function runCli(args) {

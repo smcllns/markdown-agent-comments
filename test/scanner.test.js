@@ -72,6 +72,23 @@ describe("scanPath", () => {
     ]);
   });
 
+  it("treats normalized multi-word human label placeholders as parked", async () => {
+    await write("name.md", [
+      "> [!NOTE] awaiting clarification",
+      ">",
+      "> @claude tighten this",
+      ">",
+      "> [@claude] Which paragraph should I edit? <!--mdac:eot-->",
+      ">",
+      "> [@sam]",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir, { humanLabel: "Sam McLoughlin" });
+
+    expect(matches).toEqual([]);
+  });
+
   it("detects DONE follow-ups after the mdac seal", async () => {
     await write("done.md", [
       "> [!DONE]- resolved",

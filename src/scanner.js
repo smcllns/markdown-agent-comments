@@ -1,14 +1,22 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import {
+  ACTIVE_CALLOUT,
+  DEFAULT_HUMAN_LABEL,
+  DEFAULT_TRIGGERS,
+  DONE_CALLOUT,
+  EOT_SEAL,
+  normalizeHumanLabel,
+} from "./protocol.js";
 
-const DEFAULT_TRIGGERS = ["agent", "claude", "codex"];
-const SEAL = "<!--mdac:eot-->";
+const ACTIVE_CALLOUT_RE = new RegExp(`^\\s*>\\s*${escapeRegExp(ACTIVE_CALLOUT)}(?:\\s|$)`);
+const DONE_CALLOUT_RE = new RegExp(`^\\s*>\\s*${escapeRegExp(DONE_CALLOUT)}(?:\\s|$)`);
 
 export async function scanPath(root, options = {}) {
   const absoluteRoot = path.resolve(root);
   const rootStat = await stat(absoluteRoot);
   const triggers = normalizeTriggers(options.triggers ?? DEFAULT_TRIGGERS);
-  const humanLabel = normalizeLabel(options.humanLabel ?? "sam");
+  const humanLabel = normalizeHumanLabel(options.humanLabel ?? DEFAULT_HUMAN_LABEL);
   const rootIsFile = rootStat.isFile();
   const files = rootIsFile
     ? (absoluteRoot.endsWith(".md") ? [absoluteRoot] : [])
@@ -34,7 +42,7 @@ export async function scanPath(root, options = {}) {
 
 export function scanFile(contents, options = {}) {
   const triggers = normalizeTriggers(options.triggers ?? DEFAULT_TRIGGERS);
-  const humanLabel = normalizeLabel(options.humanLabel ?? "sam");
+  const humanLabel = normalizeHumanLabel(options.humanLabel ?? DEFAULT_HUMAN_LABEL);
   const lines = contents.split(/\r?\n/);
   const reasons = [];
 
@@ -95,7 +103,7 @@ function scanCallout(lines, startIndex, kind, triggers, humanLabel) {
 
   if (!hasTrigger) return { reason: null, endIndex };
 
-  const sealed = latestRealLine.endsWith(SEAL);
+  const sealed = latestRealLine.endsWith(EOT_SEAL);
   if (kind === "note" && !sealed && !latestIsAgent) {
     return { reason: { kind, line: startIndex + 1, trigger: hasTrigger }, endIndex };
   }
@@ -106,8 +114,8 @@ function scanCallout(lines, startIndex, kind, triggers, humanLabel) {
 }
 
 function parseCalloutStart(line) {
-  if (/^\s*>\s*\[!NOTE\](?:\s|$)/.test(line)) return { kind: "note" };
-  if (/^\s*>\s*\[!DONE\]-(?:\s|$)/.test(line)) return { kind: "done" };
+  if (ACTIVE_CALLOUT_RE.test(line)) return { kind: "note" };
+  if (DONE_CALLOUT_RE.test(line)) return { kind: "done" };
   return null;
 }
 
@@ -145,10 +153,6 @@ function isAgentSpeakerLine(line, triggers) {
     if (pattern.test(line)) return true;
   }
   return false;
-}
-
-function normalizeLabel(label) {
-  return label.replace(/^@/, "").trim().toLowerCase() || "user";
 }
 
 async function markdownFiles(root) {
