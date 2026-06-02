@@ -2,6 +2,7 @@
 import { access } from "node:fs/promises";
 import { constants } from "node:fs";
 import { spawn } from "node:child_process";
+import { setTimeout as sleep } from "node:timers/promises";
 import { scanPath, normalizeTriggers } from "./scanner.js";
 
 const DEFAULT_AGENT_COMMAND = "claude -p --permission-mode acceptEdits";
@@ -18,6 +19,9 @@ export async function main(argv = process.argv.slice(2), io = process) {
     }
     if (parsed.command === "run") {
       return await runCommand(parsed, io);
+    }
+    if (parsed.command === "watch") {
+      return await watchCommand(parsed, io);
     }
     throw new UsageError(`Unknown command: ${parsed.command}`);
   } catch (error) {
@@ -43,6 +47,8 @@ function parseArgs(argv) {
     humanLabel: "sam",
     debug: false,
     once: false,
+    intervalSeconds: 60,
+    maxCycles: null,
     agentCommand: process.env.MDAC_AGENT_COMMAND || DEFAULT_AGENT_COMMAND,
   };
 
@@ -62,6 +68,16 @@ function parseArgs(argv) {
       options.debug = true;
     } else if (arg === "--once") {
       options.once = true;
+    } else if (arg === "--interval") {
+      const value = rest[index + 1];
+      if (!value) throw new UsageError("--interval requires a value");
+      options.intervalSeconds = parsePositiveInteger(value, "--interval");
+      index += 1;
+    } else if (arg === "--max-cycles") {
+      const value = rest[index + 1];
+      if (!value) throw new UsageError("--max-cycles requires a value");
+      options.maxCycles = parsePositiveInteger(value, "--max-cycles");
+      index += 1;
     } else if (arg === "--agent-command") {
       const value = rest[index + 1];
       if (!value) throw new UsageError("--agent-command requires a value");
@@ -93,6 +109,26 @@ async function runCommand(options, io) {
   if (!options.once) throw new UsageError("run currently requires --once");
   await access(options.targetPath, constants.R_OK);
 
+  return await runAgentCycle(options, io);
+}
+
+async function watchCommand(options, io) {
+  if (!options.targetPath) throw new UsageError("watch requires a path");
+  await access(options.targetPath, constants.R_OK);
+
+  io.stdout.write(`Watching ${options.targetPath} every ${options.intervalSeconds}s...\n`);
+
+  let cycles = 0;
+  while (true) {
+    cycles += 1;
+    const code = await runAgentCycle(options, io);
+    if (code !== 0) return code;
+    if (options.maxCycles !== null && cycles >= options.maxCycles) return 0;
+    await sleep(options.intervalSeconds * 1000);
+  }
+}
+
+async function runAgentCycle(options, io) {
   const matches = await scanForOptions(options);
   io.stdout.write(formatScan(matches));
   if (matches.length === 0) return 0;
@@ -156,6 +192,13 @@ function parseTriggerList(value) {
   return value.split(",").map((trigger) => trigger.trim()).filter(Boolean);
 }
 
+function parsePositiveInteger(value, optionName) {
+  if (!/^[1-9][0-9]*$/.test(value)) {
+    throw new UsageError(`${optionName} must be a positive integer`);
+  }
+  return Number(value);
+}
+
 async function invokeAgent(commandText, prompt, cwd, io) {
   const command = splitCommand(commandText);
   if (command.length === 0) throw new UsageError("--agent-command cannot be empty");
@@ -214,11 +257,13 @@ function usage() {
     "Commands:",
     "  scan <path>        Show actionable @agent comments without invoking an agent.",
     "  run <path> --once  Scan, then invoke an agent only when work exists.",
+    "  watch <path>       Run continuously, invoking an agent only when work exists.",
     "",
     "Options:",
     "  --trigger @name    Replace the default trigger set.",
     "  --name NAME        Human speaker label for thread placeholders.",
     "  --agent-command C  Agent command for run. Default: claude -p --permission-mode acceptEdits.",
+    "  --interval SEC     Watch interval in seconds. Default: 60.",
     "  --once             Required for run in V1.",
     "  --debug            Print verbose diagnostics when supported.",
     "  -h, --help         Show help.",
