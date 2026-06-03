@@ -4,7 +4,7 @@
   "description": "@agent comments in markdown",
   "type": "module",
   "bin": {
-    "mdac": "./src/cli.js"
+    "mdac": "src/cli.js"
   },
   "files": [
     "src",
