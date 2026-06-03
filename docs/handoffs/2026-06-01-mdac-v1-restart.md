@@ -63,9 +63,9 @@ Verification:
 - `bun run test` passes.
 - Scratch smoke passed for `scan`, `run --once`, and bounded `watch` with a fake agent command.
 - Read-only Obsidian scan completed against `<local-projects>/obsidian` and found real actionable files.
-- `bun publish --dry-run` packs the intended six files.
+- The published `0.1.1` tarball contains the intended files: `package.json`, `LICENSE`, `README.md`, `docs/PRD.md`, and `src/`.
 
 V1 publish status:
 
-- `markdown-agent-comments@0.1.0` is published on npm.
+- `markdown-agent-comments@0.1.1` is published on npm.
 - GitHub Actions publish uses npm trusted publishing and waits for the maintainer `npm` environment approval.

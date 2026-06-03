@@ -315,7 +315,7 @@ function usage() {
     "",
     "Options:",
     "  --trigger @name    Replace the default trigger set.",
-    "  --name NAME        Human speaker label for thread placeholders.",
+    `  --name NAME        Human speaker label for thread placeholders. Default: ${DEFAULT_HUMAN_LABEL}.`,
     "  --agent-command C  Agent command for run/watch. Prompt is appended as final argument.",
     "  --interval SEC     Watch interval in seconds. Default: 60.",
     "  --once             Required for run in V1.",

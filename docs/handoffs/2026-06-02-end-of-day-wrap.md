@@ -9,18 +9,20 @@ The local V1 CLI is implemented and passing tests:
 - `mdac watch <path> --interval <seconds>`
 - custom triggers, human labels, debug diagnostics, single-file targets, and package allowlist
 
-`markdown-agent-comments@0.0.1` is published on npm as a placeholder to secure the package name. The real CLI release should use `0.1.0`.
+`markdown-agent-comments@0.1.1` is published on npm with the V1 CLI and public default human label set to `human`.
 
 ## Important decisions
 
 - V1 prompt should preserve the old `atag` behavior contract; V1.5 can shrink it only with prompt-regression tests protecting behavior.
 - Protocol constants live in `src/protocol.js`, but prompt prose stays inline in `src/cli.js`.
 - No legacy `#agent`, `#silent`, `[!NOTE]+`, or `<!--atag:eot-->` in forward V1 behavior.
-- GitHub Actions publish workflow is committed, but npm trusted publishing still needs external setup.
+- GitHub Actions publish workflow uses npm trusted publishing and requires maintainer approval through the GitHub `npm` environment.
 
 ## Verification
 
-- `bun run test` passes: 20 tests.
+- `bun run test` passes: 25 tests.
+- `bun run test:review` passes and regenerates the human-review processed output.
+- Published `0.1.1` tarball smoke passed for `--help`, package contents, default `human` label, `scan`, and `run --once` with a stub agent.
 - Scratch smoke and read-only Obsidian scan were completed earlier.
 - Latest code review fix addressed shared protocol constants and human-label normalization.
 
@@ -30,11 +32,11 @@ Start on `main` in `<local-projects>/markdown-agent-comments`.
 
 Recommended next sequence:
 
-1. Configure GitHub environment `npm` and npm trusted publishing for `smcllns/markdown-agent-comments` / `publish.yml` / environment `npm`.
-2. Review `test/human-review/README.md`, `test/human-review/agent-input.md`, and `test/human-review/.generated/processed-output.md` via `bun run test:review` so scanner coverage and subjective processed behavior feel right before publish.
-3. Do one last CLI polish pass before `0.1.0`: focus on `--agent-command` semantics, README install wording, and whether `watch` should print quieter status by default.
-4. Bump `package.json` from `0.1.0` only if needed, or publish current `0.1.0` once the final CLI changes are in.
-5. Push to GitHub and verify CI/publish behavior.
+1. Review the V1 human-review fixture and processed output.
+2. Run `mdac` as the main CLI against the maintainer's Obsidian workflow for a day.
+3. Patch any dogfooding issues that block daily use.
+4. Publish a quick V1 `mdac.dev` page for the terminal solution.
+5. Add thin coding-agent plugin packaging after the terminal path feels reliable.
 
 Useful files:
 

@@ -2,14 +2,14 @@
 
 ## Current result
 
-`markdown-agent-comments@0.1.0` was published successfully from GitHub Actions after the maintainer approved the `npm` environment deployment.
+`markdown-agent-comments@0.1.1` was published successfully from GitHub Actions after the maintainer approved the `npm` environment deployment.
 
-- Successful run: `https://github.com/smcllns/markdown-agent-comments/actions/runs/26857235315`
-- Registry version URL: `https://registry.npmjs.org/markdown-agent-comments/0.1.0`
+- Successful run: `https://github.com/smcllns/markdown-agent-comments/actions/runs/26857702615`
+- Registry version URL: `https://registry.npmjs.org/markdown-agent-comments/0.1.1`
 - Published bin metadata: `{"mdac":"src/cli.js"}`
-- Published tarball smoke passed by downloading the npm tarball and running `node package/src/cli.js --help`.
+- Published tarball smoke passed by downloading the npm tarball and running `node package/src/cli.js --help`, checking `DEFAULT_HUMAN_LABEL=human`, and running `scan` plus `run --once` on a tiny fixture with a stub agent.
 
-Local `bun add markdown-agent-comments@0.1.0` is expected to fail briefly on the local machine because the Bun wrapper enforces a minimum package release age. That is a local supply-chain guard, not an npm publish failure.
+Local `bun add markdown-agent-comments@0.1.1` is expected to fail briefly on the local machine because the Bun wrapper enforces a minimum package release age. That is a local supply-chain guard, not an npm publish failure.
 
 ## What is configured
 

@@ -37,7 +37,7 @@ bun run test
 node ./src/cli.js scan ~/Notes
 ```
 
-After the package is published:
+Install the published CLI:
 
 ```bash
 bun add -g markdown-agent-comments
