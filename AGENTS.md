@@ -8,5 +8,7 @@
   - If Claude authored the change, ask Codex to review it.
   - If Codex authored the change, ask Claude to review it.
 - The reviewer should look for real blockers: broken behavior, missing tests, stale docs, release risks, security issues, and scope creep. Do not use review as a rubber stamp.
-- Sam approves and merges PRs. Agents do not merge their own PRs.
+- The author requests the review, and the reviewer posts findings as a PR comment before Sam approves.
+- Sam approves and merges all PRs. Agents never merge PRs: not their own, not each other's.
+- The only allowed npm publish path is the gated GitHub Actions workflow. Agents must never run `npm publish`, `bun publish`, or any local version-bump-and-publish flow.
 - For npm releases, do not approve the GitHub `npm` environment publish gate until the merged PR has passed CI and Sam has approved the release.
