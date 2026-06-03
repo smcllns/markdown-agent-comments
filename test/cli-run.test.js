@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -27,6 +27,21 @@ afterEach(async () => {
 });
 
 describe("mdac run --once", () => {
+  it("runs when invoked through a bin symlink", async () => {
+    const linkedCli = join(tempDir, "mdac");
+    await symlink(CLI, linkedCli);
+
+    const proc = Bun.spawnSync({
+      cmd: ["node", linkedCli, "--help"],
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+
+    expect(proc.exitCode).toBe(0);
+    expect(new TextDecoder().decode(proc.stdout)).toContain("usage: mdac");
+    expect(new TextDecoder().decode(proc.stderr)).toBe("");
+  });
+
   it("does not invoke the agent when scan is clean", async () => {
     await write("note.md", "plain markdown\n");
 

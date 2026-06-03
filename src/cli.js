@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { access, stat } from "node:fs/promises";
-import { constants } from "node:fs";
+import { constants, realpathSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { scanPath, normalizeTriggers } from "./scanner.js";
 import {
   ACTIVE_CALLOUT,
@@ -327,7 +328,12 @@ function usage() {
 
 class UsageError extends Error {}
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+function isDirectRun() {
+  if (!process.argv[1]) return false;
+  return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1]);
+}
+
+if (isDirectRun()) {
   const code = await main();
   process.exitCode = code;
 }

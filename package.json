@@ -1,6 +1,6 @@
 {
   "name": "markdown-agent-comments",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "@agent comments in markdown",
   "type": "module",
   "bin": {
