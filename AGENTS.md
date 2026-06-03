@@ -11,4 +11,4 @@
 - The author requests the review, and the reviewer posts findings as a PR comment before Sam approves.
 - Sam approves and merges all PRs. Agents never merge PRs: not their own, not each other's.
 - The only allowed npm publish path is the gated GitHub Actions workflow. Agents must never run `npm publish`, `bun publish`, or any local version-bump-and-publish flow.
-- For npm releases, do not approve the GitHub `npm` environment publish gate until the merged PR has passed CI and Sam has approved the release.
+- Only Sam approves the GitHub `npm` environment publish gate, and only after the merged PR has passed CI and Sam has approved the release.
