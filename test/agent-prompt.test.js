@@ -5,14 +5,14 @@ describe("agent prompt contract", () => {
   it("preserves V1 agent behavior requirements from the historic atag skill", () => {
     const prompt = buildAgentPrompt({
       triggers: null,
-      humanLabel: "Sam",
+      humanLabel: "Human",
     }, [{
       relativePath: "note.md",
       reasons: [{ kind: "inline", line: 3, trigger: "claude" }],
     }]);
 
     expect(prompt).toContain("Trigger set: @agent, @claude, @codex");
-    expect(prompt).toContain("Human speaker label: [@sam]");
+    expect(prompt).toContain("Human speaker label: [@human]");
     expect(prompt).toContain("- note.md");
 
     expect(prompt).toContain("Read the full file and enough surrounding context");
@@ -37,7 +37,7 @@ describe("agent prompt contract", () => {
   it("does not carry forward historical scanner or protocol markers", () => {
     const prompt = buildAgentPrompt({
       triggers: ["pi"],
-      humanLabel: "Sam",
+      humanLabel: "Human",
     }, [{
       relativePath: "custom.md",
       reasons: [{ kind: "note", line: 10, trigger: "pi" }],

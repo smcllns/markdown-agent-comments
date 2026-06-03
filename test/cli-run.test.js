@@ -41,7 +41,7 @@ describe("mdac run --once", () => {
   it("invokes the configured agent from the target directory when matches exist", async () => {
     await write("note.md", "@claude tighten this\n");
 
-    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`, "--name", "Sam"]);
+    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`, "--name", "Human"]);
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe("");
@@ -56,7 +56,7 @@ describe("mdac run --once", () => {
     expect(log.argv[0]).toContain("[!NOTE]");
     expect(log.argv[0]).toContain("[!DONE]-");
     expect(log.argv[0]).toContain("<!--mdac:eot-->");
-    expect(log.argv[0]).toContain("Human speaker label: [@sam]");
+    expect(log.argv[0]).toContain("Human speaker label: [@human]");
   });
 
   it("uses MDAC_AGENT_COMMAND when --agent-command is omitted", async () => {

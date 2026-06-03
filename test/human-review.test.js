@@ -31,7 +31,7 @@ describe("human review markdown fixture", () => {
     await writeFile(join(REVIEW_DIR, ".generated", "processed-output.md"), [
       "> [!NOTE] generated output should not be scanned",
       ">",
-      "> [@sam] @agent ignore generated files",
+      "> [@human] @agent ignore generated files",
       "",
     ].join("\n"));
 

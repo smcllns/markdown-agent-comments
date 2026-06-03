@@ -1,5 +1,5 @@
 export const DEFAULT_TRIGGERS = ["agent", "claude", "codex"];
-export const DEFAULT_HUMAN_LABEL = "sam";
+export const DEFAULT_HUMAN_LABEL = "human";
 export const ACTIVE_CALLOUT = "[!NOTE]";
 export const DONE_CALLOUT = "[!DONE]-";
 export const EOT_SEAL = "<!--mdac:eot-->";

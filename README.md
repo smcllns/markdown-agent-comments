@@ -13,7 +13,7 @@ After the agent resolves it:
 ```markdown
 > [!DONE]- paragraph converted to list
 >
-> [@sam] @claude can you update this paragraph to a numbered list pls
+> [@human] @claude can you update this paragraph to a numbered list pls
 >
 > [@claude] done - updated to a 3-point list <!--mdac:eot-->
 ```
@@ -69,7 +69,7 @@ Runs in the foreground and repeats the `run --once` behavior on an interval. Cle
 | Option | Meaning |
 |---|---|
 | `--trigger @name` | Replace the default trigger set. |
-| `--name NAME` | Human speaker label used in threads. Defaults to `sam`. |
+| `--name NAME` | Human speaker label used in threads. Defaults to `human`. |
 | `--agent-command CMD` | Command used by `run` and `watch`. The prompt is appended as the final argument. |
 | `--interval SEC` | Watch interval in seconds. Defaults to `60`. |
 | `--debug` | Print scanner diagnostics to stderr. |
@@ -103,7 +103,7 @@ V1 recognizes inline comments and markdown callout threads.
 ```markdown
 > [!NOTE] heading options
 >
-> [@sam] @agent can you give me three sharper options for this heading?
+> [@human] @agent can you give me three sharper options for this heading?
 >
 > [@agent] Option 1...
 ```

@@ -2,7 +2,7 @@
 
 Two subagents ran in parallel on the same 9-case fixture (`tests/input.md`).
 
-- **V1 instructions:** `~/Projects/dotfiles/skills/obsidian-comments/SKILL.md` (currently deployed)
+- **V1 instructions:** `<local-projects>/dotfiles/skills/obsidian-comments/SKILL.md` (currently deployed)
 - **V2 instructions:** `2 projects/obsidian-comments/SKILL-v2.md` (draft)
 - Outputs: `tests/runs/v{1,2}-input.md` (modified in place) + `tests/runs/v{1,2}-observations.md` (subagent's own honesty log)
 
@@ -21,15 +21,15 @@ V2 wins on 6 cases. Loses on 0. Surfaces 3 SKILL.md ambiguities worth clarifying
 
 | # | Shape | V1 result | V2 result | Verdict |
 |---|---|---|---|---|
-| 1 | `> @sam: ...` v1 blockquote | Replied as `> @claude:` below. Clean. | Upgraded to `[!NOTE]+`, replied inside. Thread structured. | **V2** — same content, better containment |
+| 1 | `> @human: ...` v1 blockquote | Replied as `> @claude:` below. Clean. | Upgraded to `[!NOTE]+`, replied inside. Thread structured. | **V2** — same content, better containment |
 | 2 | `#claude ...` inline directive | Replied as sibling `> @claude:` blockquote, left bare `#claude` line in place. Visual noise. | Wrapped directive + reply into a single `[!DONE]-` callout. Clean. | **V2** — fixes the V1 "ugly leftover directive" problem |
-| 3 | `> sam: ...` (shorthand, no `@`) | No V1 rule — replied anyway as a judgment call (low confidence) | Upgraded to `[!NOTE]+ @sam:` per shorthand table, replied inside | **V2** — explicit rule vs ad-hoc |
-| 4 | `@sam: ...` (no leading `>`) | No V1 rule — replied with awkward bare-paragraph + blockquote layout | Upgraded to `[!NOTE]+ @sam:`, replied inside the callout | **V2** — explicit rule vs awkward layout |
+| 3 | `> human: ...` (shorthand, no `@`) | No V1 rule — replied anyway as a judgment call (low confidence) | Upgraded to `[!NOTE]+ @human:` per shorthand table, replied inside | **V2** — explicit rule vs ad-hoc |
+| 4 | `@human: ...` (no leading `>`) | No V1 rule — replied with awkward bare-paragraph + blockquote layout | Upgraded to `[!NOTE]+ @human:`, replied inside the callout | **V2** — explicit rule vs awkward layout |
 | 5 | Active `[!NOTE]+` callout | V1 doesn't know callouts — reply sits as sibling blockquote, *outside* the callout chrome | Reply added inside the callout, thread stays `[!NOTE]+` | **V2** — structural correctness |
 | 6 | `[!NOTE]+` with agent reply ending in 2 open questions | V1 strictly treats this as resolved (`> @claude:` reply present). Subagent broke V1 rules to add a useful follow-up. | Added a second `@claude:` reply with recommendation. **Ambiguous** — see Friction A below. | Tie (both fumble — for different reasons) |
 | 7 | `#claude #silent fix typos` | Fixed typo, deleted directive, no sign-off. Clean. | Same — fixed typo, removed directive, no callout, no trace. | **Tie** — both correct |
-| 8 | Bare `sam: ...` mid-prose | Left alone. Correct. | Left alone. Correct. | **Tie** — both correct |
-| 9 | Resolved `[!DONE]-` callout | V1 has no concept of "DONE means closed". Subagent deviated from strict V1 to leave it alone. A literal V1 bot would post a reply to `> @sam: 👍`. | Left alone per explicit rule. | **V2** — explicit rule vs subagent saving V1 from itself |
+| 8 | Bare `human: ...` mid-prose | Left alone. Correct. | Left alone. Correct. | **Tie** — both correct |
+| 9 | Resolved `[!DONE]-` callout | V1 has no concept of "DONE means closed". Subagent deviated from strict V1 to leave it alone. A literal V1 bot would post a reply to `> @human: 👍`. | Left alone per explicit rule. | **V2** — explicit rule vs subagent saving V1 from itself |
 
 ## Where V2 actually moves the needle
 
@@ -52,7 +52,7 @@ Recommendation: clarify the rule as "unresolved if the last reply is from the *u
 
 **B. `[!DONE]-` title conventions**
 
-Spec says "one-line outcome summary." No convention on tense, voice, length cap. Subagent used past-tense action verb ("cleaned up formatting...", "trimmed section to 3 bullets per @sam"). Worth codifying — even a one-line example block.
+Spec says "one-line outcome summary." No convention on tense, voice, length cap. Subagent used past-tense action verb ("cleaned up formatting...", "trimmed section to 3 bullets per @human"). Worth codifying — even a one-line example block.
 
 **C. Silent + no-change edge case**
 
@@ -66,4 +66,4 @@ Spec says "If no change can be made, request further direction from the user" �
 
 Ship V2. Optionally apply A/B/C clarifications to `SKILL-v2.md` before promoting to dotfiles. Each is a one-or-two-line edit.
 
-Sam can review the actual diff between V1 and V2 outputs side-by-side by opening `tests/runs/v1-input.md` and `tests/runs/v2-input.md` in Obsidian.
+A reviewer can inspect the actual diff between V1 and V2 outputs side-by-side by opening `tests/runs/v1-input.md` and `tests/runs/v2-input.md` in Obsidian.

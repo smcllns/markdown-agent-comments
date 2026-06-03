@@ -27,7 +27,7 @@ import { join } from "node:path";
 // ─── single source of truth (TS side) ─────────────────────────────────────
 const INLINE_SCAN_REGEX = String.raw`^([^>]*[[:space:]])?@(agent|claude|codex)([^[:alnum:]_]|$)`;
 const AGENTS = ["agent", "claude", "codex"] as const;
-const HUMAN_LABEL = "sam";
+const HUMAN_LABEL = "human";
 const DONE_EOT = "<!--atag:eot-->";
 const TRIGGER_ALT = AGENTS.join("|");
 const CALLOUT_SCAN_AWK = [

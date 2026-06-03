@@ -49,9 +49,9 @@ Inside an active callout, separate turns with a **single blank `>` line** — on
 Use `@name` only for trigger tags. Speaker labels use inline code as the sender/from field. Do not add a colon or other punctuation after the label:
 
 - Agent turn: ``*`claude`* reply <!--atag:eot-->``.
-- Human turn: `` `sam` reply``.
+- Human turn: `` `human` reply``.
 
-Throughout this skill, `sam` is the example human speaker label. The poller passes the human label to agents as the agent's known name for the human. Prefer `atag-poll.sh --name <name>` or `--user-name <name>`; when omitted, the poller tries `git config user.name`, GitHub user name/login, and the Unix username before falling back to `user`. Names are normalized to a simple lower-case label, using the first word for full names. Labels that collide with the active agent trigger set are invalid for `--name` and skipped during fallback; if the final fallback would collide, the poller uses the next non-colliding generic label.
+Throughout this skill, `human` is the example human speaker label. The poller passes the human label to agents as the agent's known name for the human. Prefer `atag-poll.sh --name <name>` or `--user-name <name>`; when omitted, the poller tries `git config user.name`, GitHub user name/login, and the Unix username before falling back to `user`. Names are normalized to a simple lower-case label, using the first word for full names. Labels that collide with the active agent trigger set are invalid for `--name` and skipped during fallback; if the final fallback would collide, the poller uses the next non-colliding generic label.
 
 Humans are not expected to type the speaker-label markdown by hand. Agents and tools should prefill or normalize the human label in active threads, so the human can just type the reply text after the label.
 
@@ -64,7 +64,7 @@ Humans are not expected to type the speaker-label markdown by hand. Agents and t
 >
 > *`claude`* trimmed to 3 sentences — does that read OK or want to go shorter? <!--atag:eot-->
 >
-> `sam` shorter please, ~1 sentence
+> `human` shorter please, ~1 sentence
 >
 > *`claude`* done — single sentence. <!--atag:eot-->
 > no, make it sharper
@@ -80,7 +80,7 @@ A tag is unresolved when any of:
 - A valid inline tag for a recognized trigger not yet processed into a callout.
 - A resolved `> [!DONE]- ...` callout whose latest nonblank, non-placeholder quoted line does not end with `<!--atag:eot-->`.
 
-A bare inline-code human label for this skill, such as ``> `sam` ``, is a placeholder, not a turn. Legacy emphasized label-only human placeholders are also skipped so old prefilled threads do not retrigger. This skip applies only to this skill's human speaker label; other code-only quoted lines remain real replies.
+A bare inline-code human label for this skill, such as ``> `human` ``, is a placeholder, not a turn. Legacy emphasized label-only human placeholders are also skipped so old prefilled threads do not retrigger. This skip applies only to this skill's human speaker label; other code-only quoted lines remain real replies.
 
 If the human label falls back to `user` or another generic missing-name label, add this quoted HTML comment immediately after the label-only line when leaving a `[!NOTE]+` thread waiting on the human:
 
@@ -109,7 +109,7 @@ End every agent reply with `<!--atag:eot-->` so cheap pollers can skip threads w
 ```markdown
 > *`claude`* Which direction should I take it? <!--atag:eot-->
 >
-> `sam`
+> `human`
 ```
 
 ## If further human input required
@@ -123,7 +123,7 @@ When the tag is ambiguous, missing context, or non-actionable, **don't guess**. 
 >
 > *`claude`* the wording above stretches back 12,000 words but your request sounds smaller. Confirm: (1) the last paragraph, (2) the last 4 paragraphs on this topic, or (3) the full doc. <!--atag:eot-->
 >
-> `sam`
+> `human`
 ```
 
 ## Scanning for unresolved tags
@@ -138,10 +138,10 @@ grep -rlnE --include='*.md' '^([^>]*[[:space:]])?@(agent|claude|codex)([^[:alnum
 
 Default agent names are `agent claude codex`. For custom triggers, replace the `agent|claude|codex` alternation with the custom alternation, e.g. `nora|hermes`.
 
-2. **Inline awk for callout threads** — multiline scan for actionable `[!NOTE]+` and unsealed `[!DONE]-` callouts. Pass `trigger_alt` as the same alternation used above, e.g. `agent|claude|codex`, and `human_label` as the human speaker label, e.g. `sam`.
+2. **Inline awk for callout threads** — multiline scan for actionable `[!NOTE]+` and unsealed `[!DONE]-` callouts. Pass `trigger_alt` as the same alternation used above, e.g. `agent|claude|codex`, and `human_label` as the human speaker label, e.g. `human`.
 
 ```sh
-find <path> -name '*.md' -exec awk -v trigger_alt='agent|claude|codex' -v human_label='sam' '
+find <path> -name '*.md' -exec awk -v trigger_alt='agent|claude|codex' -v human_label='human' '
 BEGIN {
   trigger_re = "(^|[[:space:]])@(" trigger_alt ")([^[:alnum:]_]|$)"
   agent_re = "^[[:space:]]*(\\*`(" trigger_alt ")`\\*|`(" trigger_alt ")`)([[:space:]]|:|$)"
@@ -229,7 +229,7 @@ Useful options:
 
 ```sh
 skills/atag/scripts/atag-poll.sh --once --dir /path/to/notes
-skills/atag/scripts/atag-poll.sh --name Sam --dir /path/to/notes
+skills/atag/scripts/atag-poll.sh --name "Human Example" --dir /path/to/notes
 skills/atag/scripts/atag-poll.sh --debug --interval 30 --dir /path/to/notes
 skills/atag/scripts/atag-poll.sh --response-style terminal --dir /path/to/notes
 skills/atag/scripts/atag-poll.sh --dir /path/to/notes @pi

@@ -13,8 +13,8 @@ A subagent reviewed the CLI/scanner code for maintainability and overengineering
   - end-of-turn seal
   - human label normalization
 - Updated scanner and CLI to share those values.
-- Fixed split human-label normalization: `--name "Sam McLoughlin"` now normalizes to `sam` consistently in both prompt generation and scanner placeholder detection.
-- Added a regression test so `> [@sam]` placeholders stay parked when the configured human name is multi-word.
+- Fixed split human-label normalization: `--name "Human Person"` now normalizes to `human` consistently in both prompt generation and scanner placeholder detection.
+- Added a regression test so `> [@human]` placeholders stay parked when the configured human name is multi-word.
 - Made `--agent-command` fail clearly on an unterminated quote instead of falling through to a spawn error.
 
 ## Deliberately not changed

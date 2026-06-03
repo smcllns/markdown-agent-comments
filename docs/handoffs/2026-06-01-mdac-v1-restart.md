@@ -2,14 +2,14 @@
 
 ## Current direction
 
-Sam is restarting the project in this fresh repo. Current naming preference:
+The maintainer is restarting the project in this fresh repo. Current naming preference:
 
 - Repo/code/spec docs: `markdown-agent-comments`
 - CLI: `mdac`
 - Natural description: `@agent comments in markdown`
 - Website: `mdac.dev`
 
-The important product constraint is that forward-looking docs should be concise, curated, and something Sam feels ownership of. Historic work can be archived broadly, but it should not become the source of truth by accident.
+The important product constraint is that forward-looking docs should be concise, curated, and something the maintainer feels ownership of. Historic work can be archived broadly, but it should not become the source of truth by accident.
 
 ## Current artifacts
 
@@ -17,9 +17,7 @@ The important product constraint is that forward-looking docs should be concise,
 - Local CLI user guide: `README.md`
 - Archive index: `docs/archive/README.md`
 - Copied prior art: `docs/archive/prior-art/`
-- Research notes: `research/2026-06-01-mdac-v1/`
-- Research plan: `.agents/plans/2026-06-01-mdac-v1-restart.md`
-- Implementation plan: `.agents/plans/2026-06-02-mdac-v1-cli.md`
+- Implementation handoffs: `docs/handoffs/`
 
 ## Decisions encoded in the approved PRD
 
@@ -34,15 +32,15 @@ The important product constraint is that forward-looking docs should be concise,
 
 ## Known prior-art locations
 
-- `/Users/smcllns/Projects/skills/skills/atag`
-- `/Users/smcllns/Projects/skills/docs/naming/atag.md`
-- `/Users/smcllns/Projects/skills/docs/handoffs/atag-naming-plan-2026-05-26.md`
-- `/Users/smcllns/Projects/skills/.agents/plans/*atag*.md`
-- `/Users/smcllns/Projects/obsidian/2 projects/obsidian-comments`
-- `/Users/smcllns/Projects/obsidian/_agents/reports/*md-asks*.md`
-- `/Users/smcllns/Projects/atag-landing`
-- `/Users/smcllns/Projects/atag-hero-options`
-- `/Users/smcllns/Projects/memos/md-asks/md-asks.memo.md`
+- `<local-projects>/skills/skills/atag`
+- `<local-projects>/skills/docs/naming/atag.md`
+- `<local-projects>/skills/docs/handoffs/atag-naming-plan-2026-05-26.md`
+- `<local-projects>/skills/.agents/plans/*atag*.md`
+- `<local-projects>/obsidian/2 projects/obsidian-comments`
+- `<local-projects>/obsidian/_agents/reports/*md-asks*.md`
+- `<local-projects>/atag-landing`
+- `<local-projects>/atag-hero-options`
+- `<local-projects>/memos/md-asks/md-asks.memo.md`
 
 ## Review Decisions
 
@@ -64,9 +62,10 @@ Verification:
 
 - `bun run test` passes.
 - Scratch smoke passed for `scan`, `run --once`, and bounded `watch` with a fake agent command.
-- Read-only Obsidian scan completed against `/Users/smcllns/Projects/obsidian` and found real actionable files.
+- Read-only Obsidian scan completed against `<local-projects>/obsidian` and found real actionable files.
 - `bun publish --dry-run` packs the intended six files.
 
-Remaining blocker:
+V1 publish status:
 
-- Real npm publish is blocked until an npm credential is available. The configured 1Password service account found no npm/npmjs/package-publish token, and local npm/Bun config points at `http://127.0.0.1:8765/` with no auth token.
+- `markdown-agent-comments@0.1.0` is published on npm.
+- GitHub Actions publish uses npm trusted publishing and waits for the maintainer `npm` environment approval.

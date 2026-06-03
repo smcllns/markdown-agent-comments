@@ -26,7 +26,7 @@ The local V1 CLI is implemented and passing tests:
 
 ## Good place to resume tomorrow
 
-Start on `main` in `/Users/smcllns/Projects/markdown-agent-comments`.
+Start on `main` in `<local-projects>/markdown-agent-comments`.
 
 Recommended next sequence:
 
@@ -38,8 +38,8 @@ Recommended next sequence:
 
 Useful files:
 
-- `.agents/plans/2026-06-02-mdac-v1-cli.md`
-- `.agents/plans/2026-06-02-npm-publish-workflow.md`
+- `docs/PRD.md`
+- `README.md`
 - `docs/handoffs/2026-06-02-v1-agent-prompt.md`
 - `docs/handoffs/2026-06-02-protocol-constants-review.md`
 - `docs/handoffs/2026-06-02-npm-publish-workflow.md`

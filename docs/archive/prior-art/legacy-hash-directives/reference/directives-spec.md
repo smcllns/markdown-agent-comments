@@ -146,7 +146,7 @@ see #claude for the rule (mid-line)
 
 ### Trailing directive
 
-Sam's case from 2026-05-19 — directive at the end of a sentence.
+User case from 2026-05-19 — directive at the end of a sentence.
 
 ```md @test:match
 tell me my options please #claude

@@ -18,7 +18,7 @@ beforeEach(async () => {
   logPath = join(tempDir, "claude.log");
   await mkdir(binDir);
   await mkdir(fixtureDir);
-  await installGitStub("Sam Collins");
+  await installGitStub("Human Example");
 });
 
 afterEach(async () => {
@@ -130,7 +130,7 @@ describe("atag-poll", () => {
         ">",
         "> *`claude`* Which direction should I take it? <!--atag:eot-->",
         ">",
-        "> `sam` make it more concrete",
+        "> `human` make it more concrete",
         "",
       ].join("\n"),
     );
@@ -149,11 +149,11 @@ describe("atag-poll", () => {
       [
         "> [!NOTE]+ awaiting direction",
         ">",
-        "> `sam` @claude make this better",
+        "> `human` @claude make this better",
         ">",
         "> *`claude`* Which direction should I take it? <!--atag:eot-->",
         ">",
-        "> `sam` ",
+        "> `human` ",
         "",
       ].join("\n"),
     );
@@ -201,7 +201,7 @@ describe("atag-poll", () => {
   });
 
   it("falls back to git name before GitHub name and unix username", async () => {
-    await installGitStub("Sam Collins");
+    await installGitStub("Human Example");
     await installGhStub("Maya Example");
     await installIdStub("unixname");
     await installClaudeStub();
@@ -210,11 +210,11 @@ describe("atag-poll", () => {
       [
         "> [!NOTE]+ awaiting direction",
         ">",
-        "> `sam` @claude make this better",
+        "> `human` @claude make this better",
         ">",
         "> *`claude`* Which direction should I take it? <!--atag:eot-->",
         ">",
-        "> `sam` ",
+        "> `human` ",
         "",
       ].join("\n"),
     );
@@ -348,11 +348,11 @@ describe("atag-poll", () => {
       [
         "> [!NOTE]+ awaiting direction",
         ">",
-        "> `sam` @claude make this better",
+        "> `human` @claude make this better",
         ">",
         "> *`claude`* Which direction should I take it? <!--atag:eot-->",
         ">",
-        "> *`sam`* ",
+        "> *`human`* ",
         "",
       ].join("\n"),
     );
@@ -372,11 +372,11 @@ describe("atag-poll", () => {
       [
         "> [!NOTE]+ awaiting direction",
         ">",
-        "> `sam` @claude make this better",
+        "> `human` @claude make this better",
         ">",
         "> *`claude`* Which direction should I take it? <!--atag:eot-->",
         ">",
-        "> `sam` make it more concrete",
+        "> `human` make it more concrete",
         "",
       ].join("\n"),
     );
@@ -395,11 +395,11 @@ describe("atag-poll", () => {
       [
         "> [!NOTE]+ awaiting direction",
         ">",
-        "> `sam` @claude make this better",
+        "> `human` @claude make this better",
         ">",
         "> *`claude`* Which direction should I take it? <!--atag:eot-->",
         ">",
-        "> `sam`",
+        "> `human`",
         "> make it more concrete",
         "",
       ].join("\n"),
@@ -419,11 +419,11 @@ describe("atag-poll", () => {
       [
         "> [!NOTE]+ awaiting direction",
         ">",
-        "> `sam` @claude which command?",
+        "> `human` @claude which command?",
         ">",
         "> *`claude`* Which command should I use? <!--atag:eot-->",
         ">",
-        "> `sam`",
+        "> `human`",
         "> `bun`",
         "",
       ].join("\n"),
@@ -445,7 +445,7 @@ describe("atag-poll", () => {
         ">",
         "> @codex please help",
         ">",
-        "> `sam` one more thing",
+        "> `human` one more thing",
         "",
       ].join("\n"),
     );

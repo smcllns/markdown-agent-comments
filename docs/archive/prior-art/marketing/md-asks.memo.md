@@ -54,7 +54,7 @@ The agent isn't supposed to guess. It leaves the thread open and asks back:
 > @claude: the wording above stretches back 12,000 words but your ask sounds smaller. Confirm: (1) the last paragraph, (2) the last 4 paragraphs on this topic, or (3) the full doc.
 ```
 
-I reply by adding a `@sam: …` paragraph and resaving. The thread is now "human spoke last" → the next scan picks it back up.
+I reply by adding a `@human: …` paragraph and resaving. The thread is now "human spoke last" → the next scan picks it back up.
 
 <!-- TODO: multi-turn-thread.png — open amber thread with 2-3 back-and-forth turns -->
 

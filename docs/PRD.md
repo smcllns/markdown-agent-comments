@@ -2,7 +2,7 @@
 
 Status: approved for V1 implementation
 Last updated: 2026-06-02
-Owner: Sam
+Owner: maintainer
 
 ## Product Vision
 
@@ -44,7 +44,7 @@ The agent edits the document as requested, then wraps the discussion in a callou
 
 > [!DONE]- paragraph converted to list
 >
-> [@sam] @claude can you switch that paragraph to numbered list pls
+> [@human] @claude can you switch that paragraph to numbered list pls
 >
 > [@claude] done - updated to a 3-point list <!--mdac:eot-->
 
@@ -134,13 +134,13 @@ The PRD describes product intent. Detailed scanner, prompt, and fixture behavior
 
 ## Roadmap
 
-### V1: Local CLI That Works For Sam
+### V1: Local CLI That Works
 
 Ship the `mdac` CLI with `scan`, `run --once`, `watch`, core protocol tests, and a minimal README.
 
 Exit criteria:
 
-- Sam can point `mdac` at a notes folder, including inside Obsidian vault
+- Users can point `mdac` at a notes folder, including an Obsidian vault
 - No-op runs are cheap and transparent.
 - Concrete asks resolve into `[!DONE]-`.
 - Asks that require further user input become `[!NOTE]`.

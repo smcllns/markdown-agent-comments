@@ -13,7 +13,7 @@ The compact prompt in the first CLI pass was too small. It kept the core markers
 - `[!NOTE]`, not `[!NOTE]+`
 - `[!DONE]-`
 - `<!--mdac:eot-->`, not `<!--atag:eot-->`
-- `[@sam]` / `[@agent]` speaker labels
+- `[@human]` / `[@agent]` speaker labels
 - no scanner, poller, grep, awk, or legacy directive guidance
 
 ## Regression guard

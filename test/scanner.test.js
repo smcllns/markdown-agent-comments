@@ -51,7 +51,7 @@ describe("scanPath", () => {
       ">",
       "> [@claude] Which direction should I take? <!--mdac:eot-->",
       ">",
-      "> [@sam] punchier",
+      "> [@human] punchier",
       "",
       "> [!NOTE] placeholder only",
       ">",
@@ -59,11 +59,11 @@ describe("scanPath", () => {
       ">",
       "> [@claude] Which direction should I take? <!--mdac:eot-->",
       ">",
-      "> [@sam]",
+      "> [@human]",
       "",
     ].join("\n"));
 
-    const matches = await scanPath(tempDir, { humanLabel: "sam" });
+    const matches = await scanPath(tempDir, { humanLabel: "human" });
 
     expect(matches).toHaveLength(1);
     expect(matches[0].reasons).toEqual([
@@ -80,11 +80,11 @@ describe("scanPath", () => {
       ">",
       "> [@claude] Which paragraph should I edit? <!--mdac:eot-->",
       ">",
-      "> [@sam]",
+      "> [@human]",
       "",
     ].join("\n"));
 
-    const matches = await scanPath(tempDir, { humanLabel: "Sam McLoughlin" });
+    const matches = await scanPath(tempDir, { humanLabel: "Human Person" });
 
     expect(matches).toEqual([]);
   });

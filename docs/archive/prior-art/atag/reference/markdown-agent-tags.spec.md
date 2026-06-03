@@ -7,7 +7,7 @@ whether the scan should pick this file up:
 
 - info `md @test:match` — unresolved scan should find this file
 - info `md @test:nomatch` — unresolved scan should skip this file
-- optional `@human:<label>` — run this fixture with a non-`sam` human label
+- optional `@human:<label>` — run this fixture with a non-`human` human label
 - info `md @done:match` — DONE seal scan should find this file
 - info `md @done:nomatch` — DONE seal scan should skip this file
 - any other info string (or no fenced block) — ignored by the runner, free for
@@ -36,11 +36,11 @@ Inside callouts, `@name` is only for the original trigger tag. Speaker labels
 are inline-code sender/from fields with no trailing colon or punctuation. Agent
 replies start with an emphasized inline-code label like ``*`claude`* reply``
 and end with `<!--atag:eot-->` after yielding the turn. Human replies start
-with a bare inline-code label like `` `sam` reply``.
+with a bare inline-code label like `` `human` reply``.
 
-Throughout this spec, `sam` is the example human speaker label. When adapting
+Throughout this spec, `human` is the example human speaker label. When adapting
 the skill for another human, pass the agent's known name for that human with
-`atag-poll.sh --name <name>` or replace `sam` in the examples and prefilled
+`atag-poll.sh --name <name>` or replace `human` in the examples and prefilled
 human-label convention with that human's preferred short label. Agents/tools may
 prefill that bare human label in active `[!NOTE]+` threads so the human can just
 type the reply text. Label-only human-label lines are placeholders; other
@@ -138,7 +138,7 @@ again.
 >
 > *`claude`* Which direction should I take it? <!--atag:eot-->
 >
-> `sam` make it more concrete
+> `human` make it more concrete
 ```
 
 ### Active agent thread — prefilled human label placeholder
@@ -150,11 +150,11 @@ skips it.
 ```md @test:nomatch
 > [!NOTE]+ awaiting direction
 >
-> `sam` @claude make this better
+> `human` @claude make this better
 >
 > *`claude`* Which direction should I take it? <!--atag:eot-->
 >
-> `sam`
+> `human`
 ```
 
 ### Active agent thread — legacy emphasized human label placeholder
@@ -165,11 +165,11 @@ reply, so existing prefilled threads do not retrigger.
 ```md @test:nomatch
 > [!NOTE]+ awaiting direction
 >
-> `sam` @claude make this better
+> `human` @claude make this better
 >
 > *`claude`* Which direction should I take it? <!--atag:eot-->
 >
-> *`sam`*
+> *`human`*
 ```
 
 ### Active agent thread — missing human name placeholder comment
@@ -180,7 +180,7 @@ are both placeholders, not a reply.
 ```md @test:nomatch @human:user
 > [!NOTE]+ awaiting direction
 >
-> `sam` @claude make this better
+> `human` @claude make this better
 >
 > *`claude`* Which direction should I take it? <!--atag:eot-->
 >
@@ -196,11 +196,11 @@ actionable again.
 ```md @test:match
 > [!NOTE]+ awaiting direction
 >
-> `sam` @claude make this better
+> `human` @claude make this better
 >
 > *`claude`* Which direction should I take it? <!--atag:eot-->
 >
-> `sam` make it more concrete
+> `human` make it more concrete
 ```
 
 ### Active agent thread — human reply on line after prefilled label
@@ -212,11 +212,11 @@ actionable.
 ```md @test:match
 > [!NOTE]+ awaiting direction
 >
-> `sam` @claude make this better
+> `human` @claude make this better
 >
 > *`claude`* Which direction should I take it? <!--atag:eot-->
 >
-> `sam`
+> `human`
 > make it more concrete
 ```
 
@@ -228,11 +228,11 @@ line with a code-only token, the thread is actionable.
 ```md @test:match
 > [!NOTE]+ awaiting direction
 >
-> `sam` @claude which command?
+> `human` @claude which command?
 >
 > *`claude`* Which command should I use? <!--atag:eot-->
 >
-> `sam`
+> `human`
 > `bun`
 ```
 

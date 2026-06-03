@@ -35,7 +35,7 @@ This nudges Cowork (when it auto-writes a scheduled-task SKILL.md that invokes m
 **Session files live at:**
 
 ```
-~/Library/Application Support/Claude/local-agent-mode-sessions/
+<local-claude-sessions>/
   <account-uuid>/<workspace-uuid>/
     local_<session-uuid>.json    ← metadata (title, createdAt, model)
     local_<session-uuid>/audit.jsonl    ← turn-by-turn transcript
@@ -49,13 +49,13 @@ Account/workspace UUIDs change per machine — glob `local_*.json` and filter by
 2. `audit.jsonl` `assistant` events have a `message.usage` block with `input_tokens`, `cache_creation_input_tokens`, `cache_read_input_tokens`, `output_tokens`.
 3. `cache_read` dominates totals for long agentic loops — each turn re-sends accumulated context. Don't be misled by a 1.7M-token session: most of that is cache reads at $0.30/Mtok.
 4. To classify "real action" vs "heartbeat-only", look at `Edit`/`Write` tool_use `file_path` args. Writes to `/4 wiki/agent-journal/` or `/_agents/` are heartbeat logs, not actioned asks. Writes elsewhere are real actions.
-5. The Cowork sandbox runs files at `/sessions/<name>/mnt/...` not `~/Projects/...` — relevant if you're trying to grep absolute paths from tool inputs.
+5. The Cowork sandbox runs files at `/sessions/<name>/mnt/...` not `<local-projects>/...` — relevant if you're trying to grep absolute paths from tool inputs.
 
-**Quick start script** — the analysis script lives nowhere persistent; rebuild it from the conversation at `~/.claude/projects/-Users-smcllns-Projects/` if needed. Skeleton:
+**Quick start script** — the analysis script lives nowhere persistent; rebuild it from the conversation at `<local-claude-projects>/` if needed. Skeleton:
 
 ```python
 import json, pathlib
-base = pathlib.Path("~/Library/Application Support/Claude/local-agent-mode-sessions/<acct>/<workspace>").expanduser()
+base = pathlib.Path("<local-claude-sessions>/<acct>/<workspace>").expanduser()
 for jf in base.glob("local_*.json"):
     meta = json.loads(jf.read_text())
     if meta.get("title") != "<task title>": continue
