@@ -1,5 +1,16 @@
 # npm publish workflow handoff
 
+## Current result
+
+`markdown-agent-comments@0.1.0` was published successfully from GitHub Actions after Sam approved the `npm` environment deployment.
+
+- Successful run: `https://github.com/smcllns/markdown-agent-comments/actions/runs/26857235315`
+- Registry version URL: `https://registry.npmjs.org/markdown-agent-comments/0.1.0`
+- Published bin metadata: `{"mdac":"src/cli.js"}`
+- Published tarball smoke passed by downloading the npm tarball and running `node package/src/cli.js --help`.
+
+Local `bun add markdown-agent-comments@0.1.0` is expected to fail briefly on Sam's machine because the Bun wrapper enforces a minimum package release age. That is a local supply-chain guard, not an npm publish failure.
+
 ## What is configured
 
 `.github/workflows/publish.yml` runs on pushes to `main` and on manual dispatch.
@@ -60,8 +71,8 @@ Live check on 2026-06-02: `https://registry.npmjs.org/markdown-agent-comments/0.
 
 After the trusted publisher succeeds, npm recommends setting publishing access to require 2FA and disallow tokens.
 
-## Expected first automated run
+## Expected future automated runs
 
-Once the package exists and trusted publishing is configured, the next push to `main` with a new `package.json` version should publish automatically. Re-running a workflow for an already-published version should skip publishing.
+The next push to `main` with a new `package.json` version should run tests, wait for Sam's `npm` environment approval, and publish automatically after approval. Re-running a workflow for an already-published version should skip publishing.
 
 Adding or changing non-version files on `main` should run tests but skip publish.
