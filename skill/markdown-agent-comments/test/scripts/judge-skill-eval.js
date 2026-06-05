@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path, { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { scanPath } from "../../scripts/scanner.js";
@@ -12,6 +12,7 @@ const RUNS_DIR = join(EVAL_DIR, "runs");
 const options = parseArgs(process.argv.slice(2));
 const runDir = resolveRunDir(options.run);
 const actualDir = join(runDir, "actual");
+await assertDirectory(actualDir);
 const metadata = await readJsonMaybe(join(runDir, "metadata.json"));
 const caseNames = (await readdir(EXPECTED_DIR)).filter((name) => name.endsWith(".md")).sort();
 
@@ -189,6 +190,22 @@ function resolveRunDir(run) {
   if (path.isAbsolute(run) || run.includes("/")) return path.resolve(run);
   if (!/^[A-Za-z0-9._-]+$/.test(run)) throw new Error(`Invalid run id: ${run}`);
   return join(RUNS_DIR, run);
+}
+
+async function assertDirectory(dir) {
+  let result;
+  try {
+    result = await stat(dir);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      throw new Error(`Eval actual directory does not exist: ${dir}\nRun eval:prepare first, then point the executor at the generated actual/ files.`);
+    }
+    throw error;
+  }
+
+  if (!result.isDirectory()) {
+    throw new Error(`Eval actual path is not a directory: ${dir}`);
+  }
 }
 
 async function readFileMaybe(file) {

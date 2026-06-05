@@ -34,6 +34,13 @@ describe("skill eval scripts", () => {
     expect(parsed.score).toBe(1);
     expect(parsed.cases.every((item) => item.status === "pass")).toBe(true);
   });
+
+  it("fails clearly when the actual run directory is missing", async () => {
+    const missingRunId = `missing-${process.pid}-${Date.now()}`;
+
+    await expect(runNode(join(SCRIPTS_DIR, "judge-skill-eval.js"), ["--run", missingRunId]))
+      .rejects.toThrow("Eval actual directory does not exist");
+  });
 });
 
 function runNode(script, args) {
