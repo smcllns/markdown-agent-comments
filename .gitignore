@@ -2,5 +2,5 @@
 skill/markdown-agent-comments/test/fixtures/skill-evals/runs/
 skill/markdown-agent-comments/test/fixtures/runs/
 .agents/plans/
-research/
+/research/
 SKILL.prev.md
