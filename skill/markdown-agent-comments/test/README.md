@@ -1,19 +1,20 @@
-# Markdown Agent Comments Tests And Evals
+# Tests And Evals | Markdown Agent Comments
 
-## ELI10 Overview
+## Overview
 
-This folder answers two different questions:
+This folder answers three different questions:
 
 1. Does the deterministic scanner find the right `@agent` comments?
-2. Can an agent using `SKILL.md` process realistic markdown correctly?
+2. Can an agent using `SKILL.md` process real markdown files correctly?
+3. Is it easy for a human to understand what common cases are supported and what gets ignored?
 
-Those are not the same thing.
+## How It Works
 
-The scanner tests are normal pass/fail tests. They should be boring, exact, and reliable.
+The scanner is tested using pass/fail deterministic automated tests.
 
-The skill evals are more like a practice course for agents. An agent gets markdown files with comments to resolve, writes output into a generated run directory, and then a judge compares that output to expected examples with partial-credit scoring.
+The skill is tested using evals. An agent gets markdown files with comments to resolve, writes output into a generated run directory, and then a judge compares that output with known correct results in `expected/` and scores the work with a rubric.
 
-The human demo is a small before/after example you can read quickly to understand what gets touched and what stays alone.
+The human demo is a small before/after example humans can read quickly to understand what gets touched and what stays alone.
 
 ## Quick Start
 
