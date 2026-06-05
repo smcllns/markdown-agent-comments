@@ -16,7 +16,7 @@ Those need different test shapes. Scanner behavior should be binary and regressi
 - Make it easy for a human to understand what the tool does and does not affect.
 - Keep executor-visible input separate from judge-only expected output.
 - Avoid bloating one fixture until it is bad at every job.
-- Keep tests and small fixtures with the skill so the skill travels with its verification examples.
+- Keep core skill/scanner tests and small fixtures with the skill so the skill travels with its verification examples.
 - Keep generated eval runs, generated demo output, and scratch artifacts out of git and out of the npm package.
 
 ## Non-Goals
@@ -125,19 +125,14 @@ The demo should be realistic and readable. It should show useful examples of com
 
 ## Repository And Package Shape
 
-Tests should live with the skill:
+Core tests should live with the skill, while adapter tests should live with their adapter:
 
 ```text
 skill/markdown-agent-comments/
   SKILL.md
-  cli-preprompt.md
   scripts/
-    cli.js
     scanner.js
   test/
-    cli-run.test.js
-    cli-scan.test.js
-    cli-watch.test.js
     scanner.test.js
     skill.test.js
     fixtures/
@@ -150,9 +145,17 @@ skill/markdown-agent-comments/
         input/
         expected/
         runs/
+
+cli/
+  cli.js
+  cli-preprompt.md
+  test/
+    cli-run.test.js
+    cli-scan.test.js
+    cli-watch.test.js
 ```
 
-Small committed tests and fixtures may ship with the package because they document and verify the portable skill artifact. Generated outputs should not ship.
+Small committed tests and fixtures may ship with the package because they document and verify the portable core artifact and CLI adapter. Generated outputs should not ship.
 
 Required ignore/package rules:
 

@@ -15,7 +15,7 @@ Use current naming from `docs/naming.md` in all forward-looking docs and code. I
 - `skill/markdown-agent-comments/SKILL.md` is the canonical agent behavior contract.
 - `skill/markdown-agent-comments/scripts/scanner.js` is the deterministic scanner.
 - `mdac` is the CLI wrapper around the skill and scanner.
-- Tests and fixtures live with the skill for now. Generated eval runs under `skill/markdown-agent-comments/test/fixtures/skill-evals/runs/` are ignored and must not be committed.
+- Core skill/scanner tests and fixtures live under `skill/markdown-agent-comments/test/`; CLI adapter tests live under `cli/test/`. Generated eval runs under `skill/markdown-agent-comments/test/fixtures/skill-evals/runs/` are ignored and must not be committed.
 
 ## Reviewer Checklist
 

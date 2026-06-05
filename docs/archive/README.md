@@ -18,6 +18,7 @@ Archive files are provenance, not current product direction. Forward-looking doc
 | `prior-art/atag/reference/markdown-agent-tags.spec.md` | `<local-projects>/dotfiles/agents/skills/atag/reference/markdown-agent-tags.spec.md` | scanner fixture catalog |
 | `prior-art/atag/reference/markdown-agent-tags.spec.test.ts` | `<local-projects>/dotfiles/agents/skills/atag/reference/markdown-agent-tags.spec.test.ts` | test runner for the fixture catalog |
 | `prior-art/atag/reference/atag-poll.test.ts` | `<local-projects>/dotfiles/agents/skills/atag/reference/atag-poll.test.ts` | poller behavior coverage |
+| `prior-art/atag-SKILL.prev.md` | repo-root `SKILL.prev.md` | archived legacy `atag` skill snapshot |
 | `prior-art/legacy-hash-directives/reference/directives-spec.md` | `<local-projects>/dotfiles/agents/skills/markdown-agent-directives/reference/directives-spec.md` | legacy `#agent` directive contract |
 | `prior-art/obsidian-comments/tests/RESULTS.md` | `<local-projects>/obsidian/2 projects/obsidian-comments/tests/RESULTS.md` | evidence that callout containment improved behavior |
 | `prior-art/obsidian-comments/token-audit-2026-05-26.md` | `<local-projects>/obsidian/2 projects/obsidian-comments/token-audit-2026-05-26.md` | no-op scheduled run cost evidence |

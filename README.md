@@ -34,7 +34,7 @@ From this checkout:
 ```bash
 bun install
 bun run test
-node ./skill/markdown-agent-comments/scripts/cli.js scan ~/Notes
+node ./cli/cli.js scan ~/Notes
 ```
 
 Install the published CLI:
@@ -132,9 +132,11 @@ The callout should preserve the trigger and request text, plus only the surround
 
 ## Development
 
+Core skill/scanner artifacts live under `skill/markdown-agent-comments/`. The CLI adapter lives under `cli/`.
+
 ```bash
 bun run test
-node ./skill/markdown-agent-comments/scripts/cli.js --help
+node ./cli/cli.js --help
 ```
 
 For human review before publishing:

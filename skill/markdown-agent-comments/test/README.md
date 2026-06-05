@@ -8,6 +8,8 @@ This folder answers three different questions:
 2. Can an agent using `SKILL.md` process real markdown files correctly?
 3. Is it easy for a human to understand what common cases are supported and what gets ignored?
 
+CLI adapter tests live in `../../../cli/test/`; this folder owns the portable skill, scanner, demo, and eval fixtures.
+
 ## How It Works
 
 The scanner is tested using pass/fail deterministic automated tests.
@@ -65,6 +67,7 @@ Generated eval runs live under `fixtures/skill-evals/runs/`. Generated demo runs
 ## What Is Where
 
 - `scanner.test.js` checks scanner behavior, including temp-file edge cases.
+- `../../../cli/test/` checks CLI scan, run, watch, and prompt handoff behavior.
 - `fixtures/scanner-cases.md` is the dense scanner regression fixture.
 - `fixtures/scanner-cases.expected.json` is the exact scanner output expected for that fixture.
 - `demo.test.js` checks the human demo input has intended matches and the processed demo is sealed.
