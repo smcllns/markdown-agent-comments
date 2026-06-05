@@ -4,7 +4,7 @@
 
 Markdown Agent Comments has two different correctness problems:
 
-1. The scanner must deterministically find the right markdown asks and ignore false positives.
+1. The scanner must deterministically find the right markdown comments and ignore false positives.
 2. An agent using the skill must make good edits, preserve the thread protocol, and avoid touching unrelated content.
 
 Those need different test shapes. Scanner behavior should be binary and regression-oriented. Skill behavior should be evaluated with realistic examples, partial-credit scoring, and human-readable findings. A demo fixture should be optimized for humans, not mistaken for exhaustive coverage.
@@ -30,18 +30,18 @@ Those need different test shapes. Scanner behavior should be binary and regressi
 
 ### Scanner Regression Fixtures
 
-Purpose: deterministic binary tests for what counts as an actionable mdac ask.
+Purpose: deterministic binary tests for what counts as an actionable mdac comment.
 
-Proposed files:
+Implemented files:
 
 - `skill/markdown-agent-comments/test/fixtures/scanner-cases.md`
 - `skill/markdown-agent-comments/test/fixtures/scanner-cases.expected.json`
 
-Coverage should include:
+Coverage includes the dense fixture plus focused unit tests for:
 
 - Default triggers: `@agent`, `@claude`, `@codex`.
-- Custom triggers.
-- Inline asks.
+- Custom triggers in focused unit tests.
+- Inline comments.
 - Active `[!NOTE]` threads.
 - Closed `[!DONE]-` threads.
 - DONE follow-ups after `<!--mdac:eot-->`.
@@ -59,7 +59,7 @@ Verification:
 
 Purpose: evaluate whether an agent using only the skill processes realistic markdown correctly.
 
-Proposed files:
+Implemented files:
 
 - `skill/markdown-agent-comments/test/fixtures/skill-evals/input/*.md`
 - `skill/markdown-agent-comments/test/fixtures/skill-evals/expected/*.md`
@@ -69,15 +69,15 @@ The executing agent should only be pointed at `input/`. The judge can read `inpu
 
 Initial cases:
 
-- `single-thread.md`: one clear actionable ask.
-- `mixed-open-closed.md`: one open ask plus closed or irrelevant threads that must not change.
+- `single-thread.md`: one clear actionable comment.
+- `mixed-open-closed.md`: one open comment plus closed or irrelevant threads that must not change.
 - `code-and-examples.md`: trigger-looking text inside code/examples must be ignored.
 - `multi-turn-thread.md`: existing user/agent callout where the agent must append, not overwrite.
-- `quality-sensitive.md`: ask requires a useful answer, not just mechanical DONE wrapping.
+- `quality-sensitive.md`: request requires a useful answer, not just mechanical DONE wrapping.
 
 Suggested judge dimensions:
 
-- `detection`: found every intended open ask and no ignored asks.
+- `detection`: found every intended open comment and no ignored comments.
 - `placement`: response was appended in the right thread/location.
 - `threadFormat`: callout label, DONE state, and end marker are correct.
 - `taskQuality`: answer satisfies the human request.
@@ -114,14 +114,14 @@ Suggested result shape:
 
 Purpose: provide a pleasant, quick-read overview for humans evaluating the tool.
 
-Proposed files:
+Implemented files:
 
 - `skill/markdown-agent-comments/test/fixtures/demo.md`
 - `skill/markdown-agent-comments/test/fixtures/demo.processed.md`
 
-The demo should be realistic and readable. It should show useful examples of asks that will be processed and common trigger-looking content that will not be affected. It should not try to be exhaustive.
+The demo should be realistic and readable. It should show useful examples of comments that will be processed and common trigger-looking content that will not be affected. It should not try to be exhaustive.
 
-The current `scripts/generate-review-output.js` and `skill/markdown-agent-comments/test/human-review/` flow is transitional. The eval/testing PR should replace or rename it around the committed demo fixture flow, so the repository does not keep two parallel human-review systems.
+`demo.processed.md` is a curated reference output, not proof that a current agent generated the exact text. The real demo review flow is `skill/markdown-agent-comments/test/scripts/run-demo-skill.js`, which copies `demo.md` to an ignored generated run directory, invokes a real LLM command with `SKILL.md`, and scans the generated output.
 
 ## Repository And Package Shape
 
@@ -143,6 +143,7 @@ skill/markdown-agent-comments/
     fixtures/
       demo.md
       demo.processed.md
+      runs/
       scanner-cases.md
       scanner-cases.expected.json
       skill-evals/
@@ -156,22 +157,23 @@ Small committed tests and fixtures may ship with the package because they docume
 Required ignore/package rules:
 
 - Ignore `skill/markdown-agent-comments/test/fixtures/skill-evals/runs/`.
-- Ignore generated demo scratch output if any remains after `demo.processed.md` is committed.
+- Ignore `skill/markdown-agent-comments/test/fixtures/runs/`.
 - Ignore `.generated/` directories.
 - Do not include generated run logs, model transcripts, screenshots, or temporary judge output in npm package contents.
 - Keep package contents small enough that installed users get useful examples without noisy artifacts.
 
 ## Execution Model
 
-Start semi-manual:
+Start semi-manual with the checked-in eval scripts:
 
-1. A script creates a run directory.
-2. The script prints or copies the executor prompt.
+1. `bun run eval:prepare -- --executor <name>` creates a run directory.
+2. The script writes the executor prompt.
 3. The executor agent edits generated copies of the input files.
-4. The judge compares input, expected output, and actual output.
-5. The judge emits structured scores plus narrative findings.
+4. The deterministic verifier compares input, reference output, and actual output for protocol smoke checks.
+5. `bun run eval:verify -- --run <run-id> --write` emits baseline structured scores plus mechanical findings.
+6. `bun run eval:judge -- --run <run-id> --judge-command "<agent command>"` spawns an explicit local judge command with the generated `judge-prompt.md` and writes `judge-result.json` when the judge returns valid JSON.
 
-Only automate executor/judge model calls after the fixtures and rubric are proven useful.
+Keep judge automation local and explicit until the fixtures and rubric are proven useful enough for CI or model-matrix runs.
 
 ## Definition Of Done
 
@@ -184,6 +186,7 @@ Only automate executor/judge model calls after the fixtures and rubric are prove
 - Expected-answer files are not included in executor prompts.
 - Generated run/output directories are ignored.
 - `scripts/generate-review-output.js` is replaced, renamed, or removed so there is one human-demo flow.
+- `bun run test:review` invokes a real LLM demo run, not only a scanner summary.
 - `bun pm pack --dry-run` shows committed tests/fixtures if desired, but no generated runs or scratch output.
 
 ## Temporary Implementation Plan
@@ -192,34 +195,33 @@ Remove this section after the eval/testing PR lands and the durable strategy abo
 
 ### Phase 1: Fixture Split
 
-- Move the current human-readable fixture content toward `skill/markdown-agent-comments/test/fixtures/demo.md`.
-- Commit `skill/markdown-agent-comments/test/fixtures/demo.processed.md`.
-- Add `skill/markdown-agent-comments/test/fixtures/scanner-cases.md` and `scanner-cases.expected.json`.
-- Update scanner tests to use the scanner fixture.
-- Replace, rename, or remove `scripts/generate-review-output.js` as part of the new demo flow.
+- Done: move the human-readable demo to `skill/markdown-agent-comments/test/fixtures/demo.md`.
+- Done: commit `skill/markdown-agent-comments/test/fixtures/demo.processed.md`.
+- Done: add `skill/markdown-agent-comments/test/fixtures/scanner-cases.md` and `scanner-cases.expected.json`.
+- Done: update scanner tests to use the scanner fixture.
+- Done: remove `scripts/generate-review-output.js` and replace it with the real LLM demo skill run.
 
 ### Phase 2: Skill Evals Skeleton
 
-- Add `skill/markdown-agent-comments/test/fixtures/skill-evals/input/` and `expected/`.
-- Add 3-5 initial eval cases.
-- Add ignored `runs/` directory pattern and verify generated runs are not packaged.
-- Add a README explaining executor and judge roles.
+- Done: add `skill/markdown-agent-comments/test/fixtures/skill-evals/input/` and `expected/`.
+- Done: add five initial eval cases.
+- Done: add ignored `runs/` directory pattern and verify generated runs are not packaged.
+- Done: add a README explaining executor and judge roles.
 
 ### Phase 3: Eval Harness
 
-- Add a small script to create a run directory and print or copy executor instructions.
-- Add a judge script or prompt template that emits JSON using the result schema.
-- Keep the first harness simple and explicit before automating model calls.
+- Done: add `prepare-skill-eval.js` to create run directories and executor instructions.
+- Done: add `verify-skill-eval.js` for deterministic protocol scoring.
+- Done: add `judge-skill-eval.js` and `judge-prompt.md` for explicit local LLM judge runs.
+- Done: keep the first harness simple and explicit before adding CI or model-matrix automation.
 
 ### Phase 4: Dogfood And Tighten
 
-- Run scanner tests and demo generation.
-- Run at least one skill eval with an agent executor.
-- Run a judge pass and record the result.
-- Tighten `SKILL.md` and fixtures based on observed failures.
+- Done: run scanner tests and demo review command.
+- Done: run `dogfood-codex-claude` with Claude as executor.
+- Done: run a judge pass and record structured partial-credit results in the generated ignored run directory.
+- Done: tighten `single-thread.md` after dogfood showed the original fixture lacked enough context for a specific rewrite.
 
 ### Open Questions
 
-- Should the first skill eval harness be semi-manual, or should it immediately spawn an executor agent?
-- Which executor/judge pair should run first: Codex executing and Claude judging, Claude executing and Codex judging, or both?
-- Should README link to the human demo as the primary demo once it lives under the skill test fixtures?
+No implementation-blocking questions remain for the initial eval/testing PR.

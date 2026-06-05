@@ -1,7 +1,7 @@
 # PRD: markdown-agent-comments / mdac
 
-Status: approved for V1 implementation
-Last updated: 2026-06-02
+Status: V1 implemented; maintained as product/spec reference
+Last updated: 2026-06-05
 Owner: maintainer
 
 ## Product Vision
@@ -40,7 +40,7 @@ Humans ask for work with `@agent`, `@claude`, `@codex`, or an explicitly configu
 @claude can you update that paragraph to numbered list pls
 ```
 
-The agent edits the document as requested, then wraps the discussion in a callout which acts like threaded comments inside the markdown file and can be committed to git or deleted. Comment threads can be multi-turn if the agent needs more input or the human has a follow-up ask.
+The agent edits the document as requested, then wraps the discussion in a callout which acts like threaded comments inside the markdown file and can be committed to git or deleted. Comment threads can be multi-turn if the agent needs more input or the human has a follow-up request.
 
 > [!DONE]- paragraph converted to list
 >
@@ -75,15 +75,15 @@ These are the recurring shapes that make Markdown Agent Comments useful:
 1. Human writes an `@agent` comment in a markdown file.
 2. `mdac scan <path>` shows actionable files without invoking an agent.
 3. `mdac run <path> --once` invokes an agent only when the cheap scan finds work.
-4. The agent reads surrounding context, edits the document body if the ask is concrete, and records a short reply in the callout.
-5. If the ask is ambiguous, or it is appropriate to ask for further user input before concluding, the agent leaves an open `[!NOTE]` thread and pre-fills the human reply label.
+4. The agent reads surrounding context, edits the document body when the request clearly asks for a document change, and records a short reply in the callout.
+5. If the request is ambiguous, or it is appropriate to ask for further user input before concluding, the agent leaves an open `[!NOTE]` thread and pre-fills the human reply label.
 
 ### Protocol Principles
 
 Markdown Agent Comments should feel like lightweight threaded comments that live inside the markdown file:
 
 - Humans ask for work with `@agent`, `@claude`, `@codex`, or an explicitly configured custom trigger.
-- Concrete asks should change the document body; the callout is the record of the request and agent response.
+- Concrete document-change requests should change the document body; suggestions, options, explanations, and fallback notes stay in the callout unless the human asks to insert them.
 - The original request should be preserved so the markdown file keeps the conversation context.
 - `[!NOTE]` threads are open; `[!DONE]-` threads are resolved.
 - Agent replies end with `<!--mdac:eot-->` so later human follow-ups can be detected.
@@ -100,7 +100,7 @@ Required:
 - `--trigger @<name>`: replace the default agent trigger name.
 - `--name <label>`: optional human speaker label the agent must use for prefilled replies; omit when no name is known.
 - `--debug`: verbose terminal output for debugging.
-- `skill/markdown-agent-comments/test/`: fixture-driven tests for scan and parked-thread behavior.
+- `skill/markdown-agent-comments/test/`: fixture-driven scanner tests, demo fixtures, and skill evals.
 
 Outside V1:
 
@@ -109,6 +109,8 @@ Outside V1:
 - Cleanup feature to move resolved comments to footnotes
 
 ## Naming
+
+Detailed naming guidance lives in [`docs/naming.md`](naming.md).
 
 | Context                                            | Use                                                                 |
 | -------------------------------------------------- | ------------------------------------------------------------------- |
@@ -132,7 +134,8 @@ The PRD describes product intent. Detailed scanner, prompt, and fixture behavior
 - CLI behavior: [`skill/markdown-agent-comments/test/cli-scan.test.js`](../skill/markdown-agent-comments/test/cli-scan.test.js), [`skill/markdown-agent-comments/test/cli-run.test.js`](../skill/markdown-agent-comments/test/cli-run.test.js), [`skill/markdown-agent-comments/test/cli-watch.test.js`](../skill/markdown-agent-comments/test/cli-watch.test.js)
 - Agent prompt handoff: [`skill/markdown-agent-comments/test/cli-run.test.js`](../skill/markdown-agent-comments/test/cli-run.test.js)
 - Skill file standards: [`skill/markdown-agent-comments/test/skill.test.js`](../skill/markdown-agent-comments/test/skill.test.js)
-- Human-readable review fixture: [`skill/markdown-agent-comments/test/human-review/README.md`](../skill/markdown-agent-comments/test/human-review/README.md)
+- Human-readable demo fixtures: [`skill/markdown-agent-comments/test/fixtures/demo.md`](../skill/markdown-agent-comments/test/fixtures/demo.md), [`skill/markdown-agent-comments/test/fixtures/demo.processed.md`](../skill/markdown-agent-comments/test/fixtures/demo.processed.md)
+- Skill eval fixtures: [`skill/markdown-agent-comments/test/fixtures/skill-evals/README.md`](../skill/markdown-agent-comments/test/fixtures/skill-evals/README.md)
 - Testing and eval strategy: [`docs/eval-testing-plan.md`](eval-testing-plan.md)
 
 ## Roadmap
@@ -145,9 +148,9 @@ Exit criteria:
 
 - Users can point `mdac` at a notes folder, including an Obsidian vault
 - No-op runs are cheap and transparent.
-- Concrete asks resolve into `[!DONE]-`.
-- Asks that require further user input become `[!NOTE]`.
-- Tests cover the scanner edge cases already seen in the vault.
+- Concrete requests resolve into `[!DONE]-`.
+- Requests that require further user input become `[!NOTE]`.
+- Tests cover scanner edge cases, demo before/after behavior, and skill eval fixtures.
 - Package published on [https://registry.npmjs.org/markdown-agent-comments](https://registry.npmjs.org/markdown-agent-comments)
 
 ### V2: `mdac.dev`

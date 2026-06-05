@@ -128,7 +128,7 @@ Important scanner rules:
 - If the latest real thread line is agent-authored, the thread is parked.
 - If a human follows up after `<!--mdac:eot-->`, the thread becomes actionable again.
 
-The original request should stay verbatim as the first body line inside the callout. The actual work belongs in the document body, not pasted into the discussion thread.
+The callout should preserve the trigger and request text, plus only the surrounding body text needed to understand what changed. Edit the document body only when the human clearly asks for a document change; suggestions, options, explanations, reviews, and fallback notes belong in the discussion thread.
 
 ## Development
 
@@ -140,9 +140,22 @@ node ./skill/markdown-agent-comments/scripts/cli.js --help
 For human review before publishing:
 
 ```bash
-bun run test:review
+MDAC_DEMO_AGENT_COMMAND="codex exec --ignore-user-config --ignore-rules --ephemeral --skip-git-repo-check --full-auto -m gpt-5.3-codex-spark" bun run test:review
 ```
 
-This runs the test suite and regenerates `skill/markdown-agent-comments/test/human-review/.generated/processed-output.md` from `skill/markdown-agent-comments/test/human-review/agent-input.md` so scanner coverage and expected processed shapes can be reviewed together.
+This runs the test suite, copies the committed demo fixture to an ignored generated run directory, invokes the real Markdown Agent Comments skill with the configured LLM command, and scans the generated output. The committed processed demo is a curated reference fixture:
+
+- `skill/markdown-agent-comments/test/fixtures/demo.md`
+- `skill/markdown-agent-comments/test/fixtures/demo.processed.md`
+
+For skill evals:
+
+```bash
+bun run eval:prepare -- --executor codex
+bun run eval:verify -- --run <run-id> --write
+bun run eval:judge -- --run <run-id> --judge-command "claude -p"
+```
+
+Eval inputs and expected outputs live under `skill/markdown-agent-comments/test/fixtures/skill-evals/`. Generated run directories are ignored.
 
 Forward-looking product decisions live in [docs/PRD.md](docs/PRD.md). Historic explorations live under [docs/archive](docs/archive).
