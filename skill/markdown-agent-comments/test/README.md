@@ -14,7 +14,7 @@ The scanner is tested using pass/fail deterministic automated tests.
 
 The skill is tested using evals. An agent gets markdown files with comments to resolve and writes output into a generated run directory. A deterministic verifier catches protocol regressions, and an LLM judge can score answer quality against reference outputs in `expected/`.
 
-The human demo is a small before/after example humans can read quickly to understand what gets touched and what stays alone.
+The human demo has two parts: a curated before/after fixture humans can read quickly, and a real LLM demo runner that copies `demo.md` to an ignored run directory and invokes `SKILL.md` against that copy.
 
 ## Quick Start
 
@@ -24,10 +24,10 @@ Run the normal test suite:
 bun run test
 ```
 
-Run tests plus the human-readable demo summary:
+Run tests plus a real LLM demo skill run:
 
 ```sh
-bun run test:review
+MDAC_DEMO_AGENT_COMMAND="codex exec --ignore-user-config --ignore-rules --ephemeral --skip-git-repo-check --full-auto -m gpt-5.3-codex-spark" bun run test:review
 ```
 
 Prepare a skill eval run:
@@ -60,7 +60,7 @@ Judge answer quality with an explicit local agent command:
 bun run eval:judge -- --run local-smoke --judge-command "claude -p"
 ```
 
-Generated eval runs live under `fixtures/skill-evals/runs/`. They are ignored by git and excluded from the npm package.
+Generated eval runs live under `fixtures/skill-evals/runs/`. Generated demo runs live under `fixtures/runs/`. Both are ignored by git and excluded from the npm package.
 
 ## What Is Where
 
@@ -69,7 +69,8 @@ Generated eval runs live under `fixtures/skill-evals/runs/`. They are ignored by
 - `fixtures/scanner-cases.expected.json` is the exact scanner output expected for that fixture.
 - `demo.test.js` checks the human demo input has intended matches and the processed demo is sealed.
 - `fixtures/demo.md` is the human-readable before example.
-- `fixtures/demo.processed.md` is the human-readable after example.
+- `fixtures/demo.processed.md` is the curated human-readable after reference.
+- `test/scripts/run-demo-skill.js` copies `fixtures/demo.md` to `fixtures/runs/<run-id>/demo.md`, invokes a real LLM command with `SKILL.md`, and scans the generated output.
 - `eval-fixtures.test.js` checks skill eval inputs and expected outputs stay paired.
 - `eval-scripts.test.js` checks the eval prepare, verify, and judge scripts.
 - `fixtures/skill-evals/input/` contains files the executor is allowed to see.
@@ -80,7 +81,7 @@ Generated eval runs live under `fixtures/skill-evals/runs/`. They are ignored by
 
 `bun run test` should be fully pass/fail. A failure means either code changed behavior or a fixture is out of date.
 
-`bun run test:review` prints scanner matches for `demo.md` and confirms `demo.processed.md` has no remaining actionable comments.
+`bun run test:review` runs the test suite, invokes a real LLM against a generated copy of `demo.md`, and fails if the generated demo still has actionable comments. Review the generated output against `fixtures/demo.processed.md`; exact text does not need to match.
 
 `bun run eval:verify` emits deterministic JSON. Treat this as a protocol smoke check, not the final semantic judge. The top-level `score` and each case score are partial-credit values from 0 to 1.
 

@@ -59,8 +59,11 @@ For each actionable comment:
 - For multi-part requests, address every part. If you cannot complete a requested part because a tool, permission, file, or fact is unavailable, say exactly what is missing and give the smallest useful next step instead of silently dropping that part.
 - If the request sits on a task item, update the checkbox when the task is actually complete.
 - Preserve the original request in the callout. For inline comments, this is the trigger and request text, plus only the surrounding body text needed to understand what changed.
-- For an inline trigger, create a new callout immediately after the affected block and remove the live trigger from the body.
+- For an inline trigger, create a new callout immediately after the affected block and remove the live trigger from the body. Do not leave the same live `@agent`, `@claude`, `@codex`, or custom trigger in both the body and the callout.
+- For an existing callout thread, continue inside that same callout. Do not create a second callout for the same thread.
 - Conclude completed work with `[!DONE]-` and a past-tense title, about 60 characters or less.
+
+Before finishing, run the scanner when available. If it still reports a thread you just handled, fix the remaining live trigger or unsealed thread before final output.
 
 Do not rewrite or delete earlier human or agent turns unless the human explicitly asks you to. Existing callout history is evidence.
 

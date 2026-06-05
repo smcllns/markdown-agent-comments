@@ -140,10 +140,10 @@ node ./skill/markdown-agent-comments/scripts/cli.js --help
 For human review before publishing:
 
 ```bash
-bun run test:review
+MDAC_DEMO_AGENT_COMMAND="codex exec --ignore-user-config --ignore-rules --ephemeral --skip-git-repo-check --full-auto -m gpt-5.3-codex-spark" bun run test:review
 ```
 
-This runs the test suite and prints scanner results for the committed demo fixtures:
+This runs the test suite, copies the committed demo fixture to an ignored generated run directory, invokes the real Markdown Agent Comments skill with the configured LLM command, and scans the generated output. The committed processed demo is a curated reference fixture:
 
 - `skill/markdown-agent-comments/test/fixtures/demo.md`
 - `skill/markdown-agent-comments/test/fixtures/demo.processed.md`

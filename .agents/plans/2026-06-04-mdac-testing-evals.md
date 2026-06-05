@@ -133,9 +133,9 @@ Content:
 
 Verification:
 
-- Replace `scripts/generate-review-output.js` with the fixture-oriented `skill/markdown-agent-comments/test/scripts/print-demo-summary.js`.
-- Keep `demo.processed.md` committed so humans can diff input vs output without running anything.
-- Keep generated scratch output ignored.
+- Replace `scripts/generate-review-output.js` with the real LLM demo runner at `skill/markdown-agent-comments/test/scripts/run-demo-skill.js`.
+- Keep `demo.processed.md` committed as a curated reference so humans can diff intended input vs output without running anything.
+- Keep generated demo run output ignored under `skill/markdown-agent-comments/test/fixtures/runs/`.
 
 ## Implementation Phases
 
@@ -162,7 +162,7 @@ Verification:
 
 ### Phase 4: Dogfood And Tighten
 
-- [x] Run the scanner tests and demo summary.
+- [x] Run the scanner tests and real demo skill runner.
 - [x] Run at least one skill eval with an agent executor.
 - [x] Run a judge pass and keep results in ignored generated run output.
 - [x] Tighten SKILL.md and fixtures based on observed failures.
@@ -177,10 +177,11 @@ Verification:
 - README or plan docs explain how to run scanner tests, demo review, and skill evals.
 - No expected-answer files are included in executor prompts.
 - Any generated run/output directories are ignored.
+- `bun run test:review` invokes a real LLM demo run, not only a scanner summary.
 
 ## Resolved Questions
 
 - The first executor harness is semi-manual.
 - The first judge harness is a local explicit command wrapper, not CI automation.
 - The scanner implementation is canonical at `skill/markdown-agent-comments/scripts/scanner.js`.
-- The human demo lives under `skill/markdown-agent-comments/test/fixtures/`, with README pointers.
+- The human demo lives under `skill/markdown-agent-comments/test/fixtures/`, with `demo.processed.md` as curated reference and generated LLM demo runs under ignored `fixtures/runs/`.

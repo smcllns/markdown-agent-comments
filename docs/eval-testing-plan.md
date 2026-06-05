@@ -121,7 +121,7 @@ Implemented files:
 
 The demo should be realistic and readable. It should show useful examples of comments that will be processed and common trigger-looking content that will not be affected. It should not try to be exhaustive.
 
-The former `scripts/generate-review-output.js` and `skill/markdown-agent-comments/test/human-review/` flow has been replaced by committed demo fixtures and `skill/markdown-agent-comments/test/scripts/print-demo-summary.js`, so there is one human-demo flow.
+`demo.processed.md` is a curated reference output, not proof that a current agent generated the exact text. The real demo review flow is `skill/markdown-agent-comments/test/scripts/run-demo-skill.js`, which copies `demo.md` to an ignored generated run directory, invokes a real LLM command with `SKILL.md`, and scans the generated output.
 
 ## Repository And Package Shape
 
@@ -143,6 +143,7 @@ skill/markdown-agent-comments/
     fixtures/
       demo.md
       demo.processed.md
+      runs/
       scanner-cases.md
       scanner-cases.expected.json
       skill-evals/
@@ -156,7 +157,7 @@ Small committed tests and fixtures may ship with the package because they docume
 Required ignore/package rules:
 
 - Ignore `skill/markdown-agent-comments/test/fixtures/skill-evals/runs/`.
-- Ignore generated demo scratch output if any remains after `demo.processed.md` is committed.
+- Ignore `skill/markdown-agent-comments/test/fixtures/runs/`.
 - Ignore `.generated/` directories.
 - Do not include generated run logs, model transcripts, screenshots, or temporary judge output in npm package contents.
 - Keep package contents small enough that installed users get useful examples without noisy artifacts.
@@ -185,6 +186,7 @@ Keep judge automation local and explicit until the fixtures and rubric are prove
 - Expected-answer files are not included in executor prompts.
 - Generated run/output directories are ignored.
 - `scripts/generate-review-output.js` is replaced, renamed, or removed so there is one human-demo flow.
+- `bun run test:review` invokes a real LLM demo run, not only a scanner summary.
 - `bun pm pack --dry-run` shows committed tests/fixtures if desired, but no generated runs or scratch output.
 
 ## Temporary Implementation Plan
@@ -197,7 +199,7 @@ Remove this section after the eval/testing PR lands and the durable strategy abo
 - Done: commit `skill/markdown-agent-comments/test/fixtures/demo.processed.md`.
 - Done: add `skill/markdown-agent-comments/test/fixtures/scanner-cases.md` and `scanner-cases.expected.json`.
 - Done: update scanner tests to use the scanner fixture.
-- Done: remove `scripts/generate-review-output.js` and replace it with the committed demo summary flow.
+- Done: remove `scripts/generate-review-output.js` and replace it with the real LLM demo skill run.
 
 ### Phase 2: Skill Evals Skeleton
 
