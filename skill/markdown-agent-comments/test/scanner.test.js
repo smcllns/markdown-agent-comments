@@ -1,8 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { mkdir, mkdtemp, rm, utimes, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { scanPath } from "../scripts/scanner.js";
+
+const TEST_DIR = dirname(fileURLToPath(import.meta.url));
+const FIXTURES_DIR = join(TEST_DIR, "fixtures");
 
 let tempDir;
 
@@ -15,6 +19,13 @@ afterEach(async () => {
 });
 
 describe("scanPath", () => {
+  it("matches the scanner-cases fixture exactly", async () => {
+    const matches = await scanPath(join(FIXTURES_DIR, "scanner-cases.md"));
+    const expected = JSON.parse(await readFile(join(FIXTURES_DIR, "scanner-cases.expected.json"), "utf8"));
+
+    expect(matches.map(toExpectedShape)).toEqual(expected);
+  });
+
   it("finds unwrapped inline default trigger comments", async () => {
     await write("note.md", [
       "Please fix this section @claude",
@@ -201,6 +212,15 @@ describe("scanPath", () => {
     expect(matches.map((match) => match.relativePath)).toEqual(["newer.md", "older.md"]);
   });
 
+  it("ignores generated directories while walking", async () => {
+    await write(".generated/output.md", "@agent generated scratch should stay quiet\n");
+    await write("note.md", "@agent live note\n");
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches.map((match) => match.relativePath)).toEqual(["note.md"]);
+  });
+
   it("uses the basename when scanning a single markdown file", async () => {
     const file = await write("single.md", "@codex fix this\n");
 
@@ -210,6 +230,13 @@ describe("scanPath", () => {
     expect(matches[0].relativePath).toBe("single.md");
   });
 });
+
+function toExpectedShape(match) {
+  return {
+    relativePath: match.relativePath,
+    reasons: match.reasons,
+  };
+}
 
 async function write(relativePath, contents) {
   const path = join(tempDir, relativePath);

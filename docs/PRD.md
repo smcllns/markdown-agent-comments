@@ -132,7 +132,8 @@ The PRD describes product intent. Detailed scanner, prompt, and fixture behavior
 - CLI behavior: [`skill/markdown-agent-comments/test/cli-scan.test.js`](../skill/markdown-agent-comments/test/cli-scan.test.js), [`skill/markdown-agent-comments/test/cli-run.test.js`](../skill/markdown-agent-comments/test/cli-run.test.js), [`skill/markdown-agent-comments/test/cli-watch.test.js`](../skill/markdown-agent-comments/test/cli-watch.test.js)
 - Agent prompt handoff: [`skill/markdown-agent-comments/test/cli-run.test.js`](../skill/markdown-agent-comments/test/cli-run.test.js)
 - Skill file standards: [`skill/markdown-agent-comments/test/skill.test.js`](../skill/markdown-agent-comments/test/skill.test.js)
-- Human-readable review fixture: [`skill/markdown-agent-comments/test/human-review/README.md`](../skill/markdown-agent-comments/test/human-review/README.md)
+- Human-readable demo fixtures: [`skill/markdown-agent-comments/test/fixtures/demo.md`](../skill/markdown-agent-comments/test/fixtures/demo.md), [`skill/markdown-agent-comments/test/fixtures/demo.processed.md`](../skill/markdown-agent-comments/test/fixtures/demo.processed.md)
+- Skill eval fixtures: [`skill/markdown-agent-comments/test/fixtures/skill-evals/README.md`](../skill/markdown-agent-comments/test/fixtures/skill-evals/README.md)
 - Testing and eval strategy: [`docs/eval-testing-plan.md`](eval-testing-plan.md)
 
 ## Roadmap

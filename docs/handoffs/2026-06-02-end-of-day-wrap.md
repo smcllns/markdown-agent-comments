@@ -21,7 +21,7 @@ The local V1 CLI is implemented and passing tests:
 ## Verification
 
 - `bun run test` passes: 25 tests.
-- `bun run test:review` passes and regenerates the human-review processed output.
+- `bun run test:review` passes. The former generated human-review output has since been replaced by committed demo and eval fixtures under `skill/markdown-agent-comments/test/fixtures/`.
 - Published `0.1.1` tarball smoke passed for `--help`, package contents, `scan`, and `run --once` with a stub agent.
 - Scratch smoke and read-only Obsidian scan were completed earlier.
 - Latest code review fix addressed shared scanner constants and human-label normalization.
@@ -32,7 +32,7 @@ Start on `main` in `<local-projects>/markdown-agent-comments`.
 
 Recommended next sequence:
 
-1. Review the V1 human-review fixture and processed output.
+1. Review the V1 demo and eval fixtures under `skill/markdown-agent-comments/test/fixtures/`.
 2. Run `mdac` as the main CLI against the maintainer's Obsidian workflow for a day.
 3. Patch any dogfooding issues that block daily use.
 4. Publish a quick V1 `mdac.dev` page for the terminal solution.

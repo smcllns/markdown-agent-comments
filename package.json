@@ -16,7 +16,9 @@
   ],
   "scripts": {
     "test": "bun test skill/markdown-agent-comments/test/*.test.js",
-    "test:review": "bun run test && node scripts/generate-review-output.js"
+    "test:review": "bun run test && node skill/markdown-agent-comments/test/scripts/print-demo-summary.js",
+    "eval:prepare": "node skill/markdown-agent-comments/test/scripts/prepare-skill-eval.js",
+    "eval:judge": "node skill/markdown-agent-comments/test/scripts/judge-skill-eval.js"
   },
   "engines": {
     "node": ">=20"

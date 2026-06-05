@@ -143,6 +143,18 @@ For human review before publishing:
 bun run test:review
 ```
 
-This runs the test suite and regenerates `skill/markdown-agent-comments/test/human-review/.generated/processed-output.md` from `skill/markdown-agent-comments/test/human-review/agent-input.md` so scanner coverage and expected processed shapes can be reviewed together.
+This runs the test suite and prints scanner results for the committed demo fixtures:
+
+- `skill/markdown-agent-comments/test/fixtures/demo.md`
+- `skill/markdown-agent-comments/test/fixtures/demo.processed.md`
+
+For skill evals:
+
+```bash
+bun run eval:prepare -- --executor codex
+bun run eval:judge -- --run <run-id> --write
+```
+
+Eval inputs and expected outputs live under `skill/markdown-agent-comments/test/fixtures/skill-evals/`. Generated run directories are ignored.
 
 Forward-looking product decisions live in [docs/PRD.md](docs/PRD.md). Historic explorations live under [docs/archive](docs/archive).

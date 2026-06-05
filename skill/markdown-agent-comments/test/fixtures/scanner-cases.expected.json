@@ -1,0 +1,37 @@
+[
+  {
+    "relativePath": "scanner-cases.md",
+    "reasons": [
+      {
+        "kind": "inline",
+        "line": 7,
+        "trigger": "agent"
+      },
+      {
+        "kind": "inline",
+        "line": 8,
+        "trigger": "claude"
+      },
+      {
+        "kind": "inline",
+        "line": 9,
+        "trigger": "codex"
+      },
+      {
+        "kind": "note",
+        "line": 29,
+        "trigger": "claude"
+      },
+      {
+        "kind": "note",
+        "line": 33,
+        "trigger": "agent"
+      },
+      {
+        "kind": "done",
+        "line": 67,
+        "trigger": "claude"
+      }
+    ]
+  }
+]
