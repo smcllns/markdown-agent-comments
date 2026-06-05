@@ -1,8 +1,8 @@
 # Release Brief
 
-Context: Markdown Agent Comments lets writers resolve markdown review notes without leaving the document.
+Context: Markdown Agent Comments keeps review comments and agent replies inside the markdown file while a local agent edits the document directly.
 
-Markdown Agent Comments lets writers resolve markdown review notes without leaving the document.
+Markdown Agent Comments lets writers resolve review comments in place with a local agent.
 
 > [!DONE]- rewrote release brief sentence
 >

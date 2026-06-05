@@ -4,7 +4,7 @@
 
 Markdown Agent Comments has two different correctness problems:
 
-1. The scanner must deterministically find the right markdown asks and ignore false positives.
+1. The scanner must deterministically find the right markdown comments and ignore false positives.
 2. An agent using the skill must make good edits, preserve the thread protocol, and avoid touching unrelated content.
 
 Those need different test shapes. Scanner behavior should be binary and regression-oriented. Skill behavior should be evaluated with realistic examples, partial-credit scoring, and human-readable findings. A demo fixture should be optimized for humans, not mistaken for exhaustive coverage.
@@ -30,7 +30,7 @@ Those need different test shapes. Scanner behavior should be binary and regressi
 
 ### Scanner Regression Fixtures
 
-Purpose: deterministic binary tests for what counts as an actionable mdac ask.
+Purpose: deterministic binary tests for what counts as an actionable mdac comment.
 
 Implemented files:
 
@@ -41,7 +41,7 @@ Coverage includes the dense fixture plus focused unit tests for:
 
 - Default triggers: `@agent`, `@claude`, `@codex`.
 - Custom triggers in focused unit tests.
-- Inline asks.
+- Inline comments.
 - Active `[!NOTE]` threads.
 - Closed `[!DONE]-` threads.
 - DONE follow-ups after `<!--mdac:eot-->`.
@@ -69,15 +69,15 @@ The executing agent should only be pointed at `input/`. The judge can read `inpu
 
 Initial cases:
 
-- `single-thread.md`: one clear actionable ask.
-- `mixed-open-closed.md`: one open ask plus closed or irrelevant threads that must not change.
+- `single-thread.md`: one clear actionable comment.
+- `mixed-open-closed.md`: one open comment plus closed or irrelevant threads that must not change.
 - `code-and-examples.md`: trigger-looking text inside code/examples must be ignored.
 - `multi-turn-thread.md`: existing user/agent callout where the agent must append, not overwrite.
-- `quality-sensitive.md`: ask requires a useful answer, not just mechanical DONE wrapping.
+- `quality-sensitive.md`: request requires a useful answer, not just mechanical DONE wrapping.
 
 Suggested judge dimensions:
 
-- `detection`: found every intended open ask and no ignored asks.
+- `detection`: found every intended open comment and no ignored comments.
 - `placement`: response was appended in the right thread/location.
 - `threadFormat`: callout label, DONE state, and end marker are correct.
 - `taskQuality`: answer satisfies the human request.
@@ -119,7 +119,7 @@ Implemented files:
 - `skill/markdown-agent-comments/test/fixtures/demo.md`
 - `skill/markdown-agent-comments/test/fixtures/demo.processed.md`
 
-The demo should be realistic and readable. It should show useful examples of asks that will be processed and common trigger-looking content that will not be affected. It should not try to be exhaustive.
+The demo should be realistic and readable. It should show useful examples of comments that will be processed and common trigger-looking content that will not be affected. It should not try to be exhaustive.
 
 The former `scripts/generate-review-output.js` and `skill/markdown-agent-comments/test/human-review/` flow has been replaced by committed demo fixtures and `skill/markdown-agent-comments/test/scripts/print-demo-summary.js`, so there is one human-demo flow.
 
@@ -168,10 +168,11 @@ Start semi-manual with the checked-in eval scripts:
 1. `bun run eval:prepare -- --executor <name>` creates a run directory.
 2. The script writes the executor prompt.
 3. The executor agent edits generated copies of the input files.
-4. The judge compares input, expected output, and actual output.
-5. `bun run eval:judge -- --run <run-id> --write` emits structured scores plus narrative findings.
+4. The deterministic verifier compares input, reference output, and actual output for protocol smoke checks.
+5. `bun run eval:verify -- --run <run-id> --write` emits baseline structured scores plus mechanical findings.
+6. `bun run eval:judge -- --run <run-id> --judge-command "<agent command>"` spawns an explicit local judge command with the generated `judge-prompt.md` and writes `judge-result.json` when the judge returns valid JSON.
 
-Only automate executor/judge model calls after the fixtures and rubric are proven useful.
+Keep judge automation local and explicit until the fixtures and rubric are proven useful enough for CI or model-matrix runs.
 
 ## Definition Of Done
 
@@ -208,8 +209,9 @@ Remove this section after the eval/testing PR lands and the durable strategy abo
 ### Phase 3: Eval Harness
 
 - Done: add `prepare-skill-eval.js` to create run directories and executor instructions.
-- Done: add `judge-skill-eval.js` and `judge-prompt.md` for structured scoring.
-- Done: keep the first harness simple and explicit before automating model calls.
+- Done: add `verify-skill-eval.js` for deterministic protocol scoring.
+- Done: add `judge-skill-eval.js` and `judge-prompt.md` for explicit local LLM judge runs.
+- Done: keep the first harness simple and explicit before adding CI or model-matrix automation.
 
 ### Phase 4: Dogfood And Tighten
 

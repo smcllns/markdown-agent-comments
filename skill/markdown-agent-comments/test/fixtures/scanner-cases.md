@@ -4,9 +4,9 @@ This fixture is dense on purpose. It is optimized for scanner regression tests, 
 
 ## Inline Defaults
 
-Plain inline ask @agent fix this sentence.
-Another inline ask @claude tighten this paragraph.
-One more inline ask @codex make this direct.
+Plain inline comment @agent fix this sentence.
+Another inline comment @claude tighten this paragraph.
+One more inline comment @codex make this direct.
 
 ## False Positives
 

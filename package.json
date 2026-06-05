@@ -11,6 +11,7 @@
     "!skill/**/.generated/**",
     "!skill/**/runs/**",
     "docs/PRD.md",
+    "docs/naming.md",
     "README.md",
     "LICENSE"
   ],
@@ -18,6 +19,7 @@
     "test": "bun test skill/markdown-agent-comments/test/*.test.js",
     "test:review": "bun run test && node skill/markdown-agent-comments/test/scripts/print-demo-summary.js",
     "eval:prepare": "node skill/markdown-agent-comments/test/scripts/prepare-skill-eval.js",
+    "eval:verify": "node skill/markdown-agent-comments/test/scripts/verify-skill-eval.js",
     "eval:judge": "node skill/markdown-agent-comments/test/scripts/judge-skill-eval.js"
   },
   "engines": {

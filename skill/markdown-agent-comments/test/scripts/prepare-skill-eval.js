@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path, { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -6,8 +6,10 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const SKILL_DIR = path.resolve(SCRIPT_DIR, "..", "..");
 const EVAL_DIR = join(SCRIPT_DIR, "..", "fixtures", "skill-evals");
 const INPUT_DIR = join(EVAL_DIR, "input");
+const EXPECTED_DIR = join(EVAL_DIR, "expected");
 const RUNS_DIR = join(EVAL_DIR, "runs");
 const SKILL_PATH = join(SKILL_DIR, "SKILL.md");
+const JUDGE_TEMPLATE_PATH = join(EVAL_DIR, "judge-prompt.md");
 
 const options = parseArgs(process.argv.slice(2));
 const runId = options.runId ?? defaultRunId(options.executor);
@@ -32,14 +34,19 @@ const metadata = {
 };
 
 await writeFile(join(runDir, "metadata.json"), `${JSON.stringify(metadata, null, 2)}\n`);
+const judgeTemplate = await readFile(JUDGE_TEMPLATE_PATH, "utf8");
+
 await writeFile(join(runDir, "executor-prompt.md"), executorPrompt({ runId, executor: options.executor, files }));
+await writeFile(join(runDir, "judge-prompt.md"), judgePrompt({ runId, executor: options.executor, actualDir, judgeTemplate }));
 
 console.log(`Prepared skill eval run: ${runId}`);
 console.log(`Run directory: ${runDir}`);
 console.log(`Executor prompt: ${join(runDir, "executor-prompt.md")}`);
+console.log(`Judge prompt: ${join(runDir, "judge-prompt.md")}`);
 console.log("");
 console.log("After the executor edits files in actual/, run:");
-console.log(`bun run eval:judge -- --run ${runId} --write`);
+console.log(`bun run eval:verify -- --run ${runId} --write`);
+console.log(`bun run eval:judge -- --run ${runId} --judge-command "<agent command>"`);
 
 function parseArgs(argv) {
   const parsed = {
@@ -126,14 +133,27 @@ ${fileList}
 
 Do not read \`skill-evals/expected/\` or any files outside the listed generated copies unless the human explicitly redirects you.
 
-For each actionable markdown-agent-comments ask:
-
-- edit the markdown file directly when the ask calls for document changes
-- preserve the original request verbatim in the callout thread
-- use the active trigger label for your reply
-- end every agent reply with \`<!--mdac:eot-->\`
-- leave ambiguous asks as active \`[!NOTE]\` threads with the smallest useful clarification question
+Follow \`SKILL.md\` as the behavior contract. This prompt only defines the eval run scope.
 
 When finished, report the files changed and any threads left waiting on a human.
+`;
+}
+
+function judgePrompt({ runId, executor, actualDir, judgeTemplate }) {
+  return `${judgeTemplate.trim()}
+
+## Run Context
+
+Run id: ${runId}
+Executor: ${executor}
+
+Read these directories:
+
+- input: ${INPUT_DIR}
+- expected: ${EXPECTED_DIR}
+- actual: ${actualDir}
+
+Do not edit files. Return only the JSON object described above.
+Use the run id and executor from this Run Context in the returned JSON, not placeholder strings from the example.
 `;
 }

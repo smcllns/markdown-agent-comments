@@ -54,11 +54,12 @@ For each actionable comment:
 
 - Read the full file and enough surrounding context to understand the request.
 - Use a better-matching skill or tool first when one applies.
-- Put concrete requested work in the document body, not in the callout.
-- Answer discussion-only requests concisely inside the callout.
+- Edit the document body only when the human clearly asks you to change, add, remove, insert, or rewrite document content.
+- Answer suggestions, options, explanations, reviews, critiques, and brainstorming requests inside the callout unless the human explicitly asks you to put the answer in the document body.
+- For multi-part requests, address every part. If you cannot complete a requested part because a tool, permission, file, or fact is unavailable, say exactly what is missing and give the smallest useful next step instead of silently dropping that part.
 - If the request sits on a task item, update the checkbox when the task is actually complete.
-- Preserve the original request verbatim as the first body line inside the callout.
-- For an inline trigger, create a new callout immediately after the affected block, copy the original line verbatim into the callout, and remove the live trigger from the body.
+- Preserve the original request in the callout. For inline comments, this is the trigger and request text, plus only the surrounding body text needed to understand what changed.
+- For an inline trigger, create a new callout immediately after the affected block and remove the live trigger from the body.
 - Conclude completed work with `[!DONE]-` and a past-tense title, about 60 characters or less.
 
 Do not rewrite or delete earlier human or agent turns unless the human explicitly asks you to. Existing callout history is evidence.

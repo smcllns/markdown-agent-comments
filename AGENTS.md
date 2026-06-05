@@ -1,5 +1,29 @@
 # AGENTS.md
 
+## Start Here
+
+- Product/spec source: `docs/PRD.md`
+- Naming rules: `docs/naming.md`
+- Testing/eval guide: `skill/markdown-agent-comments/test/README.md`
+- Eval strategy: `docs/eval-testing-plan.md`
+- Historical context only: `docs/archive/README.md`
+
+Use current naming from `docs/naming.md` in all forward-looking docs and code. In particular, call the user-facing construct an `@agent` comment or comment, not an ask, tag, or directive.
+
+## Architecture
+
+- `skill/markdown-agent-comments/SKILL.md` is the canonical agent behavior contract.
+- `skill/markdown-agent-comments/scripts/scanner.js` is the deterministic scanner.
+- `mdac` is the CLI wrapper around the skill and scanner.
+- Tests and fixtures live with the skill for now. Generated eval runs under `skill/markdown-agent-comments/test/fixtures/skill-evals/runs/` are ignored and must not be committed.
+
+## Reviewer Checklist
+
+- Check behavior, stale docs, missing tests, release/package risks, and scope creep.
+- For test/eval changes, check that executor prompts do not leak expected answers or restate the skill behavior being evaluated.
+- Check package dry-run output when files move or new generated paths appear.
+- Treat `docs/eval-testing-plan.md` as strategy and `skill/markdown-agent-comments/test/README.md` as the practical how-to.
+
 ## Git And Release Workflow
 
 - Never push directly to `main`.

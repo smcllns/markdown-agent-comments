@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { cp, rm } from "node:fs/promises";
+import { cp, readFile, rm, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import path, { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,7 +19,7 @@ afterEach(async () => {
 });
 
 describe("skill eval scripts", () => {
-  it("prepares a run and judges exact expected outputs as a pass", async () => {
+  it("prepares a run and verifies exact expected outputs as a pass", async () => {
     const runId = `test-${process.pid}-${Date.now()}`;
     runDir = join(RUNS_DIR, runId);
 
@@ -27,7 +27,7 @@ describe("skill eval scripts", () => {
     await rm(join(runDir, "actual"), { recursive: true, force: true });
     await cp(EXPECTED_DIR, join(runDir, "actual"), { recursive: true });
 
-    const result = await runNode(join(SCRIPTS_DIR, "judge-skill-eval.js"), ["--run", runId]);
+    const result = await runNode(join(SCRIPTS_DIR, "verify-skill-eval.js"), ["--run", runId]);
     const parsed = JSON.parse(result.stdout);
 
     expect(parsed.status).toBe("pass");
@@ -35,11 +35,70 @@ describe("skill eval scripts", () => {
     expect(parsed.cases.every((item) => item.status === "pass")).toBe(true);
   });
 
+  it("keeps the executor prompt scoped to files instead of restating skill rules", async () => {
+    const runId = `prompt-${process.pid}-${Date.now()}`;
+    runDir = join(RUNS_DIR, runId);
+
+    await runNode(join(SCRIPTS_DIR, "prepare-skill-eval.js"), ["--run-id", runId, "--executor", "test"]);
+    const prompt = await readFile(join(runDir, "executor-prompt.md"), "utf8");
+    const judgePrompt = await readFile(join(runDir, "judge-prompt.md"), "utf8");
+
+    expect(prompt).toContain("Use the canonical skill:");
+    expect(prompt).toContain("Process only these generated copies:");
+    expect(prompt).not.toContain("<!--mdac:eot-->");
+    expect(prompt).not.toContain("[!DONE]");
+    expect(prompt).not.toContain("[!NOTE]");
+    expect(prompt).not.toContain("preserve the original request");
+    expect(prompt).not.toContain("active trigger label");
+    expect(judgePrompt).toContain(`Run id: ${runId}`);
+    expect(judgePrompt).toContain(`actual: ${join(runDir, "actual")}`);
+  });
+
+  it("does not pass unprocessed input copies", async () => {
+    const runId = `bad-${process.pid}-${Date.now()}`;
+    runDir = join(RUNS_DIR, runId);
+
+    await runNode(join(SCRIPTS_DIR, "prepare-skill-eval.js"), ["--run-id", runId, "--executor", "test"]);
+    const result = await runNode(join(SCRIPTS_DIR, "verify-skill-eval.js"), ["--run", runId]);
+    const parsed = JSON.parse(result.stdout);
+
+    expect(parsed.score).toBeLessThan(0.75);
+    expect(parsed.status).not.toBe("pass");
+    expect(parsed.status).not.toBe("pass-with-notes");
+  });
+
   it("fails clearly when the actual run directory is missing", async () => {
     const missingRunId = `missing-${process.pid}-${Date.now()}`;
 
-    await expect(runNode(join(SCRIPTS_DIR, "judge-skill-eval.js"), ["--run", missingRunId]))
+    await expect(runNode(join(SCRIPTS_DIR, "verify-skill-eval.js"), ["--run", missingRunId]))
       .rejects.toThrow("Eval actual directory does not exist");
+  });
+
+  it("runs an explicit judge command with the generated judge prompt", async () => {
+    const runId = `judge-${process.pid}-${Date.now()}`;
+    runDir = join(RUNS_DIR, runId);
+
+    await runNode(join(SCRIPTS_DIR, "prepare-skill-eval.js"), ["--run-id", runId, "--executor", "test"]);
+
+    const fakeJudge = join(runDir, "fake-judge.js");
+    await writeFile(fakeJudge, `
+const prompt = process.argv[2] ?? "";
+if (!prompt.includes("Run id: ${runId}")) process.exit(2);
+if (!prompt.includes("actual: ${join(runDir, "actual")}")) process.exit(3);
+process.stdout.write(JSON.stringify({ runId: "${runId}", judge: "fake", cases: [] }));
+`);
+
+    const result = await runNode(join(SCRIPTS_DIR, "judge-skill-eval.js"), [
+      "--run",
+      runId,
+      "--judge-command",
+      `${process.execPath} ${fakeJudge}`,
+    ]);
+    const parsed = JSON.parse(result.stdout);
+    const saved = JSON.parse(await readFile(join(runDir, "judge-result.json"), "utf8"));
+
+    expect(parsed.runId).toBe(runId);
+    expect(saved.judge).toBe("fake");
   });
 });
 

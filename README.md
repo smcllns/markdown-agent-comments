@@ -128,7 +128,7 @@ Important scanner rules:
 - If the latest real thread line is agent-authored, the thread is parked.
 - If a human follows up after `<!--mdac:eot-->`, the thread becomes actionable again.
 
-The original request should stay verbatim as the first body line inside the callout. The actual work belongs in the document body, not pasted into the discussion thread.
+The callout should preserve the trigger and request text, plus only the surrounding body text needed to understand what changed. Edit the document body only when the human clearly asks for a document change; suggestions, options, explanations, reviews, and fallback notes belong in the discussion thread.
 
 ## Development
 
@@ -152,7 +152,8 @@ For skill evals:
 
 ```bash
 bun run eval:prepare -- --executor codex
-bun run eval:judge -- --run <run-id> --write
+bun run eval:verify -- --run <run-id> --write
+bun run eval:judge -- --run <run-id> --judge-command "claude -p"
 ```
 
 Eval inputs and expected outputs live under `skill/markdown-agent-comments/test/fixtures/skill-evals/`. Generated run directories are ignored.
