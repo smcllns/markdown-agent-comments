@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdir, mkdtemp, rm, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { scanPath } from "../src/scanner.js";
+import { scanPath } from "../scripts/scanner.js";
 
 let tempDir;
 
@@ -33,6 +33,50 @@ describe("scanPath", () => {
     ]);
   });
 
+  it("ignores triggers and callout examples inside fenced code blocks", async () => {
+    await write("examples.md", [
+      "```markdown",
+      "@claude example only",
+      "> [!NOTE] example",
+      ">",
+      "> @agent example",
+      "```",
+      "",
+      "~~~md",
+      "@codex also an example",
+      "~~~",
+      "",
+      "real @agent outside",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].reasons).toEqual([
+      { kind: "inline", line: 12, trigger: "agent" },
+    ]);
+  });
+
+  it("ignores fenced code blocks while deciding whether a callout is unsealed", async () => {
+    await write("thread.md", [
+      "> [!DONE]- documented example",
+      ">",
+      "> @claude add the example",
+      ">",
+      "> [@claude] done <!--mdac:eot-->",
+      ">",
+      "> ```md",
+      "> @claude example inside fenced code",
+      "> ```",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toEqual([]);
+  });
+
   it("detects active NOTE threads only when the human needs another agent turn", async () => {
     await write("threads.md", [
       "> [!NOTE] new active thread",
@@ -51,7 +95,7 @@ describe("scanPath", () => {
       ">",
       "> [@claude] Which direction should I take? <!--mdac:eot-->",
       ">",
-      "> [@human] punchier",
+      "> [@sam] punchier",
       "",
       "> [!NOTE] placeholder only",
       ">",
@@ -59,11 +103,11 @@ describe("scanPath", () => {
       ">",
       "> [@claude] Which direction should I take? <!--mdac:eot-->",
       ">",
-      "> [@human]",
+      "> [@sam]",
       "",
     ].join("\n"));
 
-    const matches = await scanPath(tempDir, { humanLabel: "human" });
+    const matches = await scanPath(tempDir, { humanLabel: "Sam" });
 
     expect(matches).toHaveLength(1);
     expect(matches[0].reasons).toEqual([
@@ -80,11 +124,28 @@ describe("scanPath", () => {
       ">",
       "> [@claude] Which paragraph should I edit? <!--mdac:eot-->",
       ">",
-      "> [@human]",
+      "> [@sam]",
       "",
     ].join("\n"));
 
-    const matches = await scanPath(tempDir, { humanLabel: "Human Person" });
+    const matches = await scanPath(tempDir, { humanLabel: "Sam McLoughlin" });
+
+    expect(matches).toEqual([]);
+  });
+
+  it("treats unknown label-only human placeholders as parked", async () => {
+    await write("name.md", [
+      "> [!NOTE] awaiting clarification",
+      ">",
+      "> [@sam] @claude tighten this",
+      ">",
+      "> [@claude] Which paragraph should I edit? <!--mdac:eot-->",
+      ">",
+      "> [@sam]",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
 
     expect(matches).toEqual([]);
   });

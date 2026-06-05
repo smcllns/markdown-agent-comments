@@ -6,8 +6,8 @@
 
 - Successful run: `https://github.com/smcllns/markdown-agent-comments/actions/runs/26857702615`
 - Registry version URL: `https://registry.npmjs.org/markdown-agent-comments/0.1.1`
-- Published bin metadata: `{"mdac":"src/cli.js"}`
-- Published tarball smoke passed by downloading the npm tarball and running `node package/src/cli.js --help`, checking `DEFAULT_HUMAN_LABEL=human`, and running `scan` plus `run --once` on a tiny fixture with a stub agent.
+- Published `0.1.1` bin metadata was `{"mdac":"src/cli.js"}`; current dogfood work moves the bin to `skill/markdown-agent-comments/scripts/cli.js`.
+- Published `0.1.1` tarball smoke passed by downloading the npm tarball and running `node package/src/cli.js --help`, and running `scan` plus `run --once` on a tiny fixture with a stub agent.
 
 Local `bun add markdown-agent-comments@0.1.1` is expected to fail briefly on the local machine because the Bun wrapper enforces a minimum package release age. That is a local supply-chain guard, not an npm publish failure.
 

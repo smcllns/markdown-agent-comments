@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const CLI = new URL("../src/cli.js", import.meta.url).pathname;
+const CLI = new URL("../scripts/cli.js", import.meta.url).pathname;
 
 let tempDir;
 

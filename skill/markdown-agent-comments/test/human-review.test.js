@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { scanPath } from "../src/scanner.js";
+import { scanPath } from "../scripts/scanner.js";
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const REVIEW_DIR = join(TEST_DIR, "human-review");
@@ -31,7 +31,7 @@ describe("human review markdown fixture", () => {
     await writeFile(join(REVIEW_DIR, ".generated", "processed-output.md"), [
       "> [!NOTE] generated output should not be scanned",
       ">",
-      "> [@human] @agent ignore generated files",
+      "> [@user] @agent ignore generated files",
       "",
     ].join("\n"));
 

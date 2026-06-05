@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const CLI = new URL("../src/cli.js", import.meta.url).pathname;
+const CLI = new URL("../scripts/cli.js", import.meta.url).pathname;
 
 let tempDir;
 let logPath;
@@ -38,7 +38,8 @@ describe("mdac run --once", () => {
     });
 
     expect(proc.exitCode).toBe(0);
-    expect(new TextDecoder().decode(proc.stdout)).toContain("usage: mdac");
+    const stdout = new TextDecoder().decode(proc.stdout);
+    expect(stdout).toContain("usage: mdac");
     expect(new TextDecoder().decode(proc.stderr)).toBe("");
   });
 
@@ -56,7 +57,7 @@ describe("mdac run --once", () => {
   it("invokes the configured agent from the target directory when matches exist", async () => {
     await write("note.md", "@claude tighten this\n");
 
-    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`, "--name", "Human"]);
+    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`, "--name", "Sam McLoughlin"]);
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe("");
@@ -67,11 +68,34 @@ describe("mdac run --once", () => {
     const log = JSON.parse((await readFile(logPath, "utf8")).trim());
     expect(log.cwd).toBe(await realpath(tempDir));
     expect(log.argv).toHaveLength(1);
-    expect(log.argv[0]).toContain("note.md");
-    expect(log.argv[0]).toContain("[!NOTE]");
-    expect(log.argv[0]).toContain("[!DONE]-");
-    expect(log.argv[0]).toContain("<!--mdac:eot-->");
-    expect(log.argv[0]).toContain("Human speaker label: [@human]");
+    expect(log.argv[0]).toContain("You were invoked by the `mdac` CLI.");
+    expect(log.argv[0]).toContain("Use these instructions only as CLI-specific context.");
+    expect(log.argv[0]).not.toContain("Read the mdac CLI adapter at");
+    expect(log.argv[0]).toContain("Then run the Markdown Agent Comments skill at");
+    expect(log.argv[0]).toContain("skill/markdown-agent-comments/SKILL.md");
+    expect(log.argv[0]).toContain("Runtime facts:");
+    expect(log.argv[0]).toContain("  - inline line 1 @claude");
+    expect(log.argv[0]).toContain("Human label provided through mdac CLI args: [@sam]");
+    expect(log.argv[0].length).toBeLessThan(2000);
+    expect(log.argv[0]).not.toContain("# Markdown Agent Comments");
+  });
+
+  it("prints agent run diagnostics in debug mode", async () => {
+    await write("note.md", "@claude tighten this\n");
+
+    const result = runCli(["run", tempDir, "--once", "--debug", "--agent-command", `node ${stubPath}`]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("agent output\n");
+    expect(result.stderr).toContain(`Scanning ${tempDir}`);
+    expect(result.stderr).toContain(`Agent cwd: ${tempDir}`);
+    expect(result.stderr).toContain(`Agent command: node ${stubPath} <prompt>`);
+    expect(result.stderr).toContain("Agent prompt:");
+
+    const log = JSON.parse((await readFile(logPath, "utf8")).trim());
+    expect(log.argv[0]).toContain("Human label provided through mdac CLI args: omitted");
+    expect(log.argv[0]).not.toContain("Human label provided through mdac CLI args: [@user]");
+    expect(log.argv[0]).toContain("Debug mode: enabled");
   });
 
   it("uses MDAC_AGENT_COMMAND when --agent-command is omitted", async () => {

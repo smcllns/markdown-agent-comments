@@ -26,17 +26,17 @@ The opening sentence is a little bloated. @claude tighten this sentence in place
 
 > [!NOTE] heading options
 >
-> [@human] @claude can you give me three sharper options for this heading?
+> [@user] @claude can you give me three sharper options for this heading?
 >
 > [@claude] Option 1: Faster Launch Notes. Option 2: Release Notes That Move. Option 3: Cleaner Launch Log. <!--mdac:eot-->
 >
-> [@human] less cute and more direct
+> [@user] less cute and more direct
 
 ### Existing PR thread
 
 > [!DONE]- linked actual PR
 >
-> [@human] @claude add a link to the actual PR
+> [@user] @claude add a link to the actual PR
 >
 > [@claude] done - linked the draft PR. <!--mdac:eot-->
 > Actually use the merged PR, not the draft
@@ -60,17 +60,17 @@ Mention `@codex` in docs when describing the trigger syntax.
 
 > [!NOTE] awaiting clarification
 >
-> [@human] @claude tighten the wording above
+> [@user] @claude tighten the wording above
 >
 > [@claude] Which paragraph should I edit? <!--mdac:eot-->
 >
-> [@human]
+> [@user]
 
 ### Finished wording thread
 
 > [!DONE]- tightened paragraph
 >
-> [@human] @claude tighten the paragraph
+> [@user] @claude tighten the paragraph
 >
 > [@claude] done - tightened it to one sentence. <!--mdac:eot-->
 
@@ -78,7 +78,7 @@ Mention `@codex` in docs when describing the trigger syntax.
 
 > [!NOTE]+ old atag marker should not be part of forward V1
 >
-> [@human] @claude this old shape should not be detected
+> [@user] @claude this old shape should not be detected
 
 ### Legacy directive text
 
