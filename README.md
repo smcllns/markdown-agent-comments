@@ -13,7 +13,7 @@ After the agent resolves it:
 ```markdown
 > [!DONE]- paragraph converted to list
 >
-> [@human] @claude can you update this paragraph to a numbered list pls
+> [@user] @claude can you update this paragraph to a numbered list pls
 >
 > [@claude] done - updated to a 3-point list <!--mdac:eot-->
 ```
@@ -34,7 +34,7 @@ From this checkout:
 ```bash
 bun install
 bun run test
-node ./src/cli.js scan ~/Notes
+node ./skill/markdown-agent-comments/scripts/cli.js scan ~/Notes
 ```
 
 Install the published CLI:
@@ -43,6 +43,10 @@ Install the published CLI:
 bun add -g markdown-agent-comments
 mdac scan ~/Notes
 ```
+
+Manual agent use:
+
+Ask an agent chat to use `skill/markdown-agent-comments/SKILL.md` on one or more markdown files. The skill is the canonical behavior contract; the CLI is one way to supply scan results and invocation context.
 
 ## Commands
 
@@ -69,7 +73,7 @@ Runs in the foreground and repeats the `run --once` behavior on an interval. Cle
 | Option | Meaning |
 |---|---|
 | `--trigger @name` | Replace the default trigger set. |
-| `--name NAME` | Human speaker label used in threads. Defaults to `human`. |
+| `--name NAME` | Optional human speaker label used in threads. Omit this when no name is known. |
 | `--agent-command CMD` | Command used by `run` and `watch`. The prompt is appended as the final argument. |
 | `--interval SEC` | Watch interval in seconds. Defaults to `60`. |
 | `--debug` | Print scanner diagnostics to stderr. |
@@ -103,7 +107,7 @@ V1 recognizes inline comments and markdown callout threads.
 ```markdown
 > [!NOTE] heading options
 >
-> [@human] @agent can you give me three sharper options for this heading?
+> [@user] @agent can you give me three sharper options for this heading?
 >
 > [@agent] Option 1...
 ```
@@ -113,11 +117,13 @@ Thread markers:
 - `[!NOTE]` means active.
 - `[!DONE]-` means resolved.
 - Agent replies end with `<!--mdac:eot-->`.
+- A quoted speaker line that is only an unknown bracket label, such as `> [@sam]`, is treated as a parked human placeholder even when `--name` is omitted. Add actual request text on that line or later in the thread to make it actionable.
 
 Important scanner rules:
 
 - Custom triggers replace defaults.
 - Inline code is the escape hatch: `` `@claude` `` does not match.
+- Fenced code blocks are ignored.
 - Wrapped blockquote lines do not retrigger as fresh inline comments.
 - If the latest real thread line is agent-authored, the thread is parked.
 - If a human follows up after `<!--mdac:eot-->`, the thread becomes actionable again.
@@ -128,7 +134,7 @@ The original request should stay verbatim as the first body line inside the call
 
 ```bash
 bun run test
-node ./src/cli.js --help
+node ./skill/markdown-agent-comments/scripts/cli.js --help
 ```
 
 For human review before publishing:
@@ -137,6 +143,6 @@ For human review before publishing:
 bun run test:review
 ```
 
-This runs the test suite and regenerates `test/human-review/.generated/processed-output.md` from `test/human-review/agent-input.md` so scanner coverage and expected processed shapes can be reviewed together.
+This runs the test suite and regenerates `skill/markdown-agent-comments/test/human-review/.generated/processed-output.md` from `skill/markdown-agent-comments/test/human-review/agent-input.md` so scanner coverage and expected processed shapes can be reviewed together.
 
 Forward-looking product decisions live in [docs/PRD.md](docs/PRD.md). Historic explorations live under [docs/archive](docs/archive).

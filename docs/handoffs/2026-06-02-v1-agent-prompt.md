@@ -8,16 +8,16 @@ The compact prompt in the first CLI pass was too small. It kept the core markers
 
 ## What changed
 
-`buildAgentPrompt()` in `src/cli.js` now includes V1-relevant guidance from `skills/atag/SKILL.md`, translated to the current protocol:
+The CLI prompt in `skill/markdown-agent-comments/scripts/cli.js` now points agents at repo-local `skill/markdown-agent-comments/cli-preprompt.md` plus `skill/markdown-agent-comments/SKILL.md`, then passes runtime scan facts:
 
 - `[!NOTE]`, not `[!NOTE]+`
 - `[!DONE]-`
 - `<!--mdac:eot-->`, not `<!--atag:eot-->`
-- `[@human]` / `[@agent]` speaker labels
+- `[@user]` / `[@agent]` speaker labels
 - no scanner, poller, grep, awk, or legacy directive guidance
 
 ## Regression guard
 
-`test/agent-prompt.test.js` protects the prompt contract.
+`skill/markdown-agent-comments/test/cli-run.test.js` protects the prompt handoff through the spawned-agent stub.
 
-It asserts that the prompt includes the important V1 behavior requirements and does not carry forward historical scanner instructions or obsolete markers. V1.5 can shrink the prompt, but should keep this test green or update it only with a deliberate product decision.
+It asserts that the CLI passes a thin prompt with the skill path, matched scan facts, and normalized human label behavior. V1.5 can shrink the prompt further, but should keep that end-to-end contract green or update it only with a deliberate product decision.

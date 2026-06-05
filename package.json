@@ -4,16 +4,18 @@
   "description": "@agent comments in markdown",
   "type": "module",
   "bin": {
-    "mdac": "src/cli.js"
+    "mdac": "skill/markdown-agent-comments/scripts/cli.js"
   },
   "files": [
-    "src",
+    "skill",
+    "!skill/**/.generated/**",
+    "!skill/**/runs/**",
     "docs/PRD.md",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "test": "bun test test/*.test.js",
+    "test": "bun test skill/markdown-agent-comments/test/*.test.js",
     "test:review": "bun run test && node scripts/generate-review-output.js"
   },
   "engines": {

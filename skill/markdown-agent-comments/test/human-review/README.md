@@ -1,6 +1,6 @@
 # Markdown Agent Comments V1 Human Review
 
-Use this folder to review behavior before publishing.
+Use this folder to review behavior before publishing. It is both a scanner fixture and a manual skill-use fixture: a human should be able to point an agent at `agent-input.md` and get the same intended processed shape.
 
 ## Files
 
@@ -18,8 +18,14 @@ bun run test:review
 
 Then read:
 
-- `test/human-review/agent-input.md`
-- `test/human-review/.generated/processed-output.md`
+- `skill/markdown-agent-comments/test/human-review/agent-input.md`
+- `skill/markdown-agent-comments/test/human-review/.generated/processed-output.md`
+
+Manual skill dogfood:
+
+1. Ask an agent chat to use `skill/markdown-agent-comments/SKILL.md` on `skill/markdown-agent-comments/test/human-review/agent-input.md`.
+2. Confirm the agent edits the markdown body for concrete requests, wraps requests in mdac callouts, leaves clarification threads open, and ignores the ignored cases below.
+3. Confirm the agent's final chat response is a concise markdown summary, not terminal-style plaintext.
 
 ## Expected Scanner Cases
 

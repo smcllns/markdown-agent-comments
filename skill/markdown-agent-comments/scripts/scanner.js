@@ -1,14 +1,15 @@
+#!/usr/bin/env node
 import { readdir, readFile, stat } from "node:fs/promises";
+import { realpathSync } from "node:fs";
 import path from "node:path";
-import {
-  ACTIVE_CALLOUT,
-  DEFAULT_HUMAN_LABEL,
-  DEFAULT_TRIGGERS,
-  DONE_CALLOUT,
-  EOT_SEAL,
-  normalizeHumanLabel,
-} from "./protocol.js";
+import { fileURLToPath } from "node:url";
 
+export const DEFAULT_TRIGGERS = ["agent", "claude", "codex"];
+export const DEFAULT_HUMAN_LABEL = "user";
+
+const ACTIVE_CALLOUT = "[!NOTE]";
+const DONE_CALLOUT = "[!DONE]-";
+const EOT_SEAL = "<!--mdac:eot-->";
 const ACTIVE_CALLOUT_RE = new RegExp(`^\\s*>\\s*${escapeRegExp(ACTIVE_CALLOUT)}(?:\\s|$)`);
 const DONE_CALLOUT_RE = new RegExp(`^\\s*>\\s*${escapeRegExp(DONE_CALLOUT)}(?:\\s|$)`);
 const IGNORED_DIRS = new Set([".git", ".generated", "node_modules"]);
@@ -41,14 +42,57 @@ export async function scanPath(root, options = {}) {
   return matches;
 }
 
-export function scanFile(contents, options = {}) {
+export function normalizeTriggers(triggers) {
+  const normalized = triggers.map((trigger) => trigger.replace(/^@/, "").trim().toLowerCase()).filter(Boolean);
+  if (normalized.length === 0) return DEFAULT_TRIGGERS;
+  for (const trigger of normalized) {
+    if (!/^[a-z][a-z0-9_]*$/.test(trigger)) {
+      throw new Error(`Invalid trigger: @${trigger}`);
+    }
+  }
+  return [...new Set(normalized)];
+}
+
+export function normalizeHumanLabel(label) {
+  const first = String(label ?? "").trim().split(/\s+/)[0] || DEFAULT_HUMAN_LABEL;
+  return first.toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "") || DEFAULT_HUMAN_LABEL;
+}
+
+async function main(argv = process.argv.slice(2), io = process) {
+  const options = parseArgs(argv);
+  const matches = await scanPath(options.targetPath, {
+    triggers: options.triggers ?? undefined,
+    humanLabel: options.humanLabel ?? undefined,
+  });
+
+  if (options.json) {
+    io.stdout.write(`${JSON.stringify(formatJson(matches), null, 2)}\n`);
+  } else {
+    io.stdout.write(formatText(matches));
+  }
+
+  return 0;
+}
+
+function scanFile(contents, options = {}) {
   const triggers = normalizeTriggers(options.triggers ?? DEFAULT_TRIGGERS);
   const humanLabel = normalizeHumanLabel(options.humanLabel ?? DEFAULT_HUMAN_LABEL);
   const lines = contents.split(/\r?\n/);
   const reasons = [];
+  let activeFence = null;
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
+    const fence = parseFence(line);
+    if (activeFence) {
+      if (fence && closesFence(fence, activeFence)) activeFence = null;
+      continue;
+    }
+    if (fence) {
+      activeFence = fence;
+      continue;
+    }
+
     const callout = parseCalloutStart(line);
     if (callout) {
       const { reason, endIndex } = scanCallout(lines, index, callout.kind, triggers, humanLabel);
@@ -67,22 +111,12 @@ export function scanFile(contents, options = {}) {
   return reasons;
 }
 
-export function normalizeTriggers(triggers) {
-  const normalized = triggers.map((trigger) => trigger.replace(/^@/, "").trim().toLowerCase()).filter(Boolean);
-  if (normalized.length === 0) return DEFAULT_TRIGGERS;
-  for (const trigger of normalized) {
-    if (!/^[a-z][a-z0-9_]*$/.test(trigger)) {
-      throw new Error(`Invalid trigger: @${trigger}`);
-    }
-  }
-  return [...new Set(normalized)];
-}
-
 function scanCallout(lines, startIndex, kind, triggers, humanLabel) {
   let hasTrigger = null;
   let latestRealLine = "";
   let latestIsAgent = false;
   let endIndex = startIndex;
+  let activeFence = null;
 
   for (let index = startIndex; index < lines.length; index += 1) {
     const rawLine = lines[index];
@@ -93,10 +127,20 @@ function scanCallout(lines, startIndex, kind, triggers, humanLabel) {
     endIndex = index;
 
     const quoted = rawLine.replace(/^\s*>\s?/, "");
+    const fence = parseFence(quoted);
+    if (activeFence) {
+      if (fence && closesFence(fence, activeFence)) activeFence = null;
+      continue;
+    }
+    if (fence) {
+      activeFence = fence;
+      continue;
+    }
+
     const trigger = findTrigger(quoted, triggers);
     if (!hasTrigger && trigger) hasTrigger = trigger;
 
-    if (isRealQuotedLine(quoted, humanLabel)) {
+    if (isRealQuotedLine(quoted, humanLabel, triggers)) {
       latestRealLine = quoted.trim();
       latestIsAgent = isAgentSpeakerLine(latestRealLine, triggers);
     }
@@ -112,6 +156,41 @@ function scanCallout(lines, startIndex, kind, triggers, humanLabel) {
     return { reason: { kind, line: startIndex + 1, trigger: hasTrigger }, endIndex };
   }
   return { reason: null, endIndex };
+}
+
+function parseArgs(argv) {
+  const options = {
+    targetPath: null,
+    triggers: null,
+    humanLabel: null,
+    json: false,
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--trigger") {
+      const value = argv[index + 1];
+      if (!value) throw new Error("--trigger requires a value");
+      options.triggers = value.split(",").map((trigger) => trigger.trim()).filter(Boolean);
+      index += 1;
+    } else if (arg === "--name") {
+      const value = argv[index + 1];
+      if (!value) throw new Error("--name requires a value");
+      options.humanLabel = value;
+      index += 1;
+    } else if (arg === "--json") {
+      options.json = true;
+    } else if (arg.startsWith("-")) {
+      throw new Error(`Unknown option: ${arg}`);
+    } else if (!options.targetPath) {
+      options.targetPath = arg;
+    } else {
+      throw new Error(`Unexpected argument: ${arg}`);
+    }
+  }
+
+  if (!options.targetPath) throw new Error("usage: scanner <path> [--trigger @name] [--name NAME] [--json]");
+  return options;
 }
 
 function parseCalloutStart(line) {
@@ -134,15 +213,31 @@ function findTrigger(line, triggers) {
   return null;
 }
 
-function isRealQuotedLine(line, humanLabel) {
+function parseFence(line) {
+  const match = line.match(/^\s*(`{3,}|~{3,})/);
+  if (!match) return null;
+  return {
+    marker: match[1][0],
+    length: match[1].length,
+  };
+}
+
+function closesFence(candidate, activeFence) {
+  return candidate.marker === activeFence.marker && candidate.length >= activeFence.length;
+}
+
+function isRealQuotedLine(line, humanLabel, triggers) {
   const trimmed = line.trim();
   if (trimmed === "") return false;
-  if (isHumanPlaceholder(trimmed, humanLabel)) return false;
+  if (isHumanPlaceholder(trimmed, humanLabel, triggers)) return false;
   if (trimmed.startsWith("<!--mdac:missing-human-name ")) return false;
   return true;
 }
 
-function isHumanPlaceholder(line, humanLabel) {
+function isHumanPlaceholder(line, humanLabel, triggers) {
+  const bracketLabel = line.match(/^\[@([a-z][a-z0-9_]*)\]$/i);
+  if (bracketLabel && !triggers.includes(bracketLabel[1].toLowerCase())) return true;
+
   const label = escapeRegExp(humanLabel);
   return new RegExp(`^(?:\\[@${label}\\]|\\\`${label}\\\`|\\*\\\`${label}\\\`\\*)$`, "i").test(line);
 }
@@ -178,6 +273,38 @@ async function walk(current, files) {
   }
 }
 
+function formatJson(matches) {
+  return matches.map((match) => ({
+    file: match.file,
+    relativePath: match.relativePath,
+    reasons: match.reasons,
+  }));
+}
+
+function formatText(matches) {
+  if (matches.length === 0) return "No actionable mdac comments found.\n";
+
+  const noun = matches.length === 1 ? "file" : "files";
+  const lines = [`Found ${matches.length} actionable ${noun}:`];
+  for (const match of matches) {
+    lines.push(`- ${match.relativePath}`);
+    for (const reason of match.reasons) {
+      lines.push(`  - ${reason.kind} line ${reason.line} @${reason.trigger}`);
+    }
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+function isDirectRun() {
+  if (!process.argv[1]) return false;
+  return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1]);
+}
+
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+if (isDirectRun()) {
+  process.exitCode = await main();
 }

@@ -14,7 +14,7 @@ It follows a file-over-app philosophy (the markdown file is the source of truth)
 
 - works with any markdown editor that uses local `.md` files
 - works with coding agents that can read and edit local files
-- one human-readable SKILL.md + a minimal CLI, and wrappers for coding agent plugins or desktop apps.
+- one human-readable skill at `skill/markdown-agent-comments/SKILL.md` + a minimal CLI, and wrappers for coding agent plugins or desktop apps.
 - aspire to be fast, convenient, and minimal, with high upside and negligible downside
 
 ## Non-Goals
@@ -44,7 +44,7 @@ The agent edits the document as requested, then wraps the discussion in a callou
 
 > [!DONE]- paragraph converted to list
 >
-> [@human] @claude can you switch that paragraph to numbered list pls
+> [@user] @claude can you switch that paragraph to numbered list pls
 >
 > [@claude] done - updated to a 3-point list <!--mdac:eot-->
 
@@ -87,6 +87,7 @@ Markdown Agent Comments should feel like lightweight threaded comments that live
 - The original request should be preserved so the markdown file keeps the conversation context.
 - `[!NOTE]` threads are open; `[!DONE]-` threads are resolved.
 - Agent replies end with `<!--mdac:eot-->` so later human follow-ups can be detected.
+- A quoted speaker line that is only an unknown bracket label, such as `> [@sam]`, is a parked human placeholder even when the CLI was run without `--name`.
 - If the agent needs human input, it should leave the thread open and parked rather than guessing or self-replying.
 
 ### CLI Scope
@@ -97,9 +98,9 @@ Required:
 - `mdac run <path> --once`: scan, then invoke an agent if actionable work exists.
 - `mdac watch <path>`: foreground loop around `run --once`.
 - `--trigger @<name>`: replace the default agent trigger name.
-- `--name <human>`: human speaker label the agent uses for prefilled replies.
+- `--name <label>`: optional human speaker label the agent must use for prefilled replies; omit when no name is known.
 - `--debug`: verbose terminal output for debugging.
-- `test/`: fixture-driven tests for scan and parked-thread behavior.
+- `skill/markdown-agent-comments/test/`: fixture-driven tests for scan and parked-thread behavior.
 
 Outside V1:
 
@@ -127,10 +128,12 @@ Prior names from historic work are retired: `atag`, `Markdown Agent Tags`, `@age
 
 The PRD describes product intent. Detailed scanner, prompt, and fixture behavior belongs in tests to avoid drift:
 
-- Scanner rules: [`test/scanner.test.js`](../test/scanner.test.js)
-- CLI behavior: [`test/cli-scan.test.js`](../test/cli-scan.test.js), [`test/cli-run.test.js`](../test/cli-run.test.js), [`test/cli-watch.test.js`](../test/cli-watch.test.js)
-- Agent prompt contract: [`test/agent-prompt.test.js`](../test/agent-prompt.test.js)
-- Human-readable review fixture: [`test/human-review/README.md`](../test/human-review/README.md)
+- Scanner rules: [`skill/markdown-agent-comments/test/scanner.test.js`](../skill/markdown-agent-comments/test/scanner.test.js)
+- CLI behavior: [`skill/markdown-agent-comments/test/cli-scan.test.js`](../skill/markdown-agent-comments/test/cli-scan.test.js), [`skill/markdown-agent-comments/test/cli-run.test.js`](../skill/markdown-agent-comments/test/cli-run.test.js), [`skill/markdown-agent-comments/test/cli-watch.test.js`](../skill/markdown-agent-comments/test/cli-watch.test.js)
+- Agent prompt handoff: [`skill/markdown-agent-comments/test/cli-run.test.js`](../skill/markdown-agent-comments/test/cli-run.test.js)
+- Skill file standards: [`skill/markdown-agent-comments/test/skill.test.js`](../skill/markdown-agent-comments/test/skill.test.js)
+- Human-readable review fixture: [`skill/markdown-agent-comments/test/human-review/README.md`](../skill/markdown-agent-comments/test/human-review/README.md)
+- Testing and eval strategy: [`docs/eval-testing-plan.md`](eval-testing-plan.md)
 
 ## Roadmap
 

@@ -9,12 +9,12 @@ The local V1 CLI is implemented and passing tests:
 - `mdac watch <path> --interval <seconds>`
 - custom triggers, human labels, debug diagnostics, single-file targets, and package allowlist
 
-`markdown-agent-comments@0.1.1` is published on npm with the V1 CLI and public default human label set to `human`.
+`markdown-agent-comments@0.1.1` is published on npm with the V1 CLI.
 
 ## Important decisions
 
 - V1 prompt should preserve the old `atag` behavior contract; V1.5 can shrink it only with prompt-regression tests protecting behavior.
-- Protocol constants live in `src/protocol.js`, but prompt prose stays inline in `src/cli.js`.
+- Scanner-owned protocol constants stay in `skill/markdown-agent-comments/scripts/scanner.js`; prompt prose stays in the canonical skill plus CLI preprompt.
 - No legacy `#agent`, `#silent`, `[!NOTE]+`, or `<!--atag:eot-->` in forward V1 behavior.
 - GitHub Actions publish workflow uses npm trusted publishing and requires maintainer approval through the GitHub `npm` environment.
 
@@ -22,9 +22,9 @@ The local V1 CLI is implemented and passing tests:
 
 - `bun run test` passes: 25 tests.
 - `bun run test:review` passes and regenerates the human-review processed output.
-- Published `0.1.1` tarball smoke passed for `--help`, package contents, default `human` label, `scan`, and `run --once` with a stub agent.
+- Published `0.1.1` tarball smoke passed for `--help`, package contents, `scan`, and `run --once` with a stub agent.
 - Scratch smoke and read-only Obsidian scan were completed earlier.
-- Latest code review fix addressed shared protocol constants and human-label normalization.
+- Latest code review fix addressed shared scanner constants and human-label normalization.
 
 ## Good place to resume tomorrow
 
