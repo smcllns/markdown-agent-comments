@@ -1,7 +1,7 @@
 # PRD: markdown-agent-comments / mdac
 
-Status: approved for V1 implementation
-Last updated: 2026-06-02
+Status: V1 implemented; maintained as product/spec reference
+Last updated: 2026-06-05
 Owner: maintainer
 
 ## Product Vision
@@ -100,7 +100,7 @@ Required:
 - `--trigger @<name>`: replace the default agent trigger name.
 - `--name <label>`: optional human speaker label the agent must use for prefilled replies; omit when no name is known.
 - `--debug`: verbose terminal output for debugging.
-- `skill/markdown-agent-comments/test/`: fixture-driven tests for scan and parked-thread behavior.
+- `skill/markdown-agent-comments/test/`: fixture-driven scanner tests, demo fixtures, and skill evals.
 
 Outside V1:
 
@@ -148,7 +148,7 @@ Exit criteria:
 - No-op runs are cheap and transparent.
 - Concrete asks resolve into `[!DONE]-`.
 - Asks that require further user input become `[!NOTE]`.
-- Tests cover the scanner edge cases already seen in the vault.
+- Tests cover scanner edge cases, demo before/after behavior, and skill eval fixtures.
 - Package published on [https://registry.npmjs.org/markdown-agent-comments](https://registry.npmjs.org/markdown-agent-comments)
 
 ### V2: `mdac.dev`
