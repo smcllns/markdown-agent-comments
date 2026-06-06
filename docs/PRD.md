@@ -14,7 +14,7 @@ It follows a file-over-app philosophy (the markdown file is the source of truth)
 
 - works with any markdown editor that uses local `.md` files
 - works with coding agents that can read and edit local files
-- one human-readable skill at `skill/markdown-agent-comments/SKILL.md` + a minimal CLI, and wrappers for coding agent plugins or desktop apps.
+- one human-readable skill at `skill/markdown-agent-comments/SKILL.md`, one scanner helper at `skill/markdown-agent-comments/scripts/scanner.js`, a minimal CLI adapter in `cli/`, and future wrappers for coding agent plugins or desktop apps.
 - aspire to be fast, convenient, and minimal, with high upside and negligible downside
 
 ## Non-Goals
@@ -100,7 +100,10 @@ Required:
 - `--trigger @<name>`: replace the default agent trigger name.
 - `--name <label>`: optional human speaker label the agent must use for prefilled replies; omit when no name is known.
 - `--debug`: verbose terminal output for debugging.
-- `skill/markdown-agent-comments/test/`: fixture-driven scanner tests, demo fixtures, and skill evals.
+- `skill/markdown-agent-comments/test/`: deterministic core scanner and skill tests.
+- `skill/markdown-agent-comments/eval/`: skill-owned agent eval cases and eval runner scripts.
+- `cli/test/`: CLI adapter tests for scan, run, watch, and prompt handoff behavior.
+- `demo/`: human-facing product demo, demo runner, and demo tests.
 
 Outside V1:
 
@@ -130,12 +133,13 @@ Prior names from historic work are retired: `atag`, `Markdown Agent Tags`, `@age
 
 The PRD describes product intent. Detailed scanner, prompt, and fixture behavior belongs in tests to avoid drift:
 
+- Layout ownership: [`docs/adrs/0001-layout-ownership.md`](adrs/0001-layout-ownership.md)
 - Scanner rules: [`skill/markdown-agent-comments/test/scanner.test.js`](../skill/markdown-agent-comments/test/scanner.test.js)
-- CLI behavior: [`skill/markdown-agent-comments/test/cli-scan.test.js`](../skill/markdown-agent-comments/test/cli-scan.test.js), [`skill/markdown-agent-comments/test/cli-run.test.js`](../skill/markdown-agent-comments/test/cli-run.test.js), [`skill/markdown-agent-comments/test/cli-watch.test.js`](../skill/markdown-agent-comments/test/cli-watch.test.js)
-- Agent prompt handoff: [`skill/markdown-agent-comments/test/cli-run.test.js`](../skill/markdown-agent-comments/test/cli-run.test.js)
+- CLI behavior: [`cli/test/cli-scan.test.js`](../cli/test/cli-scan.test.js), [`cli/test/cli-run.test.js`](../cli/test/cli-run.test.js), [`cli/test/cli-watch.test.js`](../cli/test/cli-watch.test.js)
+- Agent prompt handoff: [`cli/test/cli-run.test.js`](../cli/test/cli-run.test.js)
 - Skill file standards: [`skill/markdown-agent-comments/test/skill.test.js`](../skill/markdown-agent-comments/test/skill.test.js)
-- Human-readable demo fixtures: [`skill/markdown-agent-comments/test/fixtures/demo.md`](../skill/markdown-agent-comments/test/fixtures/demo.md), [`skill/markdown-agent-comments/test/fixtures/demo.processed.md`](../skill/markdown-agent-comments/test/fixtures/demo.processed.md)
-- Skill eval fixtures: [`skill/markdown-agent-comments/test/fixtures/skill-evals/README.md`](../skill/markdown-agent-comments/test/fixtures/skill-evals/README.md)
+- Human-readable demo: [`demo/README.md`](../demo/README.md)
+- Skill evals: [`skill/markdown-agent-comments/eval/README.md`](../skill/markdown-agent-comments/eval/README.md)
 - Testing and eval strategy: [`docs/eval-testing-plan.md`](eval-testing-plan.md)
 
 ## Roadmap

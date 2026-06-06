@@ -11,13 +11,14 @@ import {
   normalizeTriggers,
   normalizeHumanLabel,
   scanPath,
-} from "./scanner.js";
+} from "../skill/markdown-agent-comments/scripts/scanner.js";
 
 const DEFAULT_AGENT_COMMAND = "claude -p --permission-mode acceptEdits";
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_DIR = path.join(MODULE_DIR, "..");
+const PROJECT_ROOT = path.join(MODULE_DIR, "..");
+const SKILL_DIR = path.join(PROJECT_ROOT, "skill", "markdown-agent-comments");
 const SKILL_PATH = path.join(SKILL_DIR, "SKILL.md");
-const CLI_PREPROMPT_PATH = path.join(SKILL_DIR, "cli-preprompt.md");
+const CLI_PREPROMPT_PATH = path.join(MODULE_DIR, "cli-preprompt.md");
 
 export async function main(argv = process.argv.slice(2), io = process) {
   try {

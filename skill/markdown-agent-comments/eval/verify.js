@@ -1,12 +1,12 @@
 import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path, { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { scanPath } from "../../scripts/scanner.js";
+import { scanPath } from "../scripts/scanner.js";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const EVAL_DIR = join(SCRIPT_DIR, "..", "fixtures", "skill-evals");
-const INPUT_DIR = join(EVAL_DIR, "input");
-const EXPECTED_DIR = join(EVAL_DIR, "expected");
+const EVAL_DIR = SCRIPT_DIR;
+const INPUT_DIR = join(EVAL_DIR, "cases", "input");
+const EXPECTED_DIR = join(EVAL_DIR, "cases", "expected");
 const RUNS_DIR = join(EVAL_DIR, "runs");
 
 const options = parseArgs(process.argv.slice(2));
@@ -176,7 +176,7 @@ function parseArgs(argv) {
     }
   }
 
-  if (!parsed.run) throw new Error("usage: verify-skill-eval --run <run-id-or-path> [--write]");
+  if (!parsed.run) throw new Error("usage: eval:verify -- --run <run-id-or-path> [--write]");
   return parsed;
 }
 

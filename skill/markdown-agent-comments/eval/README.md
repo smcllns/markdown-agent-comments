@@ -4,8 +4,8 @@ These fixtures evaluate whether an agent can use `SKILL.md` to process realistic
 
 ## Directory Roles
 
-- `input/` is executor-visible. Copy these files into a generated run and point the executing agent only at that copy.
-- `expected/` is judge-only. Do not include these files in executor prompts.
+- `cases/input/` is executor-visible. Copy these files into a generated run and point the executing agent only at that copy.
+- `cases/expected/` is judge-only. Do not include these files in executor prompts.
 - `runs/` is generated and ignored. It contains actual executor outputs, prompts, and judge results.
 
 ## Run Flow
@@ -16,7 +16,7 @@ Prepare a run:
 bun run eval:prepare -- --executor manual --run-id local-smoke
 ```
 
-The script creates `runs/<run-id>/actual/` from `input/` and writes `executor-prompt.md` and `judge-prompt.md`.
+The script creates `runs/<run-id>/actual/` from `cases/input/` and writes `executor-prompt.md` and `judge-prompt.md`.
 
 After an agent processes the files in `actual/`, verify the run mechanically:
 

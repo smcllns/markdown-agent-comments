@@ -7,13 +7,13 @@ Build a testing setup that catches regressions in the markdown-agent-comments sc
 ## Implemented State
 
 - The canonical skill now lives at `skill/markdown-agent-comments/SKILL.md`.
-- CLI-only guidance now lives at `skill/markdown-agent-comments/cli-preprompt.md`.
+- CLI-only guidance now lives at `cli/cli-preprompt.md`.
 - The canonical scanner now lives at `skill/markdown-agent-comments/scripts/scanner.js`.
 - Unit tests cover scanner behavior through `skill/markdown-agent-comments/test/scanner.test.js`.
-- CLI tests cover prompt assembly and agent command wiring in `skill/markdown-agent-comments/test/cli-run.test.js`, `cli-scan.test.js`, and `cli-watch.test.js`.
-- Human demo fixtures live under `skill/markdown-agent-comments/test/fixtures/demo.md` and `demo.processed.md`.
-- Skill eval fixtures live under `skill/markdown-agent-comments/test/fixtures/skill-evals/`.
-- Generated eval runs live under `skill/markdown-agent-comments/test/fixtures/skill-evals/runs/`, are ignored, and are excluded from the npm package.
+- CLI tests cover prompt assembly and agent command wiring in `cli/test/cli-run.test.js`, `cli/test/cli-scan.test.js`, and `cli/test/cli-watch.test.js`.
+- Human demo fixtures live under `demo/demo.md` and `demo/demo.processed.md`.
+- Skill eval fixtures live under `skill/markdown-agent-comments/eval/`.
+- Generated eval runs live under `skill/markdown-agent-comments/eval/runs/`, are ignored, and are excluded from the npm package.
 
 ## Proposed Shape
 
@@ -48,9 +48,9 @@ Purpose: evaluate whether an agent using only the skill can process realistic fi
 
 Files:
 
-- `skill/markdown-agent-comments/test/fixtures/skill-evals/input/*.md`
-- `skill/markdown-agent-comments/test/fixtures/skill-evals/expected/*.md`
-- `skill/markdown-agent-comments/test/fixtures/skill-evals/runs/<run-id>/...` ignored/generated
+- `skill/markdown-agent-comments/eval/cases/input/*.md`
+- `skill/markdown-agent-comments/eval/cases/expected/*.md`
+- `skill/markdown-agent-comments/eval/runs/<run-id>/...` ignored/generated
 
 Why separate `input/` and `expected/`:
 
@@ -121,8 +121,8 @@ Purpose: pleasant, quick-read overview for humans evaluating the tool.
 
 Files:
 
-- `skill/markdown-agent-comments/test/fixtures/demo.md`
-- `skill/markdown-agent-comments/test/fixtures/demo.processed.md`
+- `demo/demo.md`
+- `demo/demo.processed.md`
 
 Content:
 
@@ -133,22 +133,22 @@ Content:
 
 Verification:
 
-- Replace `scripts/generate-review-output.js` with the real LLM demo runner at `skill/markdown-agent-comments/test/scripts/run-demo-skill.js`.
+- Replace `scripts/generate-review-output.js` with the real LLM demo runner at `demo/run-skill.js`.
 - Keep `demo.processed.md` committed as a curated reference so humans can diff intended input vs output without running anything.
-- Keep generated demo run output ignored under `skill/markdown-agent-comments/test/fixtures/runs/`.
+- Keep generated demo run output ignored under `demo/runs/`.
 
 ## Implementation Phases
 
 ### Phase 1: Fixture Split
 
-- [x] Move the current human-readable fixture content toward `skill/markdown-agent-comments/test/fixtures/demo.md`.
-- [x] Commit `skill/markdown-agent-comments/test/fixtures/demo.processed.md`.
+- [x] Move the current human-readable fixture content toward `demo/demo.md`.
+- [x] Commit `demo/demo.processed.md`.
 - [x] Add `skill/markdown-agent-comments/test/fixtures/scanner-cases.md` and `scanner-cases.expected.json`.
 - [x] Update tests to use the scanner fixture.
 
 ### Phase 2: Skill Evals Skeleton
 
-- [x] Add `skill/markdown-agent-comments/test/fixtures/skill-evals/input/` and `expected/`.
+- [x] Add `skill/markdown-agent-comments/eval/cases/input/` and `expected/`.
 - [x] Add 3-5 initial eval cases.
 - [x] Add ignored `runs/` directory pattern.
 - [x] Add a README explaining executor vs judge roles.
@@ -184,4 +184,4 @@ Verification:
 - The first executor harness is semi-manual.
 - The first judge harness is a local explicit command wrapper, not CI automation.
 - The scanner implementation is canonical at `skill/markdown-agent-comments/scripts/scanner.js`.
-- The human demo lives under `skill/markdown-agent-comments/test/fixtures/`, with `demo.processed.md` as curated reference and generated LLM demo runs under ignored `fixtures/runs/`.
+- The human demo lives under `demo/`, with `demo.processed.md` as curated reference and generated LLM demo runs under ignored `demo/runs/`.

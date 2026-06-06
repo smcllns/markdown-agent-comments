@@ -1,2 +1,3 @@
 **/.generated/
-skill/markdown-agent-comments/test/fixtures/skill-evals/runs/
+skill/markdown-agent-comments/eval/runs/
+demo/runs/

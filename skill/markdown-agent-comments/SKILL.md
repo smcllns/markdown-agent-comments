@@ -14,7 +14,7 @@ The document body is the source of truth. The callout is the record of the reque
 This skill can be invoked by a human in chat or by the `mdac` CLI.
 
 - Chat: use the files and trigger names the human provides. If no trigger names are supplied, use `@agent`, `@claude`, and `@codex`. If no files are supplied, ask for the smallest useful target path.
-- CLI: follow the additional adapter instructions in `cli-preprompt.md` and use the matched files/reasons supplied by the CLI.
+- CLI: follow the adapter prompt in `cli/cli-preprompt.md` and use the matched files/reasons supplied by the CLI.
 - Review-only: if the human asks only for analysis, do not edit files. Otherwise, edit the markdown files directly.
 
 ## Finding Work
@@ -108,6 +108,6 @@ For chat invocations, reply in concise markdown:
 - list active threads left waiting on the human
 - mention checks or tests only if you actually ran them
 
-For CLI invocations, follow `cli-preprompt.md`.
+For CLI invocations, follow the adapter prompt in `cli/cli-preprompt.md`.
 
 The markdown file itself is the detailed record.

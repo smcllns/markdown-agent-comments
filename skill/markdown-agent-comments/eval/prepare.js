@@ -3,10 +3,10 @@ import path, { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const SKILL_DIR = path.resolve(SCRIPT_DIR, "..", "..");
-const EVAL_DIR = join(SCRIPT_DIR, "..", "fixtures", "skill-evals");
-const INPUT_DIR = join(EVAL_DIR, "input");
-const EXPECTED_DIR = join(EVAL_DIR, "expected");
+const SKILL_DIR = path.resolve(SCRIPT_DIR, "..");
+const EVAL_DIR = SCRIPT_DIR;
+const INPUT_DIR = join(EVAL_DIR, "cases", "input");
+const EXPECTED_DIR = join(EVAL_DIR, "cases", "expected");
 const RUNS_DIR = join(EVAL_DIR, "runs");
 const SKILL_PATH = join(SKILL_DIR, "SKILL.md");
 const JUDGE_TEMPLATE_PATH = join(EVAL_DIR, "judge-prompt.md");
@@ -131,7 +131,7 @@ Process only these generated copies:
 
 ${fileList}
 
-Do not read \`skill-evals/expected/\` or any files outside the listed generated copies unless the human explicitly redirects you.
+Do not read \`cases/expected/\` or any files outside the listed generated copies unless the human explicitly redirects you.
 
 Follow \`SKILL.md\` as the behavior contract. This prompt only defines the eval run scope.
 

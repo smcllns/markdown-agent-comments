@@ -2,16 +2,15 @@ import { cp, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import path, { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { scanPath } from "../../scripts/scanner.js";
+import { scanPath } from "../skill/markdown-agent-comments/scripts/scanner.js";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const SKILL_DIR = path.resolve(SCRIPT_DIR, "..", "..");
+const SKILL_DIR = path.resolve(SCRIPT_DIR, "..", "skill", "markdown-agent-comments");
 const SKILL_PATH = join(SKILL_DIR, "SKILL.md");
 const SCANNER_PATH = join(SKILL_DIR, "scripts", "scanner.js");
-const FIXTURES_DIR = join(SCRIPT_DIR, "..", "fixtures");
-const DEMO_PATH = join(FIXTURES_DIR, "demo.md");
-const REFERENCE_PATH = join(FIXTURES_DIR, "demo.processed.md");
-const RUNS_DIR = join(FIXTURES_DIR, "runs");
+const DEMO_PATH = join(SCRIPT_DIR, "demo.md");
+const REFERENCE_PATH = join(SCRIPT_DIR, "demo.processed.md");
+const RUNS_DIR = join(SCRIPT_DIR, "runs");
 
 const options = parseArgs(process.argv.slice(2));
 const runId = options.runId ?? defaultRunId();
@@ -91,7 +90,7 @@ function parseArgs(argv) {
   }
 
   if (!parsed.agentCommand) {
-    throw new Error("run-demo-skill requires --agent-command or MDAC_DEMO_AGENT_COMMAND");
+    throw new Error("demo/run-skill.js requires --agent-command or MDAC_DEMO_AGENT_COMMAND");
   }
   return parsed;
 }

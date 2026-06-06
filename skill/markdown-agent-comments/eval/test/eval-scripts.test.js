@@ -1,29 +1,20 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, readFile, rm, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
-import { tmpdir } from "node:os";
 import path, { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(TEST_DIR, "..", "..", "..");
-const SCRIPTS_DIR = join(TEST_DIR, "scripts");
-const EVAL_DIR = join(TEST_DIR, "fixtures", "skill-evals");
-const EXPECTED_DIR = join(EVAL_DIR, "expected");
+const REPO_ROOT = path.resolve(TEST_DIR, "..", "..", "..", "..");
+const EVAL_DIR = join(TEST_DIR, "..");
+const EXPECTED_DIR = join(EVAL_DIR, "cases", "expected");
 const RUNS_DIR = join(EVAL_DIR, "runs");
-const DEMO_RUNS_DIR = join(TEST_DIR, "fixtures", "runs");
 
 let runDir;
-let demoRunDir;
-let tempDir;
 
 afterEach(async () => {
   if (runDir) await rm(runDir, { recursive: true, force: true });
-  if (demoRunDir) await rm(demoRunDir, { recursive: true, force: true });
-  if (tempDir) await rm(tempDir, { recursive: true, force: true });
   runDir = null;
-  demoRunDir = null;
-  tempDir = null;
 });
 
 describe("skill eval scripts", () => {
@@ -31,11 +22,11 @@ describe("skill eval scripts", () => {
     const runId = `test-${process.pid}-${Date.now()}`;
     runDir = join(RUNS_DIR, runId);
 
-    await runNode(join(SCRIPTS_DIR, "prepare-skill-eval.js"), ["--run-id", runId, "--executor", "test"]);
+    await runNode(join(EVAL_DIR, "prepare.js"), ["--run-id", runId, "--executor", "test"]);
     await rm(join(runDir, "actual"), { recursive: true, force: true });
     await cp(EXPECTED_DIR, join(runDir, "actual"), { recursive: true });
 
-    const result = await runNode(join(SCRIPTS_DIR, "verify-skill-eval.js"), ["--run", runId]);
+    const result = await runNode(join(EVAL_DIR, "verify.js"), ["--run", runId]);
     const parsed = JSON.parse(result.stdout);
 
     expect(parsed.status).toBe("pass");
@@ -47,7 +38,7 @@ describe("skill eval scripts", () => {
     const runId = `prompt-${process.pid}-${Date.now()}`;
     runDir = join(RUNS_DIR, runId);
 
-    await runNode(join(SCRIPTS_DIR, "prepare-skill-eval.js"), ["--run-id", runId, "--executor", "test"]);
+    await runNode(join(EVAL_DIR, "prepare.js"), ["--run-id", runId, "--executor", "test"]);
     const prompt = await readFile(join(runDir, "executor-prompt.md"), "utf8");
     const judgePrompt = await readFile(join(runDir, "judge-prompt.md"), "utf8");
 
@@ -66,8 +57,8 @@ describe("skill eval scripts", () => {
     const runId = `bad-${process.pid}-${Date.now()}`;
     runDir = join(RUNS_DIR, runId);
 
-    await runNode(join(SCRIPTS_DIR, "prepare-skill-eval.js"), ["--run-id", runId, "--executor", "test"]);
-    const result = await runNode(join(SCRIPTS_DIR, "verify-skill-eval.js"), ["--run", runId]);
+    await runNode(join(EVAL_DIR, "prepare.js"), ["--run-id", runId, "--executor", "test"]);
+    const result = await runNode(join(EVAL_DIR, "verify.js"), ["--run", runId]);
     const parsed = JSON.parse(result.stdout);
 
     expect(parsed.score).toBeLessThan(0.75);
@@ -78,7 +69,7 @@ describe("skill eval scripts", () => {
   it("fails clearly when the actual run directory is missing", async () => {
     const missingRunId = `missing-${process.pid}-${Date.now()}`;
 
-    await expect(runNode(join(SCRIPTS_DIR, "verify-skill-eval.js"), ["--run", missingRunId]))
+    await expect(runNode(join(EVAL_DIR, "verify.js"), ["--run", missingRunId]))
       .rejects.toThrow("Eval actual directory does not exist");
   });
 
@@ -86,7 +77,7 @@ describe("skill eval scripts", () => {
     const runId = `judge-${process.pid}-${Date.now()}`;
     runDir = join(RUNS_DIR, runId);
 
-    await runNode(join(SCRIPTS_DIR, "prepare-skill-eval.js"), ["--run-id", runId, "--executor", "test"]);
+    await runNode(join(EVAL_DIR, "prepare.js"), ["--run-id", runId, "--executor", "test"]);
 
     const fakeJudge = join(runDir, "fake-judge.js");
     await writeFile(fakeJudge, `
@@ -96,7 +87,7 @@ if (!prompt.includes("actual: ${join(runDir, "actual")}")) process.exit(3);
 process.stdout.write(JSON.stringify({ runId: "${runId}", judge: "fake", cases: [] }));
 `);
 
-    const result = await runNode(join(SCRIPTS_DIR, "judge-skill-eval.js"), [
+    const result = await runNode(join(EVAL_DIR, "judge.js"), [
       "--run",
       runId,
       "--judge-command",
@@ -109,34 +100,6 @@ process.stdout.write(JSON.stringify({ runId: "${runId}", judge: "fake", cases: [
     expect(saved.judge).toBe("fake");
   });
 
-  it("runs the demo fixture through an explicit agent command", async () => {
-    const runId = `demo-${process.pid}-${Date.now()}`;
-    demoRunDir = join(DEMO_RUNS_DIR, runId);
-    tempDir = await mkdtemp(join(tmpdir(), "mdac-demo-agent-"));
-
-    const fakeAgent = join(tempDir, "fake-demo-agent.js");
-    await writeFile(fakeAgent, `
-import { writeFileSync } from "node:fs";
-const prompt = process.argv[2] ?? "";
-if (!prompt.includes("SKILL.md")) process.exit(2);
-const match = prompt.match(/Process only this generated copy of the demo fixture:\\n\\n([^\\n]+)/);
-if (!match) process.exit(3);
-writeFileSync(match[1], "# Demo\\n\\nResolved by fake agent.\\n");
-process.stdout.write("fake agent processed demo\\n");
-`);
-
-    const result = await runNode(join(SCRIPTS_DIR, "run-demo-skill.js"), [
-      "--run-id",
-      runId,
-      "--agent-command",
-      `${process.execPath} ${fakeAgent}`,
-    ]);
-
-    expect(result.stdout).toContain(`Prepared demo skill run: ${runId}`);
-    expect(result.stdout).toContain("fake agent processed demo");
-    expect(result.stdout).toContain("- No actionable mdac comments found.");
-    expect(await readFile(join(demoRunDir, "agent-stdout.txt"), "utf8")).toContain("fake agent processed demo");
-  });
 });
 
 function runNode(script, args) {

@@ -2,12 +2,12 @@ import { describe, expect, it } from "bun:test";
 import { readFile, readdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { scanPath } from "../scripts/scanner.js";
+import { scanPath } from "../../scripts/scanner.js";
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
-const EVAL_DIR = join(TEST_DIR, "fixtures", "skill-evals");
-const INPUT_DIR = join(EVAL_DIR, "input");
-const EXPECTED_DIR = join(EVAL_DIR, "expected");
+const EVAL_DIR = join(TEST_DIR, "..");
+const INPUT_DIR = join(EVAL_DIR, "cases", "input");
+const EXPECTED_DIR = join(EVAL_DIR, "cases", "expected");
 
 describe("skill eval fixtures", () => {
   it("keeps input and expected cases paired", async () => {

@@ -6,7 +6,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const CLI = new URL("../scripts/cli.js", import.meta.url).pathname;
+const CLI = new URL("../cli.js", import.meta.url).pathname;
 
 let tempDir;
 let logPath;

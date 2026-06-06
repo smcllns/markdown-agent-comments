@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const SKILL = new URL("../SKILL.md", import.meta.url);
-const CLI_PREPROMPT = new URL("../cli-preprompt.md", import.meta.url);
+const CLI_PREPROMPT = new URL("../../../cli/cli-preprompt.md", import.meta.url);
 const SCAN_SCRIPT = new URL("../scripts/scanner.js", import.meta.url);
 
 describe("SKILL.md", () => {
@@ -21,7 +21,7 @@ describe("SKILL.md", () => {
     const skill = await readFile(SKILL, "utf8");
     const cliPreprompt = await readFile(CLI_PREPROMPT, "utf8");
 
-    expect(skill).toContain("For CLI invocations, follow `cli-preprompt.md`.");
+    expect(skill).toContain("For CLI invocations, follow the adapter prompt in `cli/cli-preprompt.md`.");
     expect(skill).not.toContain("final stdout plain");
     expect(cliPreprompt).toContain("You were invoked by the `mdac` CLI.");
     expect(cliPreprompt).toContain("Use these instructions only as CLI-specific context.");
