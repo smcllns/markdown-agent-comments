@@ -74,7 +74,7 @@ These are the recurring shapes that make Markdown Agent Comments useful:
 
 1. Human writes an `@agent` comment in a markdown file.
 2. `mdac scan <path>` shows actionable files without invoking an agent.
-3. `mdac run <path> --once` invokes an agent only when the cheap scan finds work.
+3. `mdac run <path>` invokes an agent only when the cheap scan finds work.
 4. The agent reads surrounding context, edits the document body when the request clearly asks for a document change, and records a short reply in the callout.
 5. If the request is ambiguous, or it is appropriate to ask for further user input before concluding, the agent leaves an open `[!NOTE]` thread and pre-fills the human reply label.
 
@@ -95,8 +95,8 @@ Markdown Agent Comments should feel like lightweight threaded comments that live
 Required:
 
 - `mdac scan <path>`: read-only candidate scan.
-- `mdac run <path> --once`: scan, then invoke an agent if actionable work exists.
-- `mdac watch <path>`: foreground loop around `run --once`.
+- `mdac run <path>`: scan, then invoke an agent if actionable work exists.
+- `mdac watch <path>`: foreground loop around `run`.
 - `--trigger @<name>`: replace the default agent trigger name.
 - `--name <label>`: optional human speaker label the agent must use for prefilled replies; omit when no name is known.
 - `--debug`: verbose terminal output for debugging.
@@ -146,7 +146,7 @@ The PRD describes product intent. Detailed scanner, prompt, and fixture behavior
 
 ### V1: Local CLI That Works
 
-Ship the `mdac` CLI with `scan`, `run --once`, `watch`, core protocol tests, and a minimal README.
+Ship the `mdac` CLI with `scan`, `run`, `watch`, core protocol tests, and a minimal README.
 
 Exit criteria:
 

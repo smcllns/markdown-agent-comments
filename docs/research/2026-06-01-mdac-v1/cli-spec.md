@@ -37,12 +37,12 @@ Recommended V1:
 
 ```sh
 mdac scan /path/to/notes
-mdac run /path/to/notes --once
+mdac run /path/to/notes
 mdac watch /path/to/notes --interval 60
 mdac run /path/to/notes --name Sam --trigger @pi
 ```
 
-`scan` is read-only. `run --once` is the Sam-first resolver path. `watch` is a foreground polling loop, not launchd/cron.
+`scan` is read-only. `run` is the Sam-first resolver path. `watch` is a foreground polling loop, not launchd/cron.
 
 ## Tests To Port First
 

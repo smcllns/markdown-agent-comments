@@ -52,7 +52,7 @@ The important product constraint is that forward-looking docs should be concise,
 Implemented:
 
 - `mdac scan <path>`
-- `mdac run <path> --once`
+- `mdac run <path>`
 - `mdac watch <path> --interval <seconds>`
 - `--trigger`, `--name`, `--agent-command`, and `--debug`
 - cheap markdown scanner for inline comments, active `[!NOTE]` threads, `[!DONE]-` follow-ups, parked agent replies, custom triggers, and mtime sorting
@@ -61,7 +61,7 @@ Implemented:
 Verification:
 
 - `bun run test` passes.
-- Scratch smoke passed for `scan`, `run --once`, and bounded `watch` with a fake agent command.
+- Scratch smoke passed for `scan`, the then-current one-shot `run` command, and bounded `watch` with a fake agent command.
 - Read-only Obsidian scan completed against `<local-projects>/obsidian` and found real actionable files.
 - The published `0.1.1` tarball contained the intended files at that time: `package.json`, `LICENSE`, `README.md`, `docs/PRD.md`, and `src/`. Current dogfood work moves runtime code into the skill directory.
 

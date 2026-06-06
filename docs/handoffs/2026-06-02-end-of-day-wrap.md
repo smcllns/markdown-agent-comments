@@ -5,7 +5,7 @@
 The local V1 CLI is implemented and passing tests:
 
 - `mdac scan <path>`
-- `mdac run <path> --once`
+- `mdac run <path>`
 - `mdac watch <path> --interval <seconds>`
 - custom triggers, human labels, debug diagnostics, single-file targets, and package allowlist
 
@@ -22,7 +22,7 @@ The local V1 CLI is implemented and passing tests:
 
 - `bun run test` passes: 25 tests.
 - `bun run test:review` passes. The former generated human-review output has since been replaced by committed demo fixtures under `demo/` and eval fixtures under `skill/markdown-agent-comments/eval/`.
-- Published `0.1.1` tarball smoke passed for `--help`, package contents, `scan`, and `run --once` with a stub agent.
+- Published `0.1.1` tarball smoke passed for `--help`, package contents, `scan`, and the then-current one-shot `run` command with a stub agent.
 - Scratch smoke and read-only Obsidian scan were completed earlier.
 - Latest code review fix addressed shared scanner constants and human-label normalization.
 
