@@ -147,8 +147,8 @@ MDAC_DEMO_AGENT_COMMAND="codex exec --ignore-user-config --ignore-rules --epheme
 
 This runs the test suite, copies the committed demo fixture to an ignored generated run directory, invokes the real Markdown Agent Comments skill with the configured LLM command, and scans the generated output. The committed processed demo is a curated reference fixture:
 
-- `skill/markdown-agent-comments/test/fixtures/demo.md`
-- `skill/markdown-agent-comments/test/fixtures/demo.processed.md`
+- `demo/demo.md`
+- `demo/demo.processed.md`
 
 For skill evals:
 
@@ -158,6 +158,6 @@ bun run eval:verify -- --run <run-id> --write
 bun run eval:judge -- --run <run-id> --judge-command "claude -p"
 ```
 
-Eval inputs and expected outputs live under `skill/markdown-agent-comments/test/fixtures/skill-evals/`. Generated run directories are ignored.
+Eval inputs and expected outputs live under `skill/markdown-agent-comments/eval/cases/`. Generated run directories are ignored.
 
 Forward-looking product decisions live in [docs/PRD.md](docs/PRD.md). Historic explorations live under [docs/archive](docs/archive).

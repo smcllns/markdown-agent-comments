@@ -4,7 +4,7 @@ import path, { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const RUNS_DIR = join(SCRIPT_DIR, "..", "fixtures", "skill-evals", "runs");
+const RUNS_DIR = join(SCRIPT_DIR, "runs");
 
 const options = parseArgs(process.argv.slice(2));
 const runDir = resolveRunDir(options.run);
@@ -47,10 +47,10 @@ function parseArgs(argv) {
   }
 
   if (!parsed.run) {
-    throw new Error("usage: judge-skill-eval --run <run-id-or-path> --judge-command <command>");
+    throw new Error("usage: eval:judge -- --run <run-id-or-path> --judge-command <command>");
   }
   if (!parsed.judgeCommand) {
-    throw new Error("judge-skill-eval requires --judge-command or MDAC_JUDGE_COMMAND");
+    throw new Error("eval:judge requires --judge-command or MDAC_JUDGE_COMMAND");
   }
   return parsed;
 }

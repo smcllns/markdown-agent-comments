@@ -8,7 +8,9 @@
   },
   "files": [
     "cli",
+    "demo",
     "skill",
+    "!demo/runs/**",
     "!skill/**/.generated/**",
     "!skill/**/runs/**",
     "docs/PRD.md",
@@ -17,13 +19,15 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "bun run test:core && bun run test:cli",
+    "test": "bun run test:core && bun run test:cli && bun run test:demo && bun run test:eval",
     "test:core": "bun test skill/markdown-agent-comments/test/*.test.js",
     "test:cli": "bun test cli/test/*.test.js",
-    "test:review": "bun run test && node skill/markdown-agent-comments/test/scripts/run-demo-skill.js",
-    "eval:prepare": "node skill/markdown-agent-comments/test/scripts/prepare-skill-eval.js",
-    "eval:verify": "node skill/markdown-agent-comments/test/scripts/verify-skill-eval.js",
-    "eval:judge": "node skill/markdown-agent-comments/test/scripts/judge-skill-eval.js"
+    "test:demo": "bun test demo/test/*.test.js",
+    "test:eval": "bun test skill/markdown-agent-comments/eval/test/*.test.js",
+    "test:review": "bun run test && node demo/run-skill.js",
+    "eval:prepare": "node skill/markdown-agent-comments/eval/prepare.js",
+    "eval:verify": "node skill/markdown-agent-comments/eval/verify.js",
+    "eval:judge": "node skill/markdown-agent-comments/eval/judge.js"
   },
   "engines": {
     "node": ">=20"

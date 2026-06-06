@@ -10,14 +10,14 @@ Verified today:
 - Registry metadata is live at `https://registry.npmjs.org/markdown-agent-comments/0.1.1`
 - Published tarball exposes the `mdac` binary path and uses the CLI-provided human label when present.
 - Published tarball smoke passed for `--help`, `scan`, and `run --once` on a tiny markdown fixture with a stub agent.
-- Local test suite and review fixtures pass. The old generated human-review flow has since been replaced by committed demo and eval fixtures under `skill/markdown-agent-comments/test/fixtures/`.
+- Local test suite and review fixtures pass. The old generated human-review flow has since been replaced by committed demo fixtures under `demo/` and eval fixtures under `skill/markdown-agent-comments/eval/`.
 
 ## Tomorrow sequence
 
 1. Review the V1 demo and eval fixtures:
-   - `skill/markdown-agent-comments/test/fixtures/demo.md`
-   - `skill/markdown-agent-comments/test/fixtures/demo.processed.md`
-   - `skill/markdown-agent-comments/test/fixtures/skill-evals/README.md`
+   - `demo/demo.md`
+   - `demo/demo.processed.md`
+   - `skill/markdown-agent-comments/eval/README.md`
 2. Run `mdac` as the main CLI for the maintainer's Obsidian workflows for the day.
 3. Patch anything that blocks real daily use, especially:
    - install/run command ergonomics

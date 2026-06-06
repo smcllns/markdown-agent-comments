@@ -2,12 +2,12 @@ import { describe, expect, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { scanPath } from "../scripts/scanner.js";
+import { scanPath } from "../../skill/markdown-agent-comments/scripts/scanner.js";
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
-const FIXTURES_DIR = join(TEST_DIR, "fixtures");
-const DEMO_PATH = join(FIXTURES_DIR, "demo.md");
-const PROCESSED_PATH = join(FIXTURES_DIR, "demo.processed.md");
+const DEMO_DIR = join(TEST_DIR, "..");
+const DEMO_PATH = join(DEMO_DIR, "demo.md");
+const PROCESSED_PATH = join(DEMO_DIR, "demo.processed.md");
 
 describe("demo markdown fixtures", () => {
   it("detects only the intended demo cases", async () => {

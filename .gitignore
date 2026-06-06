@@ -1,6 +1,6 @@
 **/.generated/
-skill/markdown-agent-comments/test/fixtures/skill-evals/runs/
-skill/markdown-agent-comments/test/fixtures/runs/
+skill/markdown-agent-comments/eval/runs/
+demo/runs/
 .agents/plans/
 /research/
 SKILL.prev.md
