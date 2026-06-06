@@ -12,7 +12,7 @@ The historic work has one clear through-line: centralize behavior in a CLI, then
 2. Keep historic material in `docs/archive`, clearly marked as provenance.
 3. Ship V1 as `@agent` comments only.
 4. Use package `markdown-agent-comments` and binary `mdac`.
-5. Start with `scan`, `run --once`, and foreground `watch`.
+5. Start with `scan`, `run`, and foreground `watch`.
 6. Defer `#agent`, `#silent`, scheduled runs, plugins, and desktop work.
 
 ## Evidence

@@ -57,7 +57,7 @@ mdac scan <path>
 Read-only scan. Prints files that contain actionable comments.
 
 ```bash
-mdac run <path> --once
+mdac run <path>
 ```
 
 Scans once, then invokes an agent only if actionable comments exist.
@@ -66,7 +66,7 @@ Scans once, then invokes an agent only if actionable comments exist.
 mdac watch <path> --interval 60
 ```
 
-Runs in the foreground and repeats the `run --once` behavior on an interval. Clean watch cycles stay quiet by default; use `--debug` to print scan diagnostics.
+Runs in the foreground and repeats the `run` behavior on an interval. Clean watch cycles stay quiet by default; use `--debug` to print scan diagnostics.
 
 ## Options
 
@@ -87,7 +87,7 @@ claude -p --permission-mode acceptEdits
 You can override it per command:
 
 ```bash
-mdac run ~/Notes --once --agent-command "claude -p --permission-mode acceptEdits"
+mdac run ~/Notes --agent-command "claude -p --permission-mode acceptEdits"
 ```
 
 Or with the environment:

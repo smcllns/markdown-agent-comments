@@ -60,7 +60,6 @@ function parseArgs(argv) {
     humanLabel: null,
     humanLabelProvided: false,
     debug: false,
-    once: false,
     intervalSeconds: 60,
     agentCommand: process.env.MDAC_AGENT_COMMAND || DEFAULT_AGENT_COMMAND,
   };
@@ -80,8 +79,6 @@ function parseArgs(argv) {
       index += 1;
     } else if (arg === "--debug") {
       options.debug = true;
-    } else if (arg === "--once") {
-      options.once = true;
     } else if (arg === "--interval") {
       const value = rest[index + 1];
       if (!value) throw new UsageError("--interval requires a value");
@@ -115,7 +112,6 @@ async function scanCommand(options, io) {
 
 async function runCommand(options, io) {
   if (!options.targetPath) throw new UsageError("run requires a path");
-  if (!options.once) throw new UsageError("run currently requires --once");
   await access(options.targetPath, constants.R_OK);
 
   return await runAgentCycle(options, io);
@@ -304,7 +300,7 @@ function usage() {
     "",
     "Commands:",
     "  scan <path>        Show actionable @agent comments without invoking an agent.",
-    "  run <path> --once  Scan, then invoke an agent only when work exists.",
+    "  run <path>         Scan, then invoke an agent only when work exists.",
     "  watch <path>       Run continuously, invoking an agent only when work exists.",
     "",
     "Options:",
@@ -312,7 +308,6 @@ function usage() {
     "  --name NAME        Optional human speaker label. Omit when no name is known.",
     "  --agent-command C  Agent command for run/watch. Prompt is appended as final argument.",
     "  --interval SEC     Watch interval in seconds. Default: 60.",
-    "  --once             Required for run in V1.",
     "  --debug            Print verbose diagnostics when supported.",
     "  -h, --help         Show help.",
     "",

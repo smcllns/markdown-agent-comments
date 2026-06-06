@@ -26,7 +26,7 @@ afterEach(async () => {
   await rm(tempDir, { recursive: true, force: true });
 });
 
-describe("mdac run --once", () => {
+describe("mdac run", () => {
   it("runs when invoked through a bin symlink", async () => {
     const linkedCli = join(tempDir, "mdac");
     await symlink(CLI, linkedCli);
@@ -46,7 +46,7 @@ describe("mdac run --once", () => {
   it("does not invoke the agent when scan is clean", async () => {
     await write("note.md", "plain markdown\n");
 
-    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`]);
+    const result = runCli(["run", tempDir, "--agent-command", `node ${stubPath}`]);
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe("");
@@ -57,7 +57,7 @@ describe("mdac run --once", () => {
   it("invokes the configured agent from the target directory when matches exist", async () => {
     await write("note.md", "@claude tighten this\n");
 
-    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`, "--name", "Sam McLoughlin"]);
+    const result = runCli(["run", tempDir, "--agent-command", `node ${stubPath}`, "--name", "Sam McLoughlin"]);
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe("");
@@ -83,7 +83,7 @@ describe("mdac run --once", () => {
   it("prints agent run diagnostics in debug mode", async () => {
     await write("note.md", "@claude tighten this\n");
 
-    const result = runCli(["run", tempDir, "--once", "--debug", "--agent-command", `node ${stubPath}`]);
+    const result = runCli(["run", tempDir, "--debug", "--agent-command", `node ${stubPath}`]);
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain("agent output\n");
@@ -101,7 +101,7 @@ describe("mdac run --once", () => {
   it("uses MDAC_AGENT_COMMAND when --agent-command is omitted", async () => {
     await write("note.md", "@claude tighten this\n");
 
-    const result = runCli(["run", tempDir, "--once"], {
+    const result = runCli(["run", tempDir], {
       MDAC_AGENT_COMMAND: `node ${stubPath}`,
     });
 
@@ -114,7 +114,7 @@ describe("mdac run --once", () => {
   it("lets --agent-command override MDAC_AGENT_COMMAND", async () => {
     await write("note.md", "@claude tighten this\n");
 
-    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`], {
+    const result = runCli(["run", tempDir, "--agent-command", `node ${stubPath}`], {
       MDAC_AGENT_COMMAND: "definitely-not-a-real-command",
     });
 
@@ -127,7 +127,7 @@ describe("mdac run --once", () => {
   it("invokes the agent from the containing directory when target is a file", async () => {
     const file = await write("single.md", "@claude tighten this\n");
 
-    const result = runCli(["run", file, "--once", "--agent-command", `node ${stubPath}`]);
+    const result = runCli(["run", file, "--agent-command", `node ${stubPath}`]);
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe("");
@@ -138,17 +138,17 @@ describe("mdac run --once", () => {
     expect(log.argv[0]).toContain("- single.md");
   });
 
-  it("requires --once for run", async () => {
-    const result = runCli(["run", tempDir, "--agent-command", `node ${stubPath}`]);
+  it("rejects the removed --once option", async () => {
+    const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`]);
 
     expect(result.exitCode).toBe(2);
-    expect(result.stderr).toContain("run currently requires --once");
+    expect(result.stderr).toContain("Unknown option: --once");
   });
 
   it("rejects unterminated quoted agent commands", async () => {
     await write("note.md", "@claude tighten this\n");
 
-    const result = runCli(["run", tempDir, "--once", "--agent-command", "\"node"]);
+    const result = runCli(["run", tempDir, "--agent-command", "\"node"]);
 
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain("--agent-command has unterminated quote");

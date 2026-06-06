@@ -19,7 +19,7 @@ Collapse historic roadmap, marketing, and docs work into a sequential path: CLI,
 
 ## Sequential Roadmap
 
-1. CLI first: `scan`, `run --once`, foreground `watch`, fixture-driven tests.
+1. CLI first: `scan`, `run`, foreground `watch`, fixture-driven tests.
 2. Cleanup/archive: safe `sweep` if resolved threads still clutter docs.
 3. `mdac.dev`: one polished page with a live before/after demo, install docs, spec link, and GitHub link.
 4. Coding-agent plugins: thin Claude/Codex/etc. wrappers that call `mdac`.
