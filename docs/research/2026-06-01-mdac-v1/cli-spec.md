@@ -2,6 +2,8 @@
 
 Status: COMPLETE
 
+Historical extraction note: this file records the June 1 V1 research snapshot. Current forward-looking behavior is governed by `docs/PRD.md`, `docs/naming.md`, and ADRs.
+
 ## Task
 
 Extract the best current CLI, scanner, thread protocol, tests, and known gotchas from prior `atag`, `md-asks`, `markdown-agent-comments`, and `markdown-agent-directives` work.
@@ -11,7 +13,7 @@ Extract the best current CLI, scanner, thread protocol, tests, and known gotchas
 ## Strongest Protocol Decisions
 
 - Treat `/Users/smcllns/Projects/dotfiles/agents/skills/atag` as the strongest source where it disagrees with `/Users/smcllns/Projects/skills/skills/atag`.
-- Core shape: `@agent`, `@claude`, and `@codex` comments create callout threads.
+- Core shape at the time of this research: trigger comments such as `@agent`, `@claude`, and `@codex` create callout threads.
 - `[!NOTE]+` means active. `[!DONE]-` means resolved. Bare callouts are plain markdown.
 - Preserve the original request verbatim inside the callout.
 - Put actual edits in the document body, not inside the callout.
@@ -24,7 +26,7 @@ Extract the best current CLI, scanner, thread protocol, tests, and known gotchas
 - Two-pass scan:
   - inline `@agent` comments with line-start/whitespace-before and word-boundary-after rules
   - multiline callout scan for actionable `[!NOTE]+` and unsealed `[!DONE]-`
-- Default triggers: `agent`, `claude`, `codex`.
+- Default triggers at the time of this research: `agent`, `claude`, `codex`. Current defaults are tracked in the PRD/ADRs.
 - Custom triggers replace defaults.
 - Skip inline triggers inside blockquotes so wrapped requests do not retrigger.
 - Inline backticks are the escape hatch.

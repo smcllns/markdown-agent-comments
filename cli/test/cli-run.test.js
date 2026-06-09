@@ -55,14 +55,14 @@ describe("mdac run", () => {
   });
 
   it("invokes the configured agent from the target directory when matches exist", async () => {
-    await write("note.md", "@claude tighten this\n");
+    await write("note.md", "@agent tighten this\n");
 
     const result = runCli(["run", tempDir, "--agent-command", `node ${stubPath}`, "--name", "Sam McLoughlin"]);
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe("");
-    expect(result.stdout).toContain("Found 1 actionable file:\n- note.md\n  - inline line 1 @claude\n");
-    expect(result.stdout).toContain("Invoking agent...\n");
+    expect(result.stdout).toContain("Found 1 actionable file:\n- note.md\n  - inline line 1 @agent\n");
+    expect(result.stdout).toContain("Invoking @agent via agent...\n");
     expect(result.stdout).toContain("agent output\n");
 
     const log = JSON.parse((await readFile(logPath, "utf8")).trim());
@@ -74,14 +74,14 @@ describe("mdac run", () => {
     expect(log.argv[0]).toContain("Then run the Markdown Agent Comments skill at");
     expect(log.argv[0]).toContain("skill/markdown-agent-comments/SKILL.md");
     expect(log.argv[0]).toContain("Runtime facts:");
-    expect(log.argv[0]).toContain("  - inline line 1 @claude");
+    expect(log.argv[0]).toContain("  - inline line 1 @agent");
     expect(log.argv[0]).toContain("Human label provided through mdac CLI args: [@sam]");
     expect(log.argv[0].length).toBeLessThan(2000);
     expect(log.argv[0]).not.toContain("# Markdown Agent Comments");
   });
 
   it("prints agent run diagnostics in debug mode", async () => {
-    await write("note.md", "@claude tighten this\n");
+    await write("note.md", "@agent tighten this\n");
 
     const result = runCli(["run", tempDir, "--debug", "--agent-command", `node ${stubPath}`]);
 
@@ -99,7 +99,7 @@ describe("mdac run", () => {
   });
 
   it("uses MDAC_AGENT_COMMAND when --agent-command is omitted", async () => {
-    await write("note.md", "@claude tighten this\n");
+    await write("note.md", "@agent tighten this\n");
 
     const result = runCli(["run", tempDir], {
       MDAC_AGENT_COMMAND: `node ${stubPath}`,
@@ -107,12 +107,12 @@ describe("mdac run", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe("");
-    expect(result.stdout).toContain("Invoking agent...\n");
+    expect(result.stdout).toContain("Invoking @agent via agent...\n");
     expect(existsSync(logPath)).toBe(true);
   });
 
   it("lets --agent-command override MDAC_AGENT_COMMAND", async () => {
-    await write("note.md", "@claude tighten this\n");
+    await write("note.md", "@agent tighten this\n");
 
     const result = runCli(["run", tempDir, "--agent-command", `node ${stubPath}`], {
       MDAC_AGENT_COMMAND: "definitely-not-a-real-command",
@@ -125,7 +125,7 @@ describe("mdac run", () => {
   });
 
   it("invokes the agent from the containing directory when target is a file", async () => {
-    const file = await write("single.md", "@claude tighten this\n");
+    const file = await write("single.md", "@agent tighten this\n");
 
     const result = runCli(["run", file, "--agent-command", `node ${stubPath}`]);
 
@@ -146,12 +146,12 @@ describe("mdac run", () => {
   });
 
   it("rejects unterminated quoted agent commands", async () => {
-    await write("note.md", "@claude tighten this\n");
+    await write("note.md", "@agent tighten this\n");
 
     const result = runCli(["run", tempDir, "--agent-command", "\"node"]);
 
     expect(result.exitCode).toBe(2);
-    expect(result.stderr).toContain("--agent-command has unterminated quote");
+    expect(result.stderr).toContain("Agent command has unterminated quote");
   });
 });
 

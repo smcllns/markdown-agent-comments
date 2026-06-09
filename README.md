@@ -25,7 +25,7 @@ V1 is a local CLI for markdown folders and Obsidian vaults.
 - Package: `markdown-agent-comments`
 - Binary: `mdac`
 - Website: `mdac.dev`
-- Default triggers: `@agent`, `@claude`, `@codex`
+- Default triggers: `@agent`, `@agents`, `@claude`, `@codex`, `@pi`
 
 ## Local Use
 
@@ -68,23 +68,35 @@ mdac watch <path> --interval 60
 
 Runs in the foreground and repeats the `run` behavior on an interval. Clean watch cycles stay quiet by default; use `--debug` to print scan diagnostics.
 
+```bash
+mdac doctor [path]
+```
+
+Prints resolved config, triggers, routes, and command availability.
+
 ## Options
 
 | Option | Meaning |
 |---|---|
 | `--trigger @name` | Replace the default trigger set. |
 | `--name NAME` | Optional human speaker label used in threads. Omit this when no name is known. |
-| `--agent-command CMD` | Command used by `run` and `watch`. The prompt is appended as the final argument. |
+| `--agent-command CMD` | Override the `@agent` / `@agents` command. The prompt is appended as the final argument. |
+| `--route @name=CMD` | Override one trigger command for this invocation. |
+| `--default-agent LIST` | Override the `@agent` / `@agents` fallback list. Comma-separated. |
 | `--interval SEC` | Watch interval in seconds. Defaults to `60`. |
 | `--debug` | Print scanner diagnostics to stderr. |
 
-The default agent command is:
+Built-in routes are:
 
 ```bash
-claude -p --permission-mode acceptEdits
+@claude -> claude -p --permission-mode acceptEdits
+@codex  -> codex exec --full-auto
+@pi     -> pi -p
 ```
 
-You can override it per command:
+`@agent` and `@agents` use `defaultAgent`, an ordered fallback list. The first installed candidate wins. The built-in list is `claude,codex,pi`.
+
+You can override the default route per command:
 
 ```bash
 mdac run ~/Notes --agent-command "claude -p --permission-mode acceptEdits"
@@ -95,6 +107,28 @@ Or with the environment:
 ```bash
 MDAC_AGENT_COMMAND="claude -p --permission-mode acceptEdits" mdac watch ~/Notes
 ```
+
+Config is JSON. Global config lives at `$XDG_CONFIG_HOME/mdac/config.json`, falling back to `~/.config/mdac/config.json`. Project config lives in `.mdac.json` discovered from the target path upward. Precedence is CLI flags, environment, project config, global config, then built-ins.
+
+```json
+{
+  "defaultAgent": ["claude", "codex", "pi"],
+  "triggers": ["agent", "agents", "claude", "codex", "pi"],
+  "agents": {
+    "reviewer": {
+      "command": "codex exec --full-auto"
+    }
+  }
+}
+```
+
+Environment overrides:
+
+- `MDAC_AGENT_COMMAND`
+- `MDAC_DEFAULT_AGENT=claude,codex`
+- `MDAC_CLAUDE_COMMAND`
+- `MDAC_CODEX_COMMAND`
+- `MDAC_PI_COMMAND`
 
 ## Protocol
 

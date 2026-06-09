@@ -63,7 +63,7 @@ describe("mdac scan", () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain("Found 1 actionable file:");
     expect(result.stderr).toContain(`Scanning ${tempDir}`);
-    expect(result.stderr).toContain("Triggers: @agent, @claude, @codex");
+    expect(result.stderr).toContain("Triggers: @agent, @agents, @claude, @codex, @pi");
     expect(result.stderr).toContain("Matched 1 actionable file.");
   });
 });

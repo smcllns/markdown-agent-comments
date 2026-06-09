@@ -31,6 +31,8 @@ describe("scanPath", () => {
       "Please fix this section @claude",
       "contact@claude.com is an email, not a comment",
       "Mentioning `@codex` in code is not actionable",
+      "@agents plural alias",
+      "@pi pi trigger",
       "> @agent already wrapped in a thread",
       "",
     ].join("\n"));
@@ -41,6 +43,8 @@ describe("scanPath", () => {
     expect(matches[0].relativePath).toBe("note.md");
     expect(matches[0].reasons).toEqual([
       { kind: "inline", line: 1, trigger: "claude" },
+      { kind: "inline", line: 4, trigger: "agents" },
+      { kind: "inline", line: 5, trigger: "pi" },
     ]);
   });
 

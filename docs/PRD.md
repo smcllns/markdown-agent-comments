@@ -34,7 +34,7 @@ When you're writing in a markdown doc it can be disruptive to prompt an agent fo
 
 ### How this solves it
 
-Humans ask for work with `@agent`, `@claude`, `@codex`, or an explicitly configured custom trigger:
+Humans ask for work with `@agent`, `@agents`, `@claude`, `@codex`, `@pi`, or an explicitly configured custom trigger:
 
 ```markdown
 @claude can you update that paragraph to numbered list pls
@@ -82,7 +82,7 @@ These are the recurring shapes that make Markdown Agent Comments useful:
 
 Markdown Agent Comments should feel like lightweight threaded comments that live inside the markdown file:
 
-- Humans ask for work with `@agent`, `@claude`, `@codex`, or an explicitly configured custom trigger.
+- Humans ask for work with `@agent`, `@agents`, `@claude`, `@codex`, `@pi`, or an explicitly configured custom trigger.
 - Concrete document-change requests should change the document body; suggestions, options, explanations, and fallback notes stay in the callout unless the human asks to insert them.
 - The original request should be preserved so the markdown file keeps the conversation context.
 - `[!NOTE]` threads are open; `[!DONE]-` threads are resolved.
@@ -97,8 +97,12 @@ Required:
 - `mdac scan <path>`: read-only candidate scan.
 - `mdac run <path>`: scan, then invoke an agent if actionable work exists.
 - `mdac watch <path>`: foreground loop around `run`.
+- `mdac doctor [path]`: print resolved config, trigger routes, and command availability.
 - `--trigger @<name>`: replace the default agent trigger name.
 - `--name <label>`: optional human speaker label the agent must use for prefilled replies; omit when no name is known.
+- `--agent-command <command>`: override the `@agent` / `@agents` command.
+- `--route @<name>=<command>`: override one trigger command for one invocation.
+- `--default-agent <list>`: override the `@agent` / `@agents` fallback list.
 - `--debug`: verbose terminal output for debugging.
 - `skill/markdown-agent-comments/test/`: deterministic core scanner and skill tests.
 - `skill/markdown-agent-comments/eval/`: skill-owned agent eval cases and eval runner scripts.
@@ -108,7 +112,7 @@ Required:
 Outside V1:
 
 - Scheduled runs with launchd/cron
-- Cowork, Codex, OpenClaw (etc) plugins and extensions
+- Cowork, OpenClaw (etc) plugins and extensions
 - Cleanup feature to move resolved comments to footnotes
 
 ## Naming
@@ -152,6 +156,8 @@ Exit criteria:
 
 - Users can point `mdac` at a notes folder, including an Obsidian vault
 - No-op runs are cheap and transparent.
+- `@agent` / `@agents` route to the first installed `defaultAgent` candidate.
+- Explicit built-in triggers route only to their matching CLI and skip/report when missing.
 - Concrete requests resolve into `[!DONE]-`.
 - Requests that require further user input become `[!NOTE]`.
 - Tests cover scanner edge cases, demo before/after behavior, and skill eval fixtures.

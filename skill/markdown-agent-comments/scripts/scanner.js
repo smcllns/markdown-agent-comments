@@ -4,7 +4,7 @@ import { realpathSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const DEFAULT_TRIGGERS = ["agent", "claude", "codex"];
+export const DEFAULT_TRIGGERS = ["agent", "agents", "claude", "codex", "pi"];
 export const DEFAULT_HUMAN_LABEL = "user";
 
 const ACTIVE_CALLOUT = "[!NOTE]";
