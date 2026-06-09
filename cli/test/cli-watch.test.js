@@ -57,7 +57,7 @@ describe("mdac watch", () => {
   });
 
   it("invokes an agent during a watch cycle when matches exist", async () => {
-    await write("note.md", "@claude tighten this\n");
+    await write("note.md", "@agent tighten this\n");
 
     const result = await runWatchUntil(
       ["watch", tempDir, "--interval", "60", "--agent-command", `node ${stubPath}`],
@@ -66,7 +66,7 @@ describe("mdac watch", () => {
 
     expect(result.stderr).toBe("");
     expect(result.stdout).toContain("Found 1 actionable file:");
-    expect(result.stdout).toContain("Invoking agent...\nagent output\n");
+    expect(result.stdout).toContain("Invoking @agent via agent...\nagent output\n");
     expect(await readFile(logPath, "utf8")).toBe("invoked\n");
   });
 });

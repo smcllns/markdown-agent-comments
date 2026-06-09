@@ -13,7 +13,7 @@ The document body is the source of truth. The callout is the record of the reque
 
 This skill can be invoked by a human in chat or by the `mdac` CLI.
 
-- Chat: use the files and trigger names the human provides. If no trigger names are supplied, use `@agent`, `@claude`, and `@codex`. If no files are supplied, ask for the smallest useful target path.
+- Chat: use the files and trigger names the human provides. If no trigger names are supplied, use `@agent`, `@agents`, `@claude`, `@codex`, and `@pi`. If no files are supplied, ask for the smallest useful target path.
 - CLI: follow the adapter prompt in `cli/cli-preprompt.md` and use the matched files/reasons supplied by the CLI.
 - Review-only: if the human asks only for analysis, do not edit files. Otherwise, edit the markdown files directly.
 
@@ -59,7 +59,7 @@ For each actionable comment:
 - For multi-part requests, address every part. If you cannot complete a requested part because a tool, permission, file, or fact is unavailable, say exactly what is missing and give the smallest useful next step instead of silently dropping that part.
 - If the request sits on a task item, update the checkbox when the task is actually complete.
 - Preserve the original request in the callout. For inline comments, this is the trigger and request text, plus only the surrounding body text needed to understand what changed.
-- For an inline trigger, create a new callout immediately after the affected block and remove the live trigger from the body. Do not leave the same live `@agent`, `@claude`, `@codex`, or custom trigger in both the body and the callout.
+- For an inline trigger, create a new callout immediately after the affected block and remove the live trigger from the body. Do not leave the same live `@agent`, `@agents`, `@claude`, `@codex`, `@pi`, or custom trigger in both the body and the callout.
 - For an existing callout thread, continue inside that same callout. Do not create a second callout for the same thread.
 - Conclude completed work with `[!DONE]-` and a past-tense title, about 60 characters or less.
 
