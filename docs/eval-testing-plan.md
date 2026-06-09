@@ -41,7 +41,7 @@ Implemented files:
 
 Coverage includes the dense fixture plus focused unit tests for:
 
-- Default triggers: `@agent`, `@claude`, `@codex`.
+- Default triggers: `@agent`, `@agents`, `@claude`, `@codex`, `@pi`.
 - Custom triggers in focused unit tests.
 - Inline comments.
 - Active `[!NOTE]` threads.

@@ -1,6 +1,6 @@
 ---
 name: markdown-agent-comments
-description: Resolve agent-directed comments in markdown files and callout threads. Use when the mdac CLI invokes this skill, or when a human asks an agent chat to process files containing @agent, @claude, @codex, custom @trigger comments, active [!NOTE] threads, or follow-ups in [!DONE]- threads.
+description: Resolve trigger-specific comments in markdown files and callout threads. Use when the mdac CLI invokes this skill, or when a human asks an agent chat to process files containing @agent, @agents, @claude, @codex, @pi, configured custom triggers, active [!NOTE] threads, or follow-ups in [!DONE]- threads.
 ---
 
 # Markdown Agent Comments
