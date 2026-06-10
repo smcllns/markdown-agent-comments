@@ -81,3 +81,22 @@ Legacy #agent directives are old syntax and should not match.
 > [!NOTE]+ historical plus callout
 >
 > [@user] @agent old atag-style thread
+
+## Adjacent Punctuation Triggers
+
+(@claude can you check this section?)
+**@codex** make this heading bolder.
+[@pi] body speaker labels count as triggers.
+
+## Inline Code Spans
+
+Run the `mdac run @agent` command to verify.
+Keep `@claude` and `spaced @codex spans` quiet.
+
+## Unsealed Agent Turn
+
+> [!NOTE] agent crashed mid-reply
+>
+> [@user] @claude fix the heading
+>
+> [@claude] Working on it now

@@ -31,6 +31,26 @@
         "kind": "done",
         "line": 67,
         "trigger": "claude"
+      },
+      {
+        "kind": "inline",
+        "line": 87,
+        "trigger": "claude"
+      },
+      {
+        "kind": "inline",
+        "line": 88,
+        "trigger": "codex"
+      },
+      {
+        "kind": "inline",
+        "line": 89,
+        "trigger": "pi"
+      },
+      {
+        "kind": "unsealed",
+        "line": 98,
+        "trigger": "claude"
       }
     ]
   }

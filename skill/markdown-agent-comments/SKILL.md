@@ -31,7 +31,10 @@ Process these actionable shapes:
 
 - inline comments containing an active trigger
 - `[!NOTE]` threads where a human turn needs an agent response
+- `[!NOTE]` threads whose latest agent turn is missing the `<!--mdac:eot-->` seal — an interrupted reply; verify the work and reseal
 - `[!DONE]-` threads with a human follow-up after the latest `<!--mdac:eot-->`
+
+A trigger matches when `@name` starts the line or follows a non-word character such as whitespace, punctuation, brackets, or emphasis markers — `(@claude please)` and `**@codex**` both count. A word character before the `@` never triggers, so emails like `contact@claude.com` are ignored.
 
 Ignore inline code, fenced code blocks, quoted source material, parked threads, sealed resolved threads, `[!NOTE]+`, `<!--atag:eot-->`, and legacy `#agent` directives.
 
