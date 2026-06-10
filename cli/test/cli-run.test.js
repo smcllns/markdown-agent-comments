@@ -138,6 +138,44 @@ describe("mdac run", () => {
     expect(log.argv[0]).toContain("- single.md");
   });
 
+  it("reports still-actionable work when the agent exits 0 without resolving it", async () => {
+    await write("note.md", "@agent tighten this\n");
+
+    const result = runCli(["run", tempDir, "--agent-command", `node ${stubPath}`]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Still actionable after run:\n- note.md\n  - inline line 1 @agent\n");
+  });
+
+  it("stays quiet about residual work when the agent resolves everything", async () => {
+    const target = await write("note.md", "@agent tighten this\n");
+    const fixingStub = join(tempDir, "agent-fix-stub.js");
+    await writeFile(fixingStub, [
+      "import { writeFileSync } from 'node:fs';",
+      "writeFileSync(process.env.MDAC_TEST_TARGET, 'all resolved\\n');",
+      "console.log('agent output');",
+      "",
+    ].join("\n"));
+
+    const result = runCli(["run", tempDir, "--agent-command", `node ${fixingStub}`], {
+      MDAC_TEST_TARGET: target,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("agent output\n");
+    expect(result.stdout).not.toContain("Still actionable after run:");
+  });
+
+  it("does not report skipped triggers as residual work", async () => {
+    await write("note.md", "@custom hi\n");
+
+    const result = runCli(["run", tempDir, "--trigger", "custom"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Skipped:\n- @custom: no route configured.\n");
+    expect(result.stdout).not.toContain("Still actionable after run:");
+  });
+
   it("rejects the removed --once option", async () => {
     const result = runCli(["run", tempDir, "--once", "--agent-command", `node ${stubPath}`]);
 

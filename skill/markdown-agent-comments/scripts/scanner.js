@@ -292,16 +292,21 @@ function formatJson(matches) {
   }));
 }
 
-function formatText(matches) {
+export function formatMatchLines(match) {
+  const lines = [`- ${match.relativePath}`];
+  for (const reason of match.reasons) {
+    lines.push(`  - ${reason.kind} line ${reason.line} @${reason.trigger}`);
+  }
+  return lines;
+}
+
+export function formatText(matches) {
   if (matches.length === 0) return "No actionable mdac comments found.\n";
 
   const noun = matches.length === 1 ? "file" : "files";
   const lines = [`Found ${matches.length} actionable ${noun}:`];
   for (const match of matches) {
-    lines.push(`- ${match.relativePath}`);
-    for (const reason of match.reasons) {
-      lines.push(`  - ${reason.kind} line ${reason.line} @${reason.trigger}`);
-    }
+    lines.push(...formatMatchLines(match));
   }
   lines.push("");
   return lines.join("\n");
