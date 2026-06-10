@@ -165,11 +165,12 @@ Exit criteria:
 
 ### V2: `mdac.dev`
 
-Publish a concise marketing/docs page:
+Publish a concise marketing/docs page plus agent-led onboarding path:
 
 - what it is
 - animated before/after demo
 - install and first-run commands
+- `NUX.md` entry point for a user's agent to install, verify, demo, scan, explain, and run one narrow first comment safely
 - protocol/spec link
 - GitHub link
 

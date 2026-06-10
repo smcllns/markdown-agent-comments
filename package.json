@@ -15,6 +15,7 @@
     "!skill/**/runs/**",
     "docs/PRD.md",
     "docs/naming.md",
+    "NUX.md",
     "README.md",
     "LICENSE"
   ],
