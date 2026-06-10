@@ -1,35 +1,40 @@
 # NUX.md — agent-led onboarding for Markdown Agent Comments
 
-You are an agent onboarding your human to `mdac`. Your goal is to make the first 10 minutes feel safe, vivid, and reversible.
+You are an agent onboarding a human to `mdac`. Make the first 10 minutes feel safe, concrete, and reversible.
 
-Start with what the product can do today. When you hit a missing option that would make onboarding better, name it as a product gap instead of pretending it exists.
+Use today's product honestly. If you want an option that does not exist yet, call it a product gap.
 
-## Safety contract
+## Contract
 
-- Inspect before you change. Use read-only commands until the human approves a run or edit.
-- Explain in human terms: what files, what comments, what would happen next.
-- Ask before `mdac run` on real user files. It can invoke another agent and edit markdown.
-- Narrow before wide. First real run is one file, not the whole vault.
-- Stop when you cannot explain the next step in one sentence.
+- Read and inspect before changing anything.
+- Ask before `mdac run` on real user files.
+- Start with a temp-file demo, then one narrow real target.
+- Explain what would happen in human terms: files, comments, next action.
+- Stop if the next step is not obvious or safe.
 
-## 1. Install and verify
+## Flow
 
-Today, the published CLI installs as:
+### 1. Install and check
+
+Published CLI:
 
 ```sh
 bun add -g markdown-agent-comments
 mdac doctor .
 ```
 
-If `https://mdac.dev/install.sh` exists in your environment, read the script before running it and verify it points to the official `smcllns/markdown-agent-comments` release artifacts. Do not claim cryptographic build integrity unless checksums, signatures, or provenance are actually available.
+If `https://mdac.dev/install.sh` exists, read it before running it. Verify it points to official `smcllns/markdown-agent-comments` release artifacts. Do not claim cryptographic integrity unless checksums, signatures, or provenance are actually available.
 
-Use `mdac doctor <target>` to confirm the CLI works and show which agents are wired up.
+If onboarding from a repo checkout, run:
 
-If you are onboarding from a repo checkout instead of the published package, run `bun install` and `bun run test` before trusting the build.
+```sh
+bun install
+bun run test
+```
 
-## 2. Offer a vivid temp-file demo
+### 2. Demo in `/tmp`
 
-Before scanning the user's real folder, offer a safe demo in `/tmp`:
+Offer a safe demo before scanning user files:
 
 ```sh
 DEMO=/tmp/mdac-demo.md
@@ -42,7 +47,7 @@ EOF
 mdac scan "$DEMO"
 ```
 
-If the scan finds one actionable comment and the human wants to see the loop, run:
+If the human wants to see the loop:
 
 ```sh
 mdac run "$DEMO"
@@ -50,67 +55,71 @@ mdac run "$DEMO"
 
 Then show the resulting file and explain: the comment triggered an agent, the document changed, and the discussion was preserved as a markdown callout thread.
 
-## 3. Scan the real target read-only
+### 3. Scan the real target read-only
 
 ```sh
 mdac scan <target>
 ```
 
-Do not dump a scary raw list back at the human. Triage it:
+Do not paste a scary raw list. Triage findings into:
 
 - Open: likely real comments that would run an agent.
-- Done or parked: resolved threads that should not run.
-- Ignore: hidden, generated, fixture, archive, or agent-log paths that should be excluded from first-run UX.
-- Suspicious: false positives, examples, inline code, or old threads that need cleanup.
+- Done/parked: resolved threads that should not run.
+- Ignore: hidden, generated, fixture, archive, or agent-log paths.
+- Suspicious: examples, inline-code misses, false positives, or legacy threads.
 
 Quote paths with spaces.
 
-If your installed `mdac` has `--json`, `--all`, dry-run, ignore config, or heal/plan commands, use them. If not, say these are product gaps that would improve this onboarding.
+If your installed `mdac` has `--json`, `--all`, dry-run, ignore config, or heal/plan commands, use them. If not, name that as a product gap.
 
-## 4. First status message
+### 4. Report status
 
 ```text
 Installed mdac and confirmed it works. I have not run it on your files.
 
 Read-only scan of <target>:
 - <X> likely open comments
-- <Y> resolved/parked/legacy threads
-- <Z> matches in folders I would ignore for first-run UX
+- <Y> done/parked/legacy threads
+- <Z> matches in paths I would ignore for first-run UX
 - <N> suspicious matches to clean up or escape
 
-Recommendation: run one narrow demo comment first, then decide whether to add ignore/config rules before scanning wider.
+Recommendation: start with one narrow approved run, or first quiet the scan with config/cleanup.
 
-Want me to: (a) run one approved comment, (b) propose config/ignore cleanup, or (c) stop here?
+Choose: (a) run one approved comment, (b) propose config/cleanup, (c) stop here.
 ```
 
-## 5. First real run
+### 5. Run one narrow real target
 
-After explicit approval, run one narrow target:
+Only after explicit approval:
 
 ```sh
 mdac run <one-file-or-small-folder>
 ```
 
-Show the diff. Ask if the result matched what the human expected. That confirmed loop is the onboarding milestone.
+Show the diff. Ask whether it matched expectations. Widen only after the loop feels predictable.
 
-## 6. Offer recurring setup only after trust
+### 6. Offer recurring setup later
 
-When manual runs feel boring, offer recurring scanning. Today the built-in recurring mode is foreground watch:
+When manual runs feel boring, offer recurring scanning. Today's built-in recurring mode is foreground watch:
 
 ```sh
 mdac watch <target> --interval 60
 ```
 
-If the human wants background scheduling with launchd, cron, or a desktop wrapper, treat that as custom setup unless the project now ships an official recipe. Explain what will run, where logs go, and how to turn it off before installing anything.
+For launchd, cron, or desktop wrappers, explain what will run, where logs go, and how to turn it off before installing anything.
 
-## Product gaps to record while onboarding
+## WIP notes
 
-When the ideal NUX needs something the product does not yet have, capture it for the maintainer. Likely gaps:
+This is a quick v1 of the new-user experience. It should become the primary install/onboarding path, but it still needs product and docs refinement.
 
-- official standalone installer with verifiable checksums or signatures
-- machine-readable scan output
-- quiet default scan with full-audit opt-in
-- dry-run or plan mode for real targets
-- first-class ignore config for hidden/generated dirs
-- safe `heal --plan` for legacy comments and false positives
-- official 1-minute scheduler recipe with uninstall instructions
+Known areas to improve:
+
+- decide whether `NUX.md` should lead with `bun add -g`, `install.sh`, or a verified binary download
+- add an official verification story: checksums, signatures, provenance, or another trust path
+- make the temp-file demo more vivid and reliable across installed agents
+- add an `EXAMPLES.md` that agents can open as teaching props
+- improve first scan UX: quiet defaults, categories, ignored paths, and full-audit mode
+- add machine-readable scan output for agent triage
+- add a real dry-run/plan mode for user files
+- document or ship a safe recurring 1-minute scanner setup with uninstall instructions
+- decide the canonical user-facing comment style: bare `@agent`, HTML comment, Obsidian blockquote, or multiple examples
