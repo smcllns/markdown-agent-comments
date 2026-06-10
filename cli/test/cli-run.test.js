@@ -166,6 +166,31 @@ describe("mdac run", () => {
     expect(result.stdout).not.toContain("Still actionable after run:");
   });
 
+  it("reports an unsealed thread the agent left behind as residual work", async () => {
+    const target = await write("note.md", "@agent tighten this\n");
+    const unsealingStub = join(tempDir, "agent-unseal-stub.js");
+    await writeFile(unsealingStub, [
+      "import { writeFileSync } from 'node:fs';",
+      "writeFileSync(process.env.MDAC_TEST_TARGET, [",
+      "  '> [!NOTE] working on it',",
+      "  '>',",
+      "  '> [@user] @agent tighten this',",
+      "  '>',",
+      "  '> [@agent] On it',",
+      "  '',",
+      "].join('\\n'));",
+      "console.log('agent output');",
+      "",
+    ].join("\n"));
+
+    const result = runCli(["run", tempDir, "--agent-command", `node ${unsealingStub}`], {
+      MDAC_TEST_TARGET: target,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Still actionable after run:\n- note.md\n  - unsealed line 1 @agent\n");
+  });
+
   it("does not report skipped triggers as residual work", async () => {
     await write("note.md", "@custom hi\n");
 
