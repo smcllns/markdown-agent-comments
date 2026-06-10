@@ -48,6 +48,65 @@ describe("scanPath", () => {
     ]);
   });
 
+  it("matches triggers adjacent to punctuation, brackets, and emphasis", async () => {
+    await write("punctuation.md", [
+      "(@claude can you check this section?)",
+      "**@codex** make this heading bolder.",
+      "Ask via [@pi] anytime.",
+      "contact@claude.com stays an email",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].reasons).toEqual([
+      { kind: "inline", line: 1, trigger: "claude" },
+      { kind: "inline", line: 2, trigger: "codex" },
+      { kind: "inline", line: 3, trigger: "pi" },
+    ]);
+  });
+
+  it("ignores triggers inside inline code spans", async () => {
+    await write("spans.md", [
+      "Run the `mdac run @agent` command to verify.",
+      "Keep `@claude` and `spaced @codex spans` quiet.",
+      "real @agent outside any span",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].reasons).toEqual([
+      { kind: "inline", line: 3, trigger: "agent" },
+    ]);
+  });
+
+  it("reports NOTE threads whose latest agent turn is missing the seal", async () => {
+    await write("unsealed.md", [
+      "> [!NOTE] agent crashed mid-reply",
+      ">",
+      "> [@user] @claude fix the heading",
+      ">",
+      "> [@claude] Working on it now",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].reasons).toEqual([
+      { kind: "unsealed", line: 1, trigger: "claude" },
+    ]);
+  });
+
+  it("rejects a single non-markdown file target", async () => {
+    const file = await write("notes.txt", "@agent hi\n");
+
+    await expect(scanPath(file)).rejects.toThrow(/Not a markdown file/);
+  });
+
   it("ignores triggers and callout examples inside fenced code blocks", async () => {
     await write("examples.md", [
       "```markdown",

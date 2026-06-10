@@ -20,9 +20,10 @@ export async function scanPath(root, options = {}) {
   const triggers = normalizeTriggers(options.triggers ?? DEFAULT_TRIGGERS);
   const humanLabel = normalizeHumanLabel(options.humanLabel ?? DEFAULT_HUMAN_LABEL);
   const rootIsFile = rootStat.isFile();
-  const files = rootIsFile
-    ? (absoluteRoot.endsWith(".md") ? [absoluteRoot] : [])
-    : await markdownFiles(absoluteRoot);
+  if (rootIsFile && !absoluteRoot.endsWith(".md")) {
+    throw new Error(`Not a markdown file: ${absoluteRoot}`);
+  }
+  const files = rootIsFile ? [absoluteRoot] : await markdownFiles(absoluteRoot);
   const matches = [];
 
   for (const file of files) {
@@ -149,8 +150,11 @@ function scanCallout(lines, startIndex, kind, triggers, humanLabel) {
   if (!hasTrigger) return { reason: null, endIndex };
 
   const sealed = latestRealLine.endsWith(EOT_SEAL);
-  if (kind === "note" && !sealed && !latestIsAgent) {
-    return { reason: { kind, line: startIndex + 1, trigger: hasTrigger }, endIndex };
+  if (kind === "note" && !sealed) {
+    // An unsealed latest agent turn is the signature of an interrupted reply, not
+    // a parked thread — report it so the contract's self-check can see it.
+    const reasonKind = latestIsAgent ? "unsealed" : kind;
+    return { reason: { kind: reasonKind, line: startIndex + 1, trigger: hasTrigger }, endIndex };
   }
   if (kind === "done" && !sealed) {
     return { reason: { kind, line: startIndex + 1, trigger: hasTrigger }, endIndex };
@@ -204,13 +208,20 @@ function isBlockquote(line) {
 }
 
 function findTrigger(line, triggers) {
+  // A word character before the @ means it is part of a word (contact@claude.com),
+  // never a trigger. Any other prefix counts, so (@claude ...) and **@codex** work.
+  const searchable = stripCodeSpans(line);
   for (const trigger of triggers) {
     const escaped = escapeRegExp(trigger);
-    const pattern = new RegExp(`(^|\\s)@(${escaped})([^A-Za-z0-9_]|$)`, "i");
-    const match = line.match(pattern);
+    const pattern = new RegExp(`(^|[^A-Za-z0-9_])@(${escaped})([^A-Za-z0-9_]|$)`, "i");
+    const match = searchable.match(pattern);
     if (match) return match[2].toLowerCase();
   }
   return null;
+}
+
+function stripCodeSpans(line) {
+  return line.replace(/(`+)[^`]*?\1/g, (span) => " ".repeat(span.length));
 }
 
 function parseFence(line) {
