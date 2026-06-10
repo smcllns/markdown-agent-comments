@@ -1,4 +1,5 @@
 **/.generated/
+dist/
 skill/markdown-agent-comments/eval/runs/
 demo/runs/
 .agents/plans/

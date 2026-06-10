@@ -27,6 +27,24 @@ V1 is a local CLI for markdown folders and Obsidian vaults.
 - Website: `mdac.dev`
 - Default triggers: `@agent`, `@agents`, `@claude`, `@codex`, `@pi`
 
+## Install
+
+One command (macOS), no JavaScript runtime required:
+
+```bash
+curl -fsSL https://mdac.dev/install.sh | sh
+```
+
+This downloads a standalone `mdac` binary to `~/.local/bin`. On first run it
+installs the Markdown Agent Comments skill to `~/.agents/skills/markdown-agent-comments/`.
+
+Or install the published CLI via a JS runtime (any OS):
+
+```bash
+bun add -g markdown-agent-comments
+mdac scan ~/Notes
+```
+
 ## Local Use
 
 From this checkout:
@@ -34,14 +52,7 @@ From this checkout:
 ```bash
 bun install
 bun run test
-node ./cli/cli.js scan ~/Notes
-```
-
-Install the published CLI:
-
-```bash
-bun add -g markdown-agent-comments
-mdac scan ~/Notes
+node ./cli/bin.js scan ~/Notes
 ```
 
 Manual agent use:
@@ -170,7 +181,7 @@ Core skill/scanner artifacts live under `skill/markdown-agent-comments/`. The CL
 
 ```bash
 bun run test
-node ./cli/cli.js --help
+node ./cli/bin.js --help
 ```
 
 For human review before publishing:

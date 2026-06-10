@@ -4,7 +4,7 @@
   "description": "@agent comments in markdown",
   "type": "module",
   "bin": {
-    "mdac": "cli/cli.js"
+    "mdac": "cli/bin.js"
   },
   "files": [
     "cli",
@@ -25,6 +25,7 @@
     "test:demo": "bun test demo/test/*.test.js",
     "test:eval": "bun test skill/markdown-agent-comments/eval/test/*.test.js",
     "test:review": "bun run test && node demo/run-skill.js",
+    "build:binaries": "bun build --compile --target=bun-darwin-arm64 cli/compiled-entry.js --outfile dist/mdac-darwin-arm64 && bun build --compile --target=bun-darwin-x64 cli/compiled-entry.js --outfile dist/mdac-darwin-x64",
     "eval:prepare": "node skill/markdown-agent-comments/eval/prepare.js",
     "eval:verify": "node skill/markdown-agent-comments/eval/verify.js",
     "eval:judge": "node skill/markdown-agent-comments/eval/judge.js"
