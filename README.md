@@ -32,11 +32,13 @@ V1 is a local CLI for markdown folders and Obsidian vaults.
 One command (macOS), no JavaScript runtime required:
 
 ```bash
-curl -fsSL https://mdac.dev/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/smcllns/markdown-agent-comments/main/install.sh | sh
 ```
 
-This downloads a standalone `mdac` binary to `~/.local/bin`. On first run it
-installs the Markdown Agent Comments skill to `~/.agents/skills/markdown-agent-comments/`.
+The URL points straight at [`install.sh`](install.sh) in this repo, so you can
+read exactly what it runs before piping it to `sh`. It downloads a standalone
+`mdac` binary to `~/.local/bin`. On first run it installs the Markdown Agent
+Comments skill to `~/.agents/skills/markdown-agent-comments/`.
 
 Or install the published CLI via a JS runtime (any OS):
 

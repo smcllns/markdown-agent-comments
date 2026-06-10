@@ -1,6 +1,6 @@
 #!/bin/sh
 # Install the standalone `mdac` binary.
-#   curl -fsSL https://mdac.dev/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/smcllns/markdown-agent-comments/main/install.sh | sh
 #
 # macOS only for now. On other systems, install via a JS runtime:
 #   bun add -g markdown-agent-comments
