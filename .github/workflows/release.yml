@@ -25,9 +25,14 @@ jobs:
 
       - name: Smoke test (host arch)
         run: |
-          ./dist/mdac-darwin-arm64 --help
+          case "$(uname -m)" in
+            arm64) bin=dist/mdac-darwin-arm64 ;;
+            x86_64) bin=dist/mdac-darwin-x64 ;;
+            *) echo "unexpected runner arch: $(uname -m)"; exit 1 ;;
+          esac
+          "./$bin" --help
           printf '# smoke\n\n@agent check\n' > smoke.md
-          ./dist/mdac-darwin-arm64 scan smoke.md
+          "./$bin" scan smoke.md
 
       - uses: actions/upload-artifact@v4
         with:
