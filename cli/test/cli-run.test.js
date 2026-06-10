@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const CLI = new URL("../cli.js", import.meta.url).pathname;
+const CLI = new URL("../bin.js", import.meta.url).pathname;
 
 let tempDir;
 let logPath;

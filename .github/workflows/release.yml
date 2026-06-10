@@ -1,0 +1,50 @@
+name: Release binaries
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build macOS binaries
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Compile binaries
+        run: |
+          mkdir -p dist
+          bun build --compile --target=bun-darwin-arm64 cli/compiled-entry.js --outfile dist/mdac-darwin-arm64
+          bun build --compile --target=bun-darwin-x64 cli/compiled-entry.js --outfile dist/mdac-darwin-x64
+
+      - name: Smoke test (host arch)
+        run: |
+          case "$(uname -m)" in
+            arm64) bin=dist/mdac-darwin-arm64 ;;
+            x86_64) bin=dist/mdac-darwin-x64 ;;
+            *) echo "unexpected runner arch: $(uname -m)"; exit 1 ;;
+          esac
+          "./$bin" --help
+          printf '# smoke\n\n@agent check\n' > smoke.md
+          "./$bin" scan smoke.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mdac-macos
+          path: dist/*
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/mdac-darwin-arm64 dist/mdac-darwin-x64 \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes

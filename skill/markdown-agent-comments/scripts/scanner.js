@@ -298,7 +298,13 @@ function formatText(matches) {
 
 function isDirectRun() {
   if (!process.argv[1]) return false;
-  return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1]);
+  // Returns false when bundled into the compiled binary: the embedded import.meta
+  // path has no real file, so realpathSync throws and this stays an import.
+  try {
+    return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1]);
+  } catch {
+    return false;
+  }
 }
 
 function escapeRegExp(value) {

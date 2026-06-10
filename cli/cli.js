@@ -1,6 +1,5 @@
-#!/usr/bin/env node
 import { access, readFile, stat } from "node:fs/promises";
-import { constants, realpathSync } from "node:fs";
+import { constants } from "node:fs";
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import path from "node:path";
@@ -18,6 +17,17 @@ const PROJECT_ROOT = path.join(MODULE_DIR, "..");
 const SKILL_DIR = path.join(PROJECT_ROOT, "skill", "markdown-agent-comments");
 const SKILL_PATH = path.join(SKILL_DIR, "SKILL.md");
 const CLI_PREPROMPT_PATH = path.join(MODULE_DIR, "cli-preprompt.md");
+
+// Asset access is injectable so the compiled single-file binary can supply
+// embedded content instead of reading the package off disk. The node/npm path
+// keeps the disk-backed defaults below.
+let loadPreprompt = () => readFile(CLI_PREPROMPT_PATH, "utf8");
+let resolveSkillPath = async () => SKILL_PATH;
+
+export function configureAssets({ preprompt, skillPath } = {}) {
+  if (preprompt) loadPreprompt = preprompt;
+  if (skillPath) resolveSkillPath = skillPath;
+}
 
 export async function main(argv = process.argv.slice(2), io = process) {
   try {
@@ -229,14 +239,15 @@ async function buildAgentPrompt(options, matches, config) {
   const triggerDisplay = triggers.map((trigger) => `@${trigger}`).join(", ");
   const humanLabel = normalizeHumanLabel(options.humanLabel ?? DEFAULT_HUMAN_LABEL);
   const files = matches.map(formatPromptMatch).join("\n");
-  const cliPreprompt = await readFile(CLI_PREPROMPT_PATH, "utf8");
+  const cliPreprompt = await loadPreprompt();
+  const skillPath = await resolveSkillPath();
   const humanLabelInstruction = options.humanLabelProvided
     ? `Human label provided through mdac CLI args: [@${humanLabel}]`
     : "Human label provided through mdac CLI args: omitted";
   return [
     cliPreprompt.trim(),
     "",
-    `Then run the Markdown Agent Comments skill at ${SKILL_PATH}.`,
+    `Then run the Markdown Agent Comments skill at ${skillPath}.`,
     "",
     "Runtime facts:",
     `Trigger set: ${triggerDisplay}`,
@@ -568,13 +579,3 @@ function usage() {
 }
 
 class UsageError extends Error {}
-
-function isDirectRun() {
-  if (!process.argv[1]) return false;
-  return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1]);
-}
-
-if (isDirectRun()) {
-  const code = await main();
-  process.exitCode = code;
-}
