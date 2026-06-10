@@ -44,6 +44,10 @@ bun add -g markdown-agent-comments
 mdac scan ~/Notes
 ```
 
+Agent-led onboarding:
+
+Ask your coding agent to read [`NUX.md`](NUX.md) and onboard one markdown folder carefully. The new-user flow starts with a safe temp-file demo, then read-only scanning, then one approved narrow run.
+
 Manual agent use:
 
 Ask an agent chat to use `skill/markdown-agent-comments/SKILL.md` on one or more markdown files. The skill is the canonical behavior contract; the CLI is one way to supply scan results and invocation context.
