@@ -173,13 +173,30 @@ Thread markers:
 Important scanner rules:
 
 - Custom triggers replace defaults.
+- Triggers match after punctuation and emphasis too: `(@claude please)` and `**@codex**` both count.
+- A word character or `/` before the `@` never matches, so emails (`contact@claude.com`) and URL handles (`youtube.com/@claude`) stay quiet.
 - Inline code is the escape hatch: `` `@claude` `` does not match.
 - Fenced code blocks are ignored.
 - Wrapped blockquote lines do not retrigger as fresh inline comments.
-- If the latest real thread line is agent-authored, the thread is parked.
+- A turn's leading speaker label like `[@claude]` is dialogue attribution, not a trigger. A thread stays scannable only while at least one turn's text contains a trigger mention — preserve the original request when wrapping a comment.
+- If the latest real thread line is a sealed agent reply, the thread is parked. An agent reply in a `[!NOTE]` thread missing the `<!--mdac:eot-->` seal is reported as `unsealed` — the signature of an interrupted reply.
 - If a human follows up after `<!--mdac:eot-->`, the thread becomes actionable again.
 
 The callout should preserve the trigger and request text, plus only the surrounding body text needed to understand what changed. Edit the document body only when the human clearly asks for a document change; suggestions, options, explanations, reviews, and fallback notes belong in the discussion thread.
+
+## Security Model
+
+`mdac run` and `mdac watch` turn markdown content into agent prompts, and the built-in Claude and Codex routes run agents with auto-accepted edits (`claude -p --permission-mode acceptEdits`, `codex exec --full-auto`). That means:
+
+- **Any actionable `@agent` comment in watched markdown becomes an agent prompt.** Pasted terminal output, synced notes, downloaded files, or content other people can write into shared folders may contain trigger-shaped instructions the agent will follow with edit permissions in that folder.
+- The agent runs with its working directory set to the scanned folder, so its file access is whatever your agent CLI allows from there.
+
+Practical guidance:
+
+- Watch only folders whose contents you control. Start with `mdac scan` (read-only) on anything new.
+- Treat pasted or imported content like untrusted input: scan it, read what matched, then run.
+- To tighten the blast radius, narrow the trigger set to the routes you have tightened: `mdac run ~/Notes --trigger @agent --agent-command "claude -p --permission-mode default"`. Overriding `--agent-command` alone is not enough — the built-in `@claude` and `@codex` routes stay auto-accepting unless you also override them with `--route` or exclude them via `--trigger`.
+- Resolved threads are ordinary markdown in your file. If the folder is versioned with git, git history can serve as your audit trail; mdac does not create a separate audit log.
 
 ## Development
 

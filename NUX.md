@@ -8,6 +8,7 @@ Use today's product honestly. If you want an option that does not exist yet, cal
 
 - Read and inspect before changing anything.
 - Ask before `mdac run` on real user files.
+- Explain the trust model before any recurring setup: any actionable `@agent` comment in watched markdown becomes an agent prompt, and the built-in Claude and Codex routes auto-accept edits. See the README Security Model section.
 - Start with a temp-file demo, then one narrow real target.
 - Explain what would happen in human terms: files, comments, next action.
 - Stop if the next step is not obvious or safe.
