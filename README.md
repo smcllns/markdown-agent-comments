@@ -196,7 +196,7 @@ Practical guidance:
 - Watch only folders whose contents you control. Start with `mdac scan` (read-only) on anything new.
 - Treat pasted or imported content like untrusted input: scan it, read what matched, then run.
 - To tighten the blast radius, narrow the trigger set to the routes you have tightened: `mdac run ~/Notes --trigger @agent --agent-command "claude -p --permission-mode default"`. Overriding `--agent-command` alone is not enough — the built-in `@claude` and `@codex` routes stay auto-accepting unless you also override them with `--route` or exclude them via `--trigger`.
-- Resolved threads are ordinary markdown in your file — git history remains your audit trail.
+- Resolved threads are ordinary markdown in your file. If the folder is versioned with git, git history can serve as your audit trail; mdac does not create a separate audit log.
 
 ## Development
 
