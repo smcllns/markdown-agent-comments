@@ -68,7 +68,7 @@ function validateConfig(config, file) {
   }
 
   for (const key of Object.keys(config)) {
-    if (!KNOWN_CONFIG_KEYS.has(key)) throw new Error(`Unknown config key: ${key}`);
+    if (!KNOWN_CONFIG_KEYS.has(key)) throw new Error(`Unknown config key in ${file}: ${key}`);
   }
 
   if ("defaultAgent" in config && !isStringArray(config.defaultAgent)) {

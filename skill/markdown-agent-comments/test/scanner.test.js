@@ -67,6 +67,76 @@ describe("scanPath", () => {
     ]);
   });
 
+  it("ignores @handles in URLs", async () => {
+    await write("urls.md", [
+      "Watch https://youtube.com/@claude for demos.",
+      "Read https://medium.com/@codex/some-post too.",
+      "But (@claude please check this) is a real comment.",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].reasons).toEqual([
+      { kind: "inline", line: 3, trigger: "claude" },
+    ]);
+  });
+
+  it("does not treat callout speaker labels as live triggers", async () => {
+    await write("labels.md", [
+      "> [!NOTE] discussion with no live mention",
+      ">",
+      "> [@user] what do you think of this section?",
+      ">",
+      "> [@claude] Looks good to me. <!--mdac:eot-->",
+      ">",
+      "> [@user] thanks!",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toEqual([]);
+  });
+
+  it("strips double-backtick code spans without inner backticks", async () => {
+    await write("ticks.md", "Use ``inline @agent code`` for examples.\n");
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toEqual([]);
+  });
+
+  it("scans uppercase markdown extensions", async () => {
+    const file = await write("NOTES.MD", "@agent tighten this\n");
+
+    const matches = await scanPath(file);
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].reasons).toEqual([
+      { kind: "inline", line: 1, trigger: "agent" },
+    ]);
+  });
+
+  it("reports DONE threads with an unsealed latest agent turn as done, not unsealed", async () => {
+    await write("done-unsealed.md", [
+      "> [!DONE]- partially recorded",
+      ">",
+      "> [@user] @claude update this",
+      ">",
+      "> [@claude] partial work, no seal",
+      "",
+    ].join("\n"));
+
+    const matches = await scanPath(tempDir);
+
+    expect(matches).toHaveLength(1);
+    expect(matches[0].reasons).toEqual([
+      { kind: "done", line: 1, trigger: "claude" },
+    ]);
+  });
+
   it("ignores triggers inside inline code spans", async () => {
     await write("spans.md", [
       "Run the `mdac run @agent` command to verify.",

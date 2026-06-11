@@ -100,3 +100,18 @@ Keep `@claude` and `spaced @codex spans` quiet.
 > [@user] @claude fix the heading
 >
 > [@claude] Working on it now
+
+## URL Handles
+
+Watch https://youtube.com/@claude for demos.
+Read https://medium.com/@codex/some-post too.
+
+## Label-Only Thread
+
+> [!NOTE] no live mention anywhere
+>
+> [@user] what do you think of this section?
+>
+> [@claude] Looks good to me. <!--mdac:eot-->
+>
+> [@user] thanks!

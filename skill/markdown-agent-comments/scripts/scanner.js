@@ -20,7 +20,7 @@ export async function scanPath(root, options = {}) {
   const triggers = normalizeTriggers(options.triggers ?? DEFAULT_TRIGGERS);
   const humanLabel = normalizeHumanLabel(options.humanLabel ?? DEFAULT_HUMAN_LABEL);
   const rootIsFile = rootStat.isFile();
-  if (rootIsFile && !absoluteRoot.endsWith(".md")) {
+  if (rootIsFile && !isMarkdownPath(absoluteRoot)) {
     throw new Error(`Not a markdown file: ${absoluteRoot}`);
   }
   const files = rootIsFile ? [absoluteRoot] : await markdownFiles(absoluteRoot);
@@ -138,7 +138,9 @@ function scanCallout(lines, startIndex, kind, triggers, humanLabel) {
       continue;
     }
 
-    const trigger = findTrigger(quoted, triggers);
+    // A turn's leading [@name] label is dialogue attribution, not a live trigger;
+    // only a mention in the turn text itself makes the thread trigger-bearing.
+    const trigger = findTrigger(stripSpeakerLabel(quoted), triggers);
     if (!hasTrigger && trigger) hasTrigger = trigger;
 
     if (isRealQuotedLine(quoted, humanLabel, triggers)) {
@@ -208,12 +210,13 @@ function isBlockquote(line) {
 }
 
 function findTrigger(line, triggers) {
-  // A word character before the @ means it is part of a word (contact@claude.com),
-  // never a trigger. Any other prefix counts, so (@claude ...) and **@codex** work.
+  // A word character before the @ means it is part of a word (contact@claude.com)
+  // and a slash means a URL handle (youtube.com/@claude) — never triggers. Any
+  // other prefix counts, so (@claude ...) and **@codex** work.
   const searchable = stripCodeSpans(line);
   for (const trigger of triggers) {
     const escaped = escapeRegExp(trigger);
-    const pattern = new RegExp(`(^|[^A-Za-z0-9_])@(${escaped})([^A-Za-z0-9_]|$)`, "i");
+    const pattern = new RegExp(`(^|[^A-Za-z0-9_/])@(${escaped})([^A-Za-z0-9_]|$)`, "i");
     const match = searchable.match(pattern);
     if (match) return match[2].toLowerCase();
   }
@@ -222,6 +225,10 @@ function findTrigger(line, triggers) {
 
 function stripCodeSpans(line) {
   return line.replace(/(`+)[^`]*?\1/g, (span) => " ".repeat(span.length));
+}
+
+function stripSpeakerLabel(line) {
+  return line.replace(/^\s*\[@[a-z][a-z0-9_]*\]/i, "");
 }
 
 function parseFence(line) {
@@ -272,7 +279,7 @@ async function markdownFiles(root) {
 async function walk(current, files) {
   const currentStat = await stat(current);
   if (currentStat.isFile()) {
-    if (current.endsWith(".md")) files.push(current);
+    if (isMarkdownPath(current)) files.push(current);
     return;
   }
   if (!currentStat.isDirectory()) return;
@@ -292,16 +299,21 @@ function formatJson(matches) {
   }));
 }
 
-function formatText(matches) {
+export function formatMatchLines(match) {
+  const lines = [`- ${match.relativePath}`];
+  for (const reason of match.reasons) {
+    lines.push(`  - ${reason.kind} line ${reason.line} @${reason.trigger}`);
+  }
+  return lines;
+}
+
+export function formatText(matches) {
   if (matches.length === 0) return "No actionable mdac comments found.\n";
 
   const noun = matches.length === 1 ? "file" : "files";
   const lines = [`Found ${matches.length} actionable ${noun}:`];
   for (const match of matches) {
-    lines.push(`- ${match.relativePath}`);
-    for (const reason of match.reasons) {
-      lines.push(`  - ${reason.kind} line ${reason.line} @${reason.trigger}`);
-    }
+    lines.push(...formatMatchLines(match));
   }
   lines.push("");
   return lines.join("\n");
@@ -316,6 +328,10 @@ function isDirectRun() {
   } catch {
     return false;
   }
+}
+
+function isMarkdownPath(file) {
+  return file.toLowerCase().endsWith(".md");
 }
 
 function escapeRegExp(value) {

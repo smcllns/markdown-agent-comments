@@ -34,7 +34,7 @@ Process these actionable shapes:
 - `[!NOTE]` threads whose latest agent turn is missing the `<!--mdac:eot-->` seal — an interrupted reply; verify the work and reseal
 - `[!DONE]-` threads with a human follow-up after the latest `<!--mdac:eot-->`
 
-A trigger matches when `@name` starts the line or follows a non-word character such as whitespace, punctuation, brackets, or emphasis markers — `(@claude please)` and `**@codex**` both count. A word character before the `@` never triggers, so emails like `contact@claude.com` are ignored.
+A trigger matches when `@name` starts the line or follows a non-word character such as whitespace, punctuation, brackets, or emphasis markers — `(@claude please)` and `**@codex**` both count. A word character or `/` before the `@` never triggers, so emails like `contact@claude.com` and URL handles like `youtube.com/@claude` are ignored. Inside callout threads, a turn's leading speaker label such as `[@claude]` is dialogue attribution, not a trigger.
 
 Ignore inline code, fenced code blocks, quoted source material, parked threads, sealed resolved threads, `[!NOTE]+`, `<!--atag:eot-->`, and legacy `#agent` directives.
 

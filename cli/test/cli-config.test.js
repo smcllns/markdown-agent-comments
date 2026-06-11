@@ -143,7 +143,7 @@ describe("mdac config", () => {
     const result = runCli(["scan", tempDir]);
 
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain("Unknown config key: routes");
+    expect(result.stderr).toContain(`Unknown config key in ${join(tempDir, ".mdac.json")}: routes`);
   });
 
   it("fails on invalid JSON for scan, run, and doctor", async () => {

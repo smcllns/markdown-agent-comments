@@ -7,6 +7,8 @@ import { fileURLToPath } from "node:url";
 import { loadMdacConfig, splitList } from "./config.js";
 import {
   DEFAULT_HUMAN_LABEL,
+  formatMatchLines,
+  formatText,
   normalizeTriggers,
   normalizeHumanLabel,
   scanPath,
@@ -131,7 +133,7 @@ async function scanCommand(options, io) {
 
   const config = await configForOptions(options);
   const matches = await scanForOptions(options, io, config);
-  io.stdout.write(formatScan(matches));
+  io.stdout.write(formatText(matches));
   return 0;
 }
 
@@ -162,11 +164,11 @@ async function runAgentCycle(options, io, { quietWhenClean = false } = {}) {
   const skipped = [];
   let matches = await scanForOptions(options, io, config);
   if (matches.length === 0) {
-    if (!quietWhenClean) io.stdout.write(formatScan(matches));
+    if (!quietWhenClean) io.stdout.write(formatText(matches));
     return 0;
   }
 
-  io.stdout.write(formatScan(matches));
+  io.stdout.write(formatText(matches));
 
   while (true) {
     const jobs = planJobs(matches).filter((job) => !attemptedTriggers.has(job.trigger));
@@ -212,7 +214,24 @@ async function runAgentCycle(options, io, { quietWhenClean = false } = {}) {
   }
 
   writeRunSummary(io, { ran, skipped });
+  writeResidualReport(io, matches, ran);
   return 0;
+}
+
+// An agent can exit 0 while leaving its own work unresolved (live trigger still in
+// the body, thread unsealed). Surface what the final rescan still shows for the
+// triggers that ran instead of ending on a clean summary.
+function writeResidualReport(io, matches, ran) {
+  const ranTriggers = new Set(ran.map((item) => item.trigger));
+  const residual = matches
+    .map((match) => ({ ...match, reasons: match.reasons.filter((reason) => ranTriggers.has(reason.trigger)) }))
+    .filter((match) => match.reasons.length > 0);
+  if (residual.length === 0) return;
+
+  io.stdout.write("Still actionable after run:\n");
+  for (const match of residual) {
+    io.stdout.write(`${formatMatchLines(match).join("\n")}\n`);
+  }
 }
 
 async function scanForOptions(options, io, config) {
@@ -238,7 +257,7 @@ async function buildAgentPrompt(options, matches, config) {
   const triggers = normalizeTriggers(config.triggers);
   const triggerDisplay = triggers.map((trigger) => `@${trigger}`).join(", ");
   const humanLabel = normalizeHumanLabel(options.humanLabel ?? DEFAULT_HUMAN_LABEL);
-  const files = matches.map(formatPromptMatch).join("\n");
+  const files = matches.map((match) => formatMatchLines(match).join("\n")).join("\n");
   const cliPreprompt = await loadPreprompt();
   const skillPath = await resolveSkillPath();
   const humanLabelInstruction = options.humanLabelProvided
@@ -324,31 +343,6 @@ async function doctorCommand(options, io) {
   }
   io.stdout.write(`${lines.join("\n")}\n`);
   return problems.length === 0 ? 0 : 1;
-}
-
-function formatPromptMatch(match) {
-  const lines = [`- ${match.relativePath}`];
-  for (const reason of match.reasons) {
-    lines.push(`  - ${reason.kind} line ${reason.line} @${reason.trigger}`);
-  }
-  return lines.join("\n");
-}
-
-function formatScan(matches) {
-  if (matches.length === 0) {
-    return "No actionable mdac comments found.\n";
-  }
-
-  const noun = matches.length === 1 ? "file" : "files";
-  const lines = [`Found ${matches.length} actionable ${noun}:`];
-  for (const match of matches) {
-    lines.push(`- ${match.relativePath}`);
-    for (const reason of match.reasons) {
-      lines.push(`  - ${reason.kind} line ${reason.line} @${reason.trigger}`);
-    }
-  }
-  lines.push("");
-  return `${lines.join("\n")}`;
 }
 
 function parseTriggerList(value) {
