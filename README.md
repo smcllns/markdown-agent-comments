@@ -186,9 +186,9 @@ The callout should preserve the trigger and request text, plus only the surround
 
 ## Security Model
 
-`mdac run` and `mdac watch` turn markdown content into agent prompts, and the built-in routes run agents with auto-accepted edits (`claude -p --permission-mode acceptEdits`, `codex exec --full-auto`). That means:
+`mdac run` and `mdac watch` turn markdown content into agent prompts, and the built-in Claude and Codex routes run agents with auto-accepted edits (`claude -p --permission-mode acceptEdits`, `codex exec --full-auto`). That means:
 
-- **Any text that lands in a watched folder becomes an agent prompt.** Pasted terminal output, synced notes, downloaded files, or content other people can write into shared folders may contain instructions the agent will follow with edit permissions in that folder.
+- **Any actionable `@agent` comment in watched markdown becomes an agent prompt.** Pasted terminal output, synced notes, downloaded files, or content other people can write into shared folders may contain trigger-shaped instructions the agent will follow with edit permissions in that folder.
 - The agent runs with its working directory set to the scanned folder, so its file access is whatever your agent CLI allows from there.
 
 Practical guidance:
